@@ -1,0 +1,23 @@
+{
+  "name": "fansunite-core",
+  "version": "0.0.0",
+  "description": "Fansunite Protocol Core Smart Contracts",
+  "main": "truffle.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fansunite12/fansunite-core.git"
+  },
+  "author": "Fansunite Entertainment Inc",
+  "license": "MIT",
+  "bugs": {
+    "url": "https:/github.com/fansunite12/fansunite-core/issues"
+  },
+  "homepage": "https://github.com/fansunite12/fansunite-core#readme",
+  "devDependencies": {
+    "eslint": "^5.0.0"
+  }
+}
