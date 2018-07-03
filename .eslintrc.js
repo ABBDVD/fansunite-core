@@ -3,9 +3,11 @@ module.exports = {
   "rules": {
     "indent": ["error", 2],
     "semi": ["error", "always"],
-    "comma-dangle": ["error", "always"]
+    "comma-dangle": ["error", "never"]
   },
   "globals" : {
-    "artifacts": false
+    "artifacts": false,
+    "module": false,
+    "process": false
   }
 };

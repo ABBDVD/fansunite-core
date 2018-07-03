@@ -31,5 +31,5 @@ node_modules/
 .env
 
 # Project Specific
-build
+build/
 TODO.md
