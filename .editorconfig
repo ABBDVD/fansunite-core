@@ -5,8 +5,15 @@ root = true
 
 # All files
 [*]
-end_of_line = lf
+end_of_line = crlf
 insert_final_newline = true
 charset = utf-8
 indent_style = space
+
+# JS
+[*.{json,js,ts}]
+indent_size = 2
+
+# Solidity
+[*.sol]
 indent_size = 2
