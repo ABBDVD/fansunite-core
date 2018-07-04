@@ -7,10 +7,10 @@ cache:
 env:
   - SOLIDITY_COVERAGE=false
 install:
-  - npm install
+  - yarn
 before_script:
 - truffle version
 script:
-  - npm test
+  - yarn test
 after_script:
-  - npm run coverage && cat coverage/lcov.info | node_modules/.bin/coveralls
+  - yarn coverage && cat coverage/lcov.info | node_modules/.bin/coveralls
