@@ -8,6 +8,9 @@ module.exports = {
   "globals" : {
     "artifacts": false,
     "module": false,
-    "process": false
+    "process": false,
+    "contract": false,
+    "assert": false,
+    "it": false
   }
 };
