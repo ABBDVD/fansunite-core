@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/FansUnite12/fansunite-core.svg?branch=master)](https://travis-ci.org/fansunite12/fansunite-core)
+[![Build Status](https://travis-ci.org/FansUnite12/fansunite-core.svg?branch=master)](https://travis-ci.org/FansUnite12/fansunite-core)
 [![Coverage Status](https://coveralls.io/repos/github/FansUnite12/fansunite-core/badge.svg?branch=master)](https://coveralls.io/github/FansUnite12/fansunite-core?branch=master)
 
 ![Fansunite logo](fansunite.png)
