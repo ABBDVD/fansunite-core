@@ -7,6 +7,7 @@
     "test": "test"
   },
   "scripts": {
+    "coverage": "scripts/coverage.sh",
     "test": "scripts/test.sh",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -32,8 +33,10 @@
   },
   "homepage": "https://github.com/fansunite12/fansunite-core#readme",
   "devDependencies": {
+    "coveralls": "^3.0.2",
     "eslint": "^5.0.0",
     "ganache-cli": "^6.1.4",
+    "solidity-coverage": "^0.5.5",
     "solium": "^1.1.7",
     "truffle": "^4.1.13"
   }
