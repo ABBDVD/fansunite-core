@@ -20,7 +20,9 @@
     "migrate:development": "truffle migrate --network=development --reset --all",
     "migrate:ropsten": "truffle migrate --network=ropsten --reset --all",
     "migrate:kovan": "truffle migrate --network=kovan --reset --all",
-    "migrate:mainnet": "truffle migrate --network=mainnet"
+    "migrate:mainnet": "truffle migrate --network=mainnet",
+    "console:development": "truffle console --network=development",
+    "console:kovan": "truffle console --network=kovan"
   },
   "repository": {
     "type": "git",
