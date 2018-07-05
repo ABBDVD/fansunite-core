@@ -17,12 +17,11 @@
     "lint:all:fix": "npm run lint:fix && npm run lint:sol:fix",
     "ganache-cli": "node_modules/.bin/ganache-cli -i 15 --gasLimit 90000000",
     "compile": "truffle compile --optimize-runs 200",
-    "migrate:development": "truffle migrate --network=development --reset --all",
+    "migrate:dev": "truffle migrate --network=dev --reset --all",
     "migrate:ropsten": "truffle migrate --network=ropsten --reset --all",
     "migrate:kovan": "truffle migrate --network=kovan --reset --all",
     "migrate:mainnet": "truffle migrate --network=mainnet",
-    "console:development": "truffle console --network=development",
-    "console:kovan": "truffle console --network=kovan"
+    "console:dev": "truffle console --network=dev"
   },
   "repository": {
     "type": "git",
