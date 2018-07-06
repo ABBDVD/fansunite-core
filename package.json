@@ -40,5 +40,8 @@
     "solidity-coverage": "^0.5.5",
     "solium": "^1.1.7",
     "truffle": "^4.1.13"
+  },
+  "dependencies": {
+    "openzeppelin-solidity": "1.10.0"
   }
 }
