@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-import "./ConvertLib.sol";
+import "../libraries/ConvertLib.sol";
 
 contract MetaCoin {
   mapping (address => uint) balances;
