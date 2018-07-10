@@ -5,7 +5,7 @@ import "../introspection/ERC165.sol";
 /**
  * @title Interface for all FansUnite registry contracts
  */
-contract IRegistry is ERC165 {
+contract IRegistry {
 
   /**
    * @notice get the contract address

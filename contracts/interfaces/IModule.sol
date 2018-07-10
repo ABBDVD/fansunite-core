@@ -5,6 +5,6 @@ import "../introspection/ERC165.sol";
 /**
  * @title Interface for all FansUnite registry contracts
  */
-contract IModule is ERC165 {
+contract IModule {
 
 }
