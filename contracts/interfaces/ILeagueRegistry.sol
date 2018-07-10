@@ -11,7 +11,7 @@ contract ILeagueRegistry {
 
   bytes32 public leagueFactoryVersion = "0.0.1";
 
-  // version to LeagueFactory (used in createLeague)
+  // version to LeagueFactory
   mapping (bytes32 => address) public leagueFactories;
 
   // Symbol/Name to league address: TODO - yet to formalize
@@ -25,7 +25,7 @@ contract ILeagueRegistry {
    */
   function createLeague(string _name, string _symbol, string _leagueDetails) public;
 
-  function setLeagueVersion(address _leagueFactory, bytes32 _version) public;
+  function setLeagueFactoryVersion(address _leagueFactory, bytes32 _version) public;
 
   /**
    * @notice Get league address by symbol

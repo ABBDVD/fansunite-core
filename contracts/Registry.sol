@@ -7,7 +7,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 /**
  * @title Registry Contract
  */
-contract Registry is IRegistry, Ownable {
+contract Registry is Ownable, IRegistry {
 
   /*
   Valid Address Keys
