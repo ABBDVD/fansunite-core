@@ -1,12 +1,13 @@
 pragma solidity ^0.4.24;
 
 import "./interfaces/IRegistry.sol";
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 
 /**
  * @title Registry Contract
  */
-contract Registry is IRegistry {
+contract Registry is IRegistry, Ownable {
 
   /*
   Valid Address Keys

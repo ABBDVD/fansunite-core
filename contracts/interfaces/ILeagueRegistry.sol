@@ -4,8 +4,8 @@ import "./ILeague.sol";
 
 /**
  * @title Interface for the fansunite league registry contract
- * @dev LeagueRegistry should store all the league contracts on the
- *      FansUnite Platform
+ * @dev LeagueRegistry stores all the league contracts on the FansUnite Platform
+ * @dev LeagueRegistry stores addresses to versioned LeagueFactory contracts to deploy new leagues
  */
 contract ILeagueRegistry {
 
@@ -39,5 +39,5 @@ contract ILeagueRegistry {
   * @param _leagueAddress Address of the league
   * @return bool
   */
-  function isRegisteredLeague(address _securityToken) public view returns (bool);
+  function isRegisteredLeague(address _leagueAddress) public view returns (bool);
 }
