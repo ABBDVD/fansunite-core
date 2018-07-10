@@ -42,6 +42,8 @@
     "truffle": "^4.1.13"
   },
   "dependencies": {
-    "openzeppelin-solidity": "1.10.0"
+    "bignumber.js": "^7.2.1",
+    "openzeppelin-solidity": "1.10.0",
+    "web3": "^1.0.0-beta.34"
   }
 }

@@ -1,4 +1,4 @@
-var MetaCoin = artifacts.require("./MetaCoin.sol");
+let MetaCoin = artifacts.require("./MetaCoin.sol");
 
 contract('MetaCoin', function(accounts) {
 
@@ -14,9 +14,9 @@ contract('MetaCoin', function(accounts) {
   });
 
   it("should call a function that depends on a linked library", function() {
-    var meta;
-    var metaCoinBalance;
-    var metaCoinEthBalance;
+    let meta;
+    let metaCoinBalance;
+    let metaCoinEthBalance;
 
     return MetaCoin.deployed()
       .then(function(instance) {
@@ -36,18 +36,18 @@ contract('MetaCoin', function(accounts) {
   });
 
   it("should send coin correctly", function() {
-    var meta;
+    let meta;
 
     // Get initial balances of first and second account.
-    var account_one = accounts[0];
-    var account_two = accounts[1];
+    let account_one = accounts[0];
+    let account_two = accounts[1];
 
-    var account_one_starting_balance;
-    var account_two_starting_balance;
-    var account_one_ending_balance;
-    var account_two_ending_balance;
+    let account_one_starting_balance;
+    let account_two_starting_balance;
+    let account_one_ending_balance;
+    let account_two_ending_balance;
 
-    var amount = 10;
+    let amount = 10;
 
     return MetaCoin.deployed()
       .then(function(instance) {

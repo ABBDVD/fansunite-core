@@ -10,15 +10,23 @@ Fansunite Core defines a protocol to facilitate trustless wagering of any ERC20 
 # The Fansunite Core Architecture
 
 ## Components
-### Betting Interface
+### Registry
 [TODO: Team]
 
-### League Interface
+### BetManager
 [TODO: Team]
 
-### SportsRegistry Interface
+### LeagueRegistry
 [TODO: Team]
 
-### Resolution Interface
+### LeagueFactory
 [TODO: Team]
 
+### ModuleFactory
+[TODO: Team]
+
+#### ResolverModule
+[TODO: Team]
+
+#### BetCheckerModule
+[TODO: Team]
