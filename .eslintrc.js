@@ -11,6 +11,10 @@ module.exports = {
     "process": false,
     "contract": false,
     "assert": false,
-    "it": false
+    "it": false,
+    "require": false
+  },
+  "parserOptions": {
+    "ecmaVersion": 2017
   }
 };

@@ -7,5 +7,5 @@ module.exports = function(deployer) {
   deployer.link(ConvertLib, MetaCoin);
   deployer.deploy(MetaCoin);
 
-  deployer.deploy(Registry)
+  deployer.deploy(Registry);
 };
