@@ -1,5 +1,4 @@
 pragma solidity ^0.4.24;
-pragma experimental ABIEncoderV2;
 
 import "./ILeague.sol";
 
@@ -7,13 +6,12 @@ import "./ILeague.sol";
 /**
  * @title Interface for the fansunite league registry contract
  * @dev LeagueRegistry stores all the league contracts on the FansUnite Platform
- * @dev LeagueRegistry stores addresses to versioned LeagueFactory contracts to deploy new leagues
+ * @dev LeagueRegistry stores addresses to versioned factories responsible for deploying new league contracts
  */
 contract ILeagueRegistry {
 
   bytes32 public leagueFactoryVersion = "0.0.1";
   mapping (bytes32 => address) public leagueFactories;
-
 
   /**
    * @notice Creates a new League Contract and saves it to the registry
@@ -21,46 +19,46 @@ contract ILeagueRegistry {
    * @param _name Name of the League (eg. Shanghai Masters)
    * @param _leagueDetails off-chain details of the league (eg. IPFS hash)
    */
-  function createLeague(string _class, string _name, string _leagueDetails) public;
+  function createLeague(bytes32 _class, byte[64] _name, bytes32 _leagueDetails) public;
 
   /**
-   * @notice Updates leagueFactoryVersion and the corresponding factory address
+   * @notice Updates leagueFactoryVersion to `_version` and factoryAddress to `_leagueFactory`
    * @param _leagueFactory Address of the LeagueFactory for `_version`
    * @param _version Version string for leagueFactory
    */
   function setLeagueFactoryVersion(address _leagueFactory, bytes32 _version) public;
 
   /**
-   * @notice Get league addresses by class
+   * @notice Get all leagues in `_class`
    * @param _class Class of the leagues
-   * @return address[]
+   * @return leagueIds, addresses, names and details for all leagues in `_class`
    */
-  function getLeagueAddresses(string _class) public view returns (address[]);
+  function getLeagues(bytes32 _class) public view returns (uint[], address[], byte[64][], bytes32[]);
 
   /**
-   * @notice Get league address by name
-   * @param _name Name of the league
-   * @return address
+   * @notice Get league by `_id`
+   * @param _id id of the league
+   * @return leagueId, address, name and details for league with id `_id`
    */
-  function getLeagueAddress(string _name) public view returns (address);
+  function getLeague(uint _id) public view returns (uint, address, byte[64], bytes32);
 
   /**
    * @notice Get classes supported by FansUnite
-   * @return string[]
+   * @return bytes32[] all classes on the FansUnite platform
    */
-  function getClasses() public view returns (string[]);
+  function getClasses() public view returns (bytes32[]);
 
   /**
-   * @notice Check if league is registered
-   * @param _name Name of the league
-   * @return bool
+   * @notice Check if league with address `_leagueAddress` is registered with FansUnite
+   * @param _leagueAddress address of the league
+   * @return true if `_leagueAddress` is registered with FansUnite, false otherwise
    */
-  function isRegisteredLeague(address _name) public view returns (bool);
+  function isLeagueRegistered(address _leagueAddress) public view returns (bool);
 
   /**
-   * @notice Check if class is registered
+   * @notice Check if class `_class` is supported by FansUnite
    * @param _class Any class
-   * @return bool
+   * @return true if `_class` is supported by FansUnite, false otherwise
    */
-  function isRegisteredClass(address _class) public view returns (bool);
+  function isClassSupported(bytes32 _class) public view returns (bool);
 }
