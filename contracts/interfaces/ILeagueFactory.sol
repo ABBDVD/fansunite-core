@@ -9,5 +9,5 @@ contract ILeagueFactory {
    * @notice deploys the league and adds default resolver modules.
    * Future versions of the factory can attach different modules or pass some other parameters.
    */
-  function deployLeague(string _name, string _symbol, string _leagueDetails) external returns (address);
+  function deployLeague(byte[64] _name, string _leagueDetails) external returns (address);
 }
