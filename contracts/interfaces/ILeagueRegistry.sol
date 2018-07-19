@@ -10,8 +10,11 @@ import "./ILeague.sol";
  */
 contract ILeagueRegistry {
 
-  bytes32 public leagueFactoryVersion = "0.0.1";
-  mapping (bytes32 => address) public leagueFactories;
+  /**
+   * @notice Creates a new league class
+   * @param _class Class of the league (eg. tennis)
+   */
+  function createClass(bytes32 _class) external;
 
   /**
    * @notice Creates a new League Contract and saves it to the registry
@@ -22,24 +25,24 @@ contract ILeagueRegistry {
   function createLeague(bytes32 _class, byte[64] _name, bytes32 _leagueDetails) external;
 
   /**
+   * @notice Updates leagueFactoryVersion to `_version` and factoryAddress to `_leagueFactory`
+   * @param _leagueFactory Address of the LeagueFactory for `_version`
+   * @param _version Version string for leagueFactory
+   */
+  function setLeagueFactoryVersion(address _leagueFactory, bytes32 _version) external;
+
+  /**
    * @notice Get the current version used to deploy new leagues contracts
    * @return current LeagueFactory version
    */
-  function leagueFactoryVersion() external view returns (bytes32);
+  function getFactoryVersion() external view returns (bytes32);
 
   /**
    * @notice Get LeagueFactory contract address for version `_version`
    * @param _version Version string for leagueFactory
    * @return address of the LeagueFactory contract for version `_version`
    */
-  function leagueFactoryVersion(bytes32 _version) external view returns (address);
-
-  /**
-   * @notice Updates leagueFactoryVersion to `_version` and factoryAddress to `_leagueFactory`
-   * @param _leagueFactory Address of the LeagueFactory for `_version`
-   * @param _version Version string for leagueFactory
-   */
-  function setLeagueFactoryVersion(address _leagueFactory, bytes32 _version) external;
+  function getFactory(bytes32 _version) external view returns (address);
 
   /**
    * @notice Get all leagues in `_class`

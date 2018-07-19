@@ -7,21 +7,26 @@ pragma solidity ^0.4.24;
 contract ILeague {
 
   /*
+   * Definition:
    *
-   * events by season
-   * global Participants
-   * global resolvers
+   * startSeason
+   * scheduleFixture
+   * addToLineup
+   * addModule
+   * pushResolution
    *
-   * TODO: Map out functions and ILeague structure
+   * getSeasons
+   * getLiveSeason
+   * getFixtures
+   * getLineup
+   * getResolution
+   * isModuleRegistered
+   * isFixtureScheduled
+   * isInLineup
    *
-   * addEvent
-   * addParticipant
-   * addResolver
-   * getEvents
-   * getParticipants
-   * getEvent
-   * getParticipant
-   *
+   * getName
+   * getClass
+   * getDetails
    */
 
 }
