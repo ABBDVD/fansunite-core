@@ -5,8 +5,8 @@ import "../interfaces/ILeagueFactory.sol";
 
 
 /**
-* @title League Contract
-*/
-contract League is ERC165, ILeagueFactory {
+ * @title League Contract
+ */
+contract LeagueFactory001 is ERC165, ILeagueFactory {
 
 }

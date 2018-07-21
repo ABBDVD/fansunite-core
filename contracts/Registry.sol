@@ -21,7 +21,7 @@ contract Registry is Ownable, IRegistry {
   mapping (bytes32 => address) public storedAddresses;
   mapping (bytes32 => bool) public validAddressKeys;
 
-  event LogChangeAddress(string _nameKey, address indexed _oldAddress, address indexed _newAddress);
+  event LogChangeAddress(string _nameKey, address indexed _old, address indexed _new);
 
   /**
    * @notice Get the contract address

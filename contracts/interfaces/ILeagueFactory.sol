@@ -12,5 +12,7 @@ contract ILeagueFactory {
    * @param _name Name of the league (approved by LeagueRegistry)
    * @param _leagueDetails off-line details of the league
    */
-  function deployLeague(bytes32 _class, byte[64] _name, bytes32 _leagueDetails) external returns (address);
+  function deployLeague(bytes32 _class, byte[64] _name, bytes32 _leagueDetails)
+    external
+    returns (address);
 }

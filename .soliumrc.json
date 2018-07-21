@@ -5,6 +5,7 @@
   ],
   "rules": {
     "quotes": ["error", "double"],
-    "indentation": ["error", 2]
+    "indentation": ["error", 2],
+    "max-len": ["error", 99]
   }
 }
