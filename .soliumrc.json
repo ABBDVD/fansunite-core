@@ -4,8 +4,20 @@
     "security"
   ],
   "rules": {
-    "quotes": ["error", "double"],
-    "indentation": ["error", 2],
-    "max-len": ["error", 99]
+    "quotes": [
+      "error",
+      "double"
+    ],
+    "indentation": [
+      "error",
+      2
+    ],
+    "max-len": [
+      "error",
+      99
+    ],
+    "no-empty-blocks": [
+      "off"
+    ]
   }
 }

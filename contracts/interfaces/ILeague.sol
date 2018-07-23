@@ -13,7 +13,7 @@ contract ILeague {
    * @dev fails if `_resolver` is not registered with FansUnite
    * @param _resolver Address of the resolver contract
    */
-  function addResolver(address _resolver) external;
+  function registerResolver(address _resolver) external;
 
   /**
    * @notice Adds a resolution payload for fixture with id `_fixtureId` and resolver `_resolver`
