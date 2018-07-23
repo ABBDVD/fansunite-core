@@ -10,7 +10,7 @@ contract ILeague {
 
   /**
    * @notice Adds resolver with address `_resolver` to league
-   * @dev fails if `_resolver` is not registered with FansUnite
+   * @dev fails if `_resolver` is not registered with FansUnite's Resolver Registry
    * @param _resolver Address of the resolver contract
    */
   function registerResolver(address _resolver) external;
@@ -24,6 +24,12 @@ contract ILeague {
   function pushResolution(uint _fixtureId, address _resolver, bytes _payload) external;
 
   /**
+   * @notice Sets league details
+   * @param _details IPFS hash with league details
+   */
+  function setDetails(bytes _details) external;
+
+  /**
    * @notice Gets resolution payload for fixture `_fixtureId` and resolver `_resolver`
    * @dev Requires the fixture `_fixtureId` to be resolved for resolver `_resolver`
    * @param _fixtureId Id of the payload's corresponding fixture
@@ -31,7 +37,6 @@ contract ILeague {
    * @return Resolution payload for fixture `_fixtureId` and resolver `_resolver`
    */
   function getResolution(uint _fixtureId, address _resolver) external view returns (bytes);
-
 
   /**
    * @notice Checks if resolver with address `_resolver` is registered with league
@@ -67,22 +72,20 @@ contract ILeague {
 
   /**
    * @notice Gets the name of the league
-   * @dev FansUnite will always set a UTF-8 encoded name
    * @return UTF-8 encoded name of league
    */
-  function getName() external view returns (byte[64]);
+  function getName() external view returns (string);
 
   /**
    * @notice Gets the class of the league
-   * @dev FansUnite will always set an UTF8 encoded class
    * @return UTF-8 encoded class of league
    */
-  function getClass() external view returns (bytes32);
+  function getClass() external view returns (string);
 
   /**
    * @notice Gets the league details
-   * @return Off-line IPFS hash with league details
+   * @return IPFS hash with league details
    */
-  function getDetails() external view returns (bytes32);
+  function getDetails() external view returns (bytes);
 
 }

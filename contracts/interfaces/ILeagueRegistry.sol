@@ -15,7 +15,7 @@ contract ILeagueRegistry {
    * @notice Creates a new league class
    * @param _class Class of the league (eg. tennis)
    */
-  function createClass(bytes32 _class) external;
+  function createClass(string _class) external;
 
   /**
    * @notice Creates a new League Contract and saves it to the registry
@@ -23,63 +23,54 @@ contract ILeagueRegistry {
    * @param _name Name of the League (eg. Shanghai Masters)
    * @param _leagueDetails Off-chain details of the league (eg. IPFS hash)
    */
-  function createLeague(bytes32 _class, byte[64] _name, bytes32 _leagueDetails) external;
+  function createLeague(string _class, string _name, bytes _leagueDetails) external;
 
   /**
    * @notice Updates leagueFactoryVersion to `_version` and factoryAddress to `_leagueFactory`
    * @param _leagueFactory Address of the LeagueFactory for `_version`
    * @param _version Version string for leagueFactory
    */
-  function setLeagueFactoryVersion(address _leagueFactory, bytes32 _version) external;
+  function setLeagueFactoryVersion(address _leagueFactory, string _version) external;
 
   /**
-   * @notice Gets classes supported by FansUnite
-   * @return bytes32[] all classes on the FansUnite platform
+   * @notice Gets Class with id `_id`
+   * @param _id id of the class
+   * @return id, name and ids of leagues in class with id `_id`
    */
-  function getClasses() external view returns (bytes32[]);
+  function getClass(uint _id) external view returns (uint, string, uint[]);
 
   /**
-   * @notice Gets all leagues in `_class`
-   * @param _class Class of the leagues
-   * @return leagueIds, addresses, names and details for all leagues in `_class`
-   */
-  function getLeagues(bytes32 _class)
-    external
-    view
-    returns (uint[], address[], byte[64][], bytes32[]);
-
-  /**
-   * @notice Gets league by `_id`
+   * @notice Gets league with id `_id`
    * @param _id id of the league
    * @return leagueId, address, name and details for league with id `_id`
    */
-  function getLeague(uint _id) external view returns (uint, address, byte[64], bytes32);
+  function getLeague(uint _id) external view returns (uint, address, string, bytes);
 
   /**
    * @notice Gets the current version used to deploy new leagues contracts
    * @return current LeagueFactory version
    */
-  function getFactoryVersion() external view returns (bytes32);
+  function getFactoryVersion() external view returns (string);
 
   /**
    * @notice Gets LeagueFactory contract address for version `_version`
+   * @dev fails if `_version` does not match any
    * @param _version Version string for leagueFactory
    * @return address of the LeagueFactory contract for version `_version`
    */
-  function getFactory(bytes32 _version) external view returns (address);
-
+  function getFactory(string _version) external view returns (address);
 
   /**
-   * @notice Checks if league with address `_leagueAddress` is registered with FansUnite
-   * @param _leagueAddress address of the league
-   * @return true if `_leagueAddress` is registered with FansUnite, false otherwise
+   * @notice Checks if league with address `_league` is registered with FansUnite
+   * @param _league address of the league
+   * @return true if `_league` is registered with FansUnite, false otherwise
    */
-  function isLeagueRegistered(address _leagueAddress) external view returns (bool);
+  function isLeagueRegistered(address _league) external view returns (bool);
 
   /**
    * @notice Checks if class `_class` is supported by FansUnite
    * @param _class Any class
    * @return true if `_class` is supported by FansUnite, false otherwise
    */
-  function isClassSupported(bytes32 _class) external view returns (bool);
+  function isClassSupported(string _class) external view returns (bool);
 }

@@ -1,5 +1,4 @@
 pragma solidity ^0.4.24;
-pragma experimental ABIEncoderV2;
 
 import "../interfaces/ILeague.sol";
 
@@ -12,7 +11,7 @@ contract ILeague001 is ILeague {
 
   /**
    * @notice Starts a new season with year `_year`
-   * @param _year Year of the first event in new season
+   * @param _year Year of the first fixture in new season
    */
   function startSeason(uint16 _year) external;
 
@@ -28,95 +27,33 @@ contract ILeague001 is ILeague {
    * @param _name Name of the participant - should match pattern /[a-zA-Z ]+/
    * @param _details Off-line hash of participant details
    */
-  function addParticipant(bytes32 _name, bytes32 _details) external;
-
-  /**
-   * @notice Adds resolver with address `_resolver` to league, if registered with FansUnite
-   * @param _resolver Address of the resolver contract
-   */
-  function addResolver(address _resolver) external;
-
-  /**
-   * @notice Adds a resolution payload for event with id `_eventId` and resolver `_resolver`
-   * @param _eventId Id of the event being resolved
-   * @param _resolver Address of the resolver that can resolve _payload
-   * @param _payload Encoded resolution payload
-   */
-  function pushResolution(uint _eventId, address _resolver, bytes _payload) external;
+  function addParticipant(string _name, bytes _details) external;
 
   /**
    * @notice Gets a list of all seasons in league
-   * @return uint16[] years of all seasons
+   * @return uint16[] years of all seasons for league
    */
   function getSeasons() external view returns (uint16[]);
 
   /**
    * @notice Gets the on-going season
-   * @return Year of the on-going season, if any, 0 otherwise
+   * @return Year of the on-going season, if any, 0 otherwise and ids fixtures scheduled
+   *     for on-going season
    */
-  function getLiveSeason() external view returns (uint16);
+  function getLiveSeason() external view returns (uint16, uint[]);
 
   /**
-   * @notice Gets all the scheduled fixtures for `_season`
-   *
-   *
+   * @notice Gets scheduled fixture with id `_id`
+   * @param _id Id of the scheduled fixture
+   * @return fixture id, participant ids and start time
    */
-  function getFixtures(uint16 _season) external view returns (uint[][], uint[]);
+  function getFixture(uint _id) external view returns (uint, uint[], uint);
 
   /**
-   *
-   *
-   *
+   * @notice Gets participant in league with id `_id`
+   * @param _id Id of the participant
+   * @return id, name and details of Participant
    */
-  function getParticipants() external view returns (bytes32[], bytes32[]);
-
-  /**
-   *
-   *
-   *
-   */
-  function getResolution(/* TODO */) external view;
-
-  /**
-   *
-   *
-   *
-   */
-  function isFixtureScheduled(/* TODO */) external view;
-
-  /**
-   *
-   *
-   *
-   */
-  function isParticipant(/* TODO */) external view;
-
-  /**
-   *
-   *
-   *
-   */
-  function isResolverRegistered(/* TODO */) external view;
-
-  /**
-   *
-   *
-   *
-   */
-  function getName() external view returns (byte[64]);
-
-  /**
-   *
-   *
-   *
-   */
-  function getClass() external view returns (bytes32);
-
-  /**
-   *
-   *
-   *
-   */
-  function getDetails() external view returns (bytes32);
+  function getParticipant(uint _id) external view returns (uint, string, bytes);
 
 }

@@ -7,12 +7,13 @@ contract ILeagueFactory {
 
   /**
    * @notice deploys the league and adds default resolver modules.
-   * Future versions of the factory can attach different modules or pass some other parameters.
+   * @dev Future versions of the factory can attach different modules or pass some other parameters.
    * @param _class Class of the league
    * @param _name Name of the league (approved by LeagueRegistry)
    * @param _leagueDetails off-line details of the league
+   * @return Address of the created league contract
    */
-  function deployLeague(bytes32 _class, byte[64] _name, bytes32 _leagueDetails)
+  function deployLeague(string _class, string _name, string _details)
     external
     returns (address);
 }
