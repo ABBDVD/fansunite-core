@@ -23,15 +23,9 @@ Fansunite Core defines a protocol to facilitate trustless wagering of any ERC20 
 ### LeagueRegistry
 [TODO: Team]
 
-### Modules
+### Resolvers
 [TODO: Team]
 
-#### ResolverModule
-[TODO: Team]
-
-#### BetCheckerModule
-[TODO: Team]
-
-### ModuleRegistry
+### ResolverRegistry
 [TODO: Team]
 

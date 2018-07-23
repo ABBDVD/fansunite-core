@@ -1,8 +1,7 @@
 pragma solidity ^0.4.24;
 
-import "./interfaces/IRegistry.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-
+import "./interfaces/IRegistry.sol";
 
 /**
  * @title Registry Contract
@@ -12,7 +11,7 @@ contract Registry is Ownable, IRegistry {
   /*
   Valid Address Keys
   leagueRegistry = getAddress("LeagueRegistry")
-  moduleRegistry = getAddress("ModuleRegistry")
+  resolverRegistry = getAddress("ResolverRegistry")
   fanToken = getAddress("FanToken")
   betManager = getAddress("BetManager")
   fanVault = getAddress("FanVault")
