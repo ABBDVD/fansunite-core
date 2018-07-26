@@ -25,7 +25,7 @@ contract Registry is Ownable, IRegistry {
   /**
    * @notice Get the contract address
    * @param _nameKey is the key for the contract address mapping
-   * @return address
+   * @return Address of contract with namekey `_namekey`
    */
   function getAddress(string _nameKey) public view returns (address) {
     require(validAddressKeys[keccak256(bytes(_nameKey))]);

@@ -4,7 +4,7 @@ pragma solidity ^0.4.24;
 /**
  * @title Interface for a fansunite league contract
  * @dev League contract is a store of seasons, fixtures, participants, resolvers and resolution
- *     payloads
+ *  payloads
  */
 contract ILeague {
 
@@ -41,14 +41,14 @@ contract ILeague {
   /**
    * @notice Checks if resolver with address `_resolver` is registered with league
    * @param _resolver Address of the resolver
-   * @return True if resolver is registered with league, false otherwise
+   * @return `true` if resolver is registered with league, `false` otherwise
    */
   function isResolverRegistered(address _resolver) external view returns (bool);
 
   /**
    * @notice Checks if fixture with id `_id` has been scheduled in league
    * @param _id Id of the fixture
-   * @return True if fixture with id `_id` is scheduled, false otherwise
+   * @return `true` if fixture with id `_id` is scheduled, `false` otherwise
    */
   function isFixtureScheduled(uint _id) external view returns (bool);
 
@@ -58,15 +58,15 @@ contract ILeague {
    * @dev It is possible that some resolvers do not get resolution payloads from oracles
    * @param _id Id of the fixture
    * @param _resolver Address of the resolver
-   * @return 0 if fixture is not resolved, 1 if fixture is resolved and for resolver `_resolver`,
-   *     2 if fixture is resolved but resolver `_resolver
+   * @return `0` if fixture is not resolved, `1` if fixture is resolved and for resolver `_resolver`,
+   *  `2` if fixture is resolved but resolver `_resolver
    */
   function isFixtureResolved(uint _id, address _resolver) external view returns (uint8);
 
   /**
    * @notice Checks if participant id `_id` is valid
    * @param _id Id of the participant
-   * @return True if participant id `_id` is valid, false otherwise
+   * @return `true` if participant id `_id` is valid, `false` otherwise
    */
   function isParticipant(uint _id) external view returns (bool);
 
@@ -87,5 +87,11 @@ contract ILeague {
    * @return IPFS hash with league details
    */
   function getDetails() external view returns (bytes);
+
+  /**
+   * @notice Gets the league version (matches LeagueFactory version)
+   * @return Version of the league protocol
+   */
+  function getVersion() external view returns (string);
 
 }
