@@ -14,6 +14,9 @@ Fansunite Core defines a protocol to facilitate trustless wagering of any ERC20 
 ### BetManager
 [TODO: Team]
 
+### Vault
+[TODO: Team]
+
 ### League
 [TODO: Team]
 
