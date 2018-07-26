@@ -25,14 +25,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fansunite12/fansunite-core.git"
+    "url": "git+https://github.com/fansunite/fansunite-core.git"
   },
   "author": "Fansunite Entertainment Inc",
   "license": "MIT",
   "bugs": {
-    "url": "https:/github.com/fansunite12/fansunite-core/issues"
+    "url": "https:/github.com/fansunite/fansunite-core/issues"
   },
-  "homepage": "https://github.com/fansunite12/fansunite-core#readme",
+  "homepage": "https://github.com/fansunite/fansunite-core#readme",
   "devDependencies": {
     "coveralls": "^3.0.2",
     "eslint": "^5.0.0",

@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.com/FansUnite12/fansunite-core.svg?token=krNWH89TcqzcfjSS8hte&branch=master)](https://travis-ci.com/FansUnite12/fansunite-core)
-[![Coverage Status](https://coveralls.io/repos/github/FansUnite12/fansunite-core/badge.svg?branch=master&t=sjBCiQ)](https://coveralls.io/github/FansUnite12/fansunite-core?branch=master)
+[![Build Status](https://travis-ci.com/fansunite/fansunite-core.svg?token=krNWH89TcqzcfjSS8hte&branch=master)](https://travis-ci.com/fansunite/fansunite-core)
+[![Coverage Status](https://coveralls.io/repos/github/fansunite/fansunite-core/badge.svg?branch=master&t=sjBCiQ)](https://coveralls.io/github/fansunite/fansunite-core?branch=master)
 
 ![Fansunite logo](fansunite.png)
 
