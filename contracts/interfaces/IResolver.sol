@@ -67,7 +67,7 @@ contract IResolver {
   /**
    * @notice Checks whether resolver works with a specific league version
    * @param _version League version
-   * @return True if resolver supports league version `_version`, false otherwise
+   * @return `true` if resolver supports league version `_version`, `false` otherwise
    */
   function doesSupportVersion(string _version) external view returns (bool);
 

@@ -31,28 +31,32 @@ contract ILeague001 is ILeague {
 
   /**
    * @notice Gets a list of all seasons in league
-   * @return uint16[] years of all seasons for league
+   * @return Years of all seasons in league
    */
   function getSeasons() external view returns (uint16[]);
 
   /**
    * @notice Gets the on-going season
-   * @return Year of the on-going season, if any, 0 otherwise and ids fixtures scheduled
-   *     for on-going season
+   * @return Year of the on-going season, if any, 0 otherwise
+   * @return Ids fixtures scheduled in on-going season
    */
   function getLiveSeason() external view returns (uint16, uint[]);
 
   /**
    * @notice Gets scheduled fixture with id `_id`
    * @param _id Id of the scheduled fixture
-   * @return fixture id, participant ids and start time
+   * @return Fixture id
+   * @return Participant Ids
+   * @return Start time
    */
   function getFixture(uint _id) external view returns (uint, uint[], uint);
 
   /**
    * @notice Gets participant in league with id `_id`
    * @param _id Id of the participant
-   * @return id, name and details of Participant
+   * @return Participant Id
+   * @return Participant name
+   * @return Details of Participant (hash)
    */
   function getParticipant(uint _id) external view returns (uint, string, bytes);
 

@@ -38,7 +38,7 @@ contract RMoneyLine is Ownable, IResolver {
    * @notice Returns the Result of a Moneyline bet
    * @param _bWinner bet payload encoded winner participant id (backer's pick)
    * @param _rWinner resolution payload encoded winner participant id (resolution data)
-   * @return 1 if backer loses and 2 if backer wins
+   * @return `1` if backer loses and `2` if backer wins
    */
   function resolve(uint _bWinner, uint _rWinner) external pure returns (uint8) {
     return _bWinner == _rWinner ? 2 : 1;
@@ -46,13 +46,16 @@ contract RMoneyLine is Ownable, IResolver {
 
   /**
    * @notice Check if participant `_winner` is scheduled in fixture `_fixture` in league `_league`
-   * @dev TODO pre:Manan => Finish implementation
    * @param _league League Address to perform validation for
    * @param _fixture Id of fixture
    * @param _winner Id of participant from bet payload
-   * @return True if bet payload valid, false otherwise
+   * @return `true` if bet payload valid, `false` otherwise
    */
-  function validate(address _league, uint _fixture, uint _winner) external view returns (bool);
+  function validate(address _league, uint _fixture, uint _winner) external view returns (bool) {
+    // TODO: pre:Manan => Finish implementation
+    // Stub
+    return true;
+  }
 
   /**
    * @notice Gets the signature of the init function
@@ -91,7 +94,7 @@ contract RMoneyLine is Ownable, IResolver {
   /**
    * @notice Checks whether resolver works with a specific league version
    * @param _version League version
-   * @return True if resolver supports league version `_version`, false otherwise
+   * @return `true` if resolver supports league version `_version`, `false` otherwise
    */
   function doesSupportVersion(string _version) external view returns (bool) {
     return versions[_version];
