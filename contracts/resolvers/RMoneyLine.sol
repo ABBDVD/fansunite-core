@@ -35,6 +35,15 @@ contract RMoneyLine is Ownable, IResolver {
   }
 
   /**
+   * @notice Checks whether resolver works with a specific league version
+   * @param _version League version
+   * @return `true` if resolver supports league version `_version`, `false` otherwise
+   */
+  function doesSupportVersion(string _version) external view returns (bool) {
+    return versions[_version];
+  }
+
+  /**
    * @notice Returns the Result of a Moneyline bet
    * @param _bWinner bet payload encoded winner participant id (backer's pick)
    * @param _rWinner resolution payload encoded winner participant id (resolution data)
@@ -92,12 +101,27 @@ contract RMoneyLine is Ownable, IResolver {
   }
 
   /**
-   * @notice Checks whether resolver works with a specific league version
-   * @param _version League version
-   * @return `true` if resolver supports league version `_version`, `false` otherwise
+   * @notice Gets Resolver's description
+   * @return Description of the resolver
    */
-  function doesSupportVersion(string _version) external view returns (bool) {
-    return versions[_version];
+  function getDescription() external view returns (string) {
+    return "Common MoneyLine Resolver: Betting on who wins the fixture";
+  }
+
+  /**
+   * @notice Gets the bet type the resolver resolves
+   * @return Type of the bet the resolver resolves
+   */
+  function getType() external pure returns (string) {
+    return "Moneyline";
+  }
+
+  /**
+   * @notice Gets the resolver details
+   * @return IPFS hash with resolver details
+   */
+  function getDetails() external view returns (bytes) {
+    return new bytes(0);
   }
 
 }

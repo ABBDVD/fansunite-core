@@ -39,6 +39,13 @@ contract IResolver {
   function supportVersion(string _version) external;
 
   /**
+   * @notice Checks whether resolver works with a specific league version
+   * @param _version League version
+   * @return `true` if resolver supports league version `_version`, `false` otherwise
+   */
+  function doesSupportVersion(string _version) external view returns (bool);
+
+  /**
    * @notice Gets the signature of the init function
    * @return The init function signature compliant with ABI Specification
    */
@@ -65,10 +72,21 @@ contract IResolver {
   function getValidatorSelector() external view returns (bytes4);
 
   /**
-   * @notice Checks whether resolver works with a specific league version
-   * @param _version League version
-   * @return `true` if resolver supports league version `_version`, `false` otherwise
+   * @notice Gets Resolver's description
+   * @return Description of the resolver
    */
-  function doesSupportVersion(string _version) external view returns (bool);
+  function getDescription() external view returns (string);
+
+  /**
+   * @notice Gets the bet type the resolver resolves
+   * @return Type of the bet the resolver resolves
+   */
+  function getType() external pure returns (string);
+
+  /**
+   * @notice Gets the resolver details
+   * @return IPFS hash with resolver details
+   */
+  function getDetails() external view returns (bytes);
 
 }
