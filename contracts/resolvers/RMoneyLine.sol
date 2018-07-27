@@ -6,7 +6,7 @@ import "../interfaces/IResolver.sol";
 
 /**
  * @title MoneyLine Resolver
- * @dev TODO pre:Manan - inherit ERC165
+ * @dev RMoneyLine is a simple Money line contract
  */
 contract RMoneyLine is Ownable, IResolver {
 
@@ -16,13 +16,12 @@ contract RMoneyLine is Ownable, IResolver {
   // Emit when resolver is validated to support new league version
   event LogSupportVersion(string _version);
 
+
   /**
    * @notice Constructor
    * @param _version Base version Resolver supports
    */
-  constructor(string _version) public {
-    versions[_version] = true;
-  }
+  constructor(string _version) public { versions[_version] = true; }
 
   /**
    * @notice Support league version `_version`
@@ -61,8 +60,7 @@ contract RMoneyLine is Ownable, IResolver {
    * @return `true` if bet payload valid, `false` otherwise
    */
   function validate(address _league, uint _fixture, uint _winner) external view returns (bool) {
-    // TODO: pre:Manan => Finish implementation
-    // Stub
+    // TODO: pre:Manan => Finish implementation (blocked by League implementation)
     return true;
   }
 
