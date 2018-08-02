@@ -25,7 +25,7 @@ contract ILeague001 is ILeague {
   /**
    * @notice Adds a new participant to the league
    * @param _name Name of the participant - should match pattern /[a-zA-Z ]+/
-   * @param _details Off-line hash of participant details
+   * @param _details Off-chain hash of participant details
    */
   function addParticipant(string _name, bytes _details) external;
 
