@@ -9,6 +9,8 @@ import "./ILeague001.sol";
  */
 contract League001 is Ownable, ILeague001 {
 
+  // Version of the league
+  string internal version = "0.0.1";
   // Name of the league
   string internal name;
   // Class to which the league belongs
@@ -108,13 +110,15 @@ contract League001 is Ownable, ILeague001 {
    * @param _name Name of the participant - should match pattern /[a-zA-Z ]+/
    * @param _details Off-chain hash of participant details
    */
-  function addParticipant(string _name, bytes _details) external;
+  function addParticipant(string _name, bytes _details) external onlyOwner ;
 
   /**
    * @notice Sets league details
    * @param _details Off-chain hash of league details
    */
-  function setDetails(bytes _details) external;
+  function setDetails(bytes _details) external onlyOwner {
+    details = _details;
+  }
 
   /**
    * @notice Gets resolution payload for fixture `_fixtureId` and resolver `_resolver`
@@ -123,7 +127,14 @@ contract League001 is Ownable, ILeague001 {
    * @param _resolver Address of the payload's corresponding resolver
    * @return Resolution payload for fixture `_fixtureId` and resolver `_resolver`
    */
-  function getResolution(uint _fixtureId, address _resolver) external view returns (bytes);
+  function getResolution(uint _fixtureId, address _resolver) external view returns (bytes) {
+    require(resolved[_fixtureId], "Fixture not resolved.");
+    require(
+      resolutions[_fixtureId][_resolver].length > 0,
+      "No payload provided for given resolver, for given fixture"
+    );
+    return resolutions[_fixtureId][_resolver];
+  }
 
   /**
    * @notice Gets a list of all seasons in league
@@ -161,7 +172,9 @@ contract League001 is Ownable, ILeague001 {
    * @param _resolver Address of the resolver
    * @return `true` if resolver is registered with league, `false` otherwise
    */
-  function isResolverRegistered(address _resolver) external view returns (bool);
+  function isResolverRegistered(address _resolver) external view returns (bool) {
+    return resolvers[_resolver];
+  }
 
   /**
    * @notice Checks if fixture with id `_id` has been scheduled in league
@@ -179,7 +192,13 @@ contract League001 is Ownable, ILeague001 {
    * @return `0` if fixture is not resolved, `1` if fixture is resolved and for resolver `_resolver`,
    *  `2` if fixture is resolved but resolver `_resolver
    */
-  function isFixtureResolved(uint _id, address _resolver) external view returns (uint8);
+  function isFixtureResolved(uint _id, address _resolver) external view returns (uint8) {
+    if (!resolved[_id])
+      return 0;
+    if (resolutions[_id][_resolver].length == 0)
+      return 1;
+    return 2;
+  }
 
   /**
    * @notice Checks if participant id `_id` is valid
@@ -192,24 +211,32 @@ contract League001 is Ownable, ILeague001 {
    * @notice Gets the name of the league
    * @return UTF-8 encoded name of league
    */
-  function getName() external view returns (string);
+  function getName() external view returns (string) {
+    return name;
+  }
 
   /**
    * @notice Gets the class of the league
    * @return UTF-8 encoded class of league
    */
-  function getClass() external view returns (string);
+  function getClass() external view returns (string) {
+    return class;
+  }
 
   /**
    * @notice Gets the league details
    * @return IPFS hash with league details
    */
-  function getDetails() external view returns (bytes);
+  function getDetails() external view returns (bytes) {
+    return details;
+  }
 
   /**
    * @notice Gets the league version (matches LeagueFactory version)
    * @return Version of the league protocol
    */
-  function getVersion() external view returns (string);
+  function getVersion() external view returns (string) {
+    return version;
+  }
 
 }
