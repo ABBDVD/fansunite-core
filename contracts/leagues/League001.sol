@@ -1,6 +1,7 @@
 pragma solidity ^0.4.24;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import { LeagueLib001 as L } from "./LeagueLib001.sol";
 import "./ILeague001.sol";
 
 
@@ -25,6 +26,16 @@ contract League001 is Ownable, ILeague001 {
   mapping(address => bool) internal resolvers;
   // List of resolver addresses registered with league
   address[] internal resolverList;
+  // Season corresponds to `true` if exists, `false` otherwise
+  mapping(uint16 => bool) internal supportedSeasons;
+  // Season corresponds to list of fixture ids
+  mapping(uint16 => uint[]) internal seasons;
+  // List of seasons
+  uint16[] internal seasonList;
+  // List of all fixtures ever in league
+  L.Fixture[] internal fixtures;
+  // List of participants ever played in league
+  L.Participant[] internal participants;
   // Fixture ids correspond to `true` if resolved, `false` if not resolved
   mapping(uint => bool) internal resolved;
   // Resolution payloads by resolver address, by fixture id
@@ -32,6 +43,12 @@ contract League001 is Ownable, ILeague001 {
 
   // Emit when a Fixture is resolved, by resolver
   event LogConsensusContractUpdated(address indexed _old, address indexed _new);
+  // Emit when new season added
+  event LogSeasonAdded(uint16 indexed _year);
+  // Emit when new fixture added
+  event LogFixtureAdded(uint _id);
+  // Emit when new participant added
+  event LogParticipantAdded(uint _id);
   // Emit when a Fixture is resolved, by resolver
   event LogFixtureResolved(uint indexed _fixtureId, address _resolver, bytes _payload);
 
@@ -87,6 +104,9 @@ contract League001 is Ownable, ILeague001 {
     external
     onlyConsensus
   {
+    // TODO:pre:think Manan => Think about case where _payload.length is 0 and payload is 0x00..00
+    require(_fixtureId <= fixtures.length + 1, "Given Fixture is not scheduled in league");
+    require(resolvers[_resolver] == true, "League does not support given resolver");
     if (!resolved[_fixtureId]) resolved[_fixtureId] = true;
     resolutions[_fixtureId][_resolver] = _payload;
     emit LogFixtureResolved(_fixtureId, _resolver, _payload);
@@ -96,21 +116,45 @@ contract League001 is Ownable, ILeague001 {
    * @notice Starts a new season with year `_year`
    * @param _year Year of the first fixture in new season
    */
-  function startSeason(uint16 _year) external;
+  function addSeason(uint16 _year) external {
+    require(supportedSeasons[_year] == true, "Season already supported");
+    supportedSeasons[_year] = true;
+    seasonList.push(_year);
+    emit LogSeasonAdded(_year);
+  }
 
   /**
    * @notice Creates a new fixture for the on-going season
-   * @param _lineup ids of participants in event
+   * @param _season Season of fixture
+   * @param _participants ids of participants in event
    * @param _start Start time (unix timestamp)
    */
-  function scheduleFixture(uint[] _lineup, uint _start) external;
+  function scheduleFixture(uint16 _season, uint[] _participants, uint _start) external {
+    // TODO:pre:gth Manan => Avoid duplication (DoS attacks possible if hash collisions)
+    require(supportedSeasons[_season] == true, "League does not support given season");
+    L.Fixture memory _fixture;
+    _fixture.id = fixtures.length + 1;
+    _fixture.start = _start;
+    seasons[_season].push(_fixture.id);
+    fixtures.push(_fixture);
+    _fixture.participants = _participants;
+
+    emit LogFixtureAdded(_fixture.id);
+  }
 
   /**
    * @notice Adds a new participant to the league
    * @param _name Name of the participant - should match pattern /[a-zA-Z ]+/
    * @param _details Off-chain hash of participant details
    */
-  function addParticipant(string _name, bytes _details) external onlyOwner ;
+  function addParticipant(string _name, bytes _details) external onlyOwner {
+    L.Participant memory _participant;
+    _participant.name = _name;
+    _participant.details = _details;
+    _participant.id = participants.length;
+
+    emit LogParticipantAdded(_participant.id);
+  }
 
   /**
    * @notice Sets league details
@@ -140,14 +184,20 @@ contract League001 is Ownable, ILeague001 {
    * @notice Gets a list of all seasons in league
    * @return Years of all seasons in league
    */
-  function getSeasons() external view returns (uint16[]);
+  function getSeasons() external view returns (uint16[]) {
+    return seasonList;
+  }
 
   /**
-   * @notice Gets the on-going season
-   * @return Year of the on-going season, if any, 0 otherwise
+   * @notice Gets the season with year `_year`
+   * @param _year Year of the season
+   * @return Year of the season
    * @return Ids fixtures scheduled in on-going season
    */
-  function getLiveSeason() external view returns (uint16, uint[]);
+  function getSeason(uint16 _year) external view returns (uint16, uint[]) {
+    require(supportedSeasons[_year] == true, "League does not support given season");
+    return (_year, seasons[_year]);
+  }
 
   /**
    * @notice Gets scheduled fixture with id `_id`

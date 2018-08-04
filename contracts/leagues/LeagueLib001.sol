@@ -10,7 +10,7 @@ library LeagueLib001 {
   struct Fixture {
     uint id;
     uint[] participants;
-    uint startTime;
+    uint start;
   }
 
   // Participant Struct

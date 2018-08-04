@@ -13,14 +13,15 @@ contract ILeague001 is ILeague {
    * @notice Starts a new season with year `_year`
    * @param _year Year of the first fixture in new season
    */
-  function startSeason(uint16 _year) external;
+  function addSeason(uint16 _year) external;
 
   /**
    * @notice Creates a new fixture for the on-going season
-   * @param _lineup ids of participants in event
+   * @param _season Season of fixture
+   * @param _participants ids of participants in event
    * @param _start Start time (unix timestamp)
    */
-  function scheduleFixture(uint[] _lineup, uint _start) external;
+  function scheduleFixture(uint16 _season, uint[] _participants, uint _start) external;
 
   /**
    * @notice Adds a new participant to the league
@@ -36,11 +37,12 @@ contract ILeague001 is ILeague {
   function getSeasons() external view returns (uint16[]);
 
   /**
-   * @notice Gets the on-going season
-   * @return Year of the on-going season, if any, 0 otherwise
+   * @notice Gets the season with year `_year`
+   * @param _year Year of the season
+   * @return Year of the season
    * @return Ids fixtures scheduled in on-going season
    */
-  function getLiveSeason() external view returns (uint16, uint[]);
+  function getSeason(uint16 _year) external view returns (uint16, uint[]);
 
   /**
    * @notice Gets scheduled fixture with id `_id`
