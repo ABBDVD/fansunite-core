@@ -46,11 +46,17 @@ contract LeagueRegistry is Ownable, ILeagueRegistry {
   function createLeague(string _class, string _name, bytes _leagueDetails) external onlyOwner;
 
   /**
-   * @notice Updates leagueFactoryVersion to `_version` and factoryAddress to `_leagueFactory`
-   * @param _leagueFactory Address of the LeagueFactory for `_version`
+ * @notice Upsert version `_version` to correspond factoryAddress `_leagueFactory`
+ * @param _leagueFactory Address of the LeagueFactory for `_version`
+ * @param _version Version string for leagueFactory
+ */
+  function addLeagueFactory(address _leagueFactory, string _version) external onlyOwner;
+
+  /**
+   * @notice Updates leagueFactoryVersion to `_version` if supported
    * @param _version Version string for leagueFactory
    */
-  function setLeagueFactoryVersion(address _leagueFactory, string _version) external onlyOwner;
+  function setLeagueFactoryVersion(string _version) external onlyOwner;
 
   /**
    * @notice Gets Class with name `_class`
