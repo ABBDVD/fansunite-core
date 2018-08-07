@@ -2,6 +2,8 @@ pragma solidity ^0.4.24;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./interfaces/ILeagueRegistry.sol";
+import "./interfaces/ILeague.sol";
+import "./interfaces/ILeagueFactory.sol";
 
 
 /**
@@ -14,16 +16,26 @@ import "./interfaces/ILeagueRegistry.sol";
 contract LeagueRegistry is Ownable, ILeagueRegistry {
 
   // Factory version
-  string internal factoryVersion = "0.0.1";
+  string internal factoryVersion;
   // Map of factory version to factory address
   mapping(string => address) internal factories;
   // Corresponds to `true` if class supported, false otherwise
   mapping(string => bool) internal supportedClasses;
   // List of all classes
   string[] internal classes;
+  // Map of classes to corresponding league addresses
+  mapping(string => address[]) leagues;
+  // Evaluates to `true` if league supported, `false` otherwise
+  mapping(address => bool) supportedLeagues;
 
   // Emit when new class added
   event LogClassCreated(string _class);
+  // Emit when new league added
+  event LogLeagueAdded(address indexed _league, string _class, string _name);
+  // Emit when Factory updated
+  event LogFactoryUpdated(string _version, address indexed _factory);
+  // Emit when version updated
+  event LogFactoryVersionUpdated(string _version);
 
   /**
    * @notice Creates a new league class
@@ -43,44 +55,66 @@ contract LeagueRegistry is Ownable, ILeagueRegistry {
    * @param _name Name of the League (eg. Shanghai Masters)
    * @param _leagueDetails Off-chain details of the league (eg. IPFS hash)
    */
-  function createLeague(string _class, string _name, bytes _leagueDetails) external onlyOwner;
+  function createLeague(string _class, string _name, bytes _leagueDetails) external onlyOwner {
+    require(supportedClasses[_class] == true, "Class not supported by Registry");
+    ILeagueFactory _factory = ILeagueFactory(factories[factoryVersion]);
+    address _league = _factory.deployLeague(_class, _name, _leagueDetails);
+    leagues[_class].push(_league);
+    supportedLeagues[_league] = true;
+
+    emit LogLeagueAdded(_league, _class, _name);
+  }
 
   /**
  * @notice Upsert version `_version` to correspond factoryAddress `_leagueFactory`
  * @param _leagueFactory Address of the LeagueFactory for `_version`
  * @param _version Version string for leagueFactory
  */
-  function addLeagueFactory(address _leagueFactory, string _version) external onlyOwner;
+  function addLeagueFactory(address _leagueFactory, string _version) external onlyOwner {
+    factories[_version] = _leagueFactory;
+    emit LogFactoryUpdated(_version, _leagueFactory);
+  }
 
   /**
-   * @notice Updates leagueFactoryVersion to `_version` if supported
+   * @notice Updates factoryVersion to `_version` if supported
    * @param _version Version string for leagueFactory
    */
-  function setLeagueFactoryVersion(string _version) external onlyOwner;
+  function setLeagueFactoryVersion(string _version) external onlyOwner {
+    require(factories[_version] != address(0), "Version is not supported by Registry");
+    factoryVersion = _version;
+    emit LogFactoryVersionUpdated(_version);
+  }
 
   /**
    * @notice Gets Class with name `_class`
    * @param _class Class name
    * @return Class name
-   * @return Ids of league in class
+   * @return Address of all league in class
    */
-  function getClass(string _class) external view returns (string, uint[]);
+  function getClass(string _class) external view returns (string, address[]) {
+    require(supportedClasses[_class] == true, "Class not supported by Registry");
+    return (_class, leagues[_class]);
+  }
 
   /**
    * @notice Gets league with id `_id`
-   * @param _id id of the league
-   * @return League id
+   * @param _league Address of the league
    * @return League address
    * @return League name
    * @return League details (hash)
    */
-  function getLeague(uint _id) external view returns (uint, address, string, bytes);
+  function getLeague(address _league) external view returns (address, string, bytes) {
+    ILeague _l = ILeague(_league);
+    return (_league, _l.getName(), _l.getDetails());
+  }
 
   /**
    * @notice Gets the current version used to deploy new leagues contracts
    * @return Current factory version
    */
-  function getFactoryVersion() external view returns (string);
+  function getFactoryVersion() external view returns (string) {
+    return factoryVersion;
+  }
 
   /**
    * @notice Gets LeagueFactory contract address for version `_version`
@@ -88,19 +122,26 @@ contract LeagueRegistry is Ownable, ILeagueRegistry {
    * @param _version Version string for leagueFactory
    * @return Address of the LeagueFactory contract for version `_version`
    */
-  function getFactory(string _version) external view returns (address);
+  function getFactory(string _version) external view returns (address) {
+    require(factories[_version] != address(0), "Version is not supported by Registry");
+    return factories[_version];
+  }
 
   /**
    * @notice Checks if league with address `_league` is registered with FansUnite
    * @param _league address of the league
    * @return `true` if `_league` is registered with FansUnite, `false` otherwise
    */
-  function isLeagueRegistered(address _league) external view returns (bool);
+  function isLeagueRegistered(address _league) external view returns (bool) {
+    return supportedLeagues[_league];
+  }
 
   /**
    * @notice Checks if class `_class` is supported by FansUnite
    * @param _class Any class
    * @return `true` if `_class` is supported by FansUnite, `false` otherwise
    */
-  function isClassSupported(string _class) external view returns (bool);
+  function isClassSupported(string _class) external view returns (bool) {
+    return supportedClasses[_class];
+  }
 }
