@@ -1,7 +1,5 @@
 pragma solidity ^0.4.24;
 
-import "./ILeague.sol";
-
 
 /**
  * @title Interface for the fansunite league registry contract
