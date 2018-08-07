@@ -1,8 +1,8 @@
 pragma solidity ^0.4.24;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import { LeagueLib001 as L } from "./LeagueLib001.sol";
 import "./ILeague001.sol";
+import { LeagueLib001 as L } from "./LeagueLib001.sol";
 
 
 /**
@@ -23,9 +23,9 @@ contract League001 is Ownable, ILeague001 {
   address internal consensus;
 
   // Resolver addresses correspond to `true` if registered with league, `false` otherwise
-  mapping(address => bool) internal resolvers;
+  mapping(address => bool) internal registeredResolvers;
   // List of resolver addresses registered with league
-  address[] internal resolverList;
+  address[] internal resolvers;
   // Season corresponds to `true` if exists, `false` otherwise
   mapping(uint16 => bool) internal supportedSeasons;
   // Season corresponds to list of fixture ids
@@ -43,6 +43,8 @@ contract League001 is Ownable, ILeague001 {
 
   // Emit when a Fixture is resolved, by resolver
   event LogConsensusContractUpdated(address indexed _old, address indexed _new);
+  // Emit when new Resolver added
+  event LogResolverAdded(address _resolver);
   // Emit when new season added
   event LogSeasonAdded(uint16 indexed _year);
   // Emit when new fixture added
@@ -92,6 +94,9 @@ contract League001 is Ownable, ILeague001 {
    */
   function registerResolver(address _resolver) external {
     // TODO:pre:blocked Manan => Finish implementation (blocked by Registry)
+    resolvers.push(_resolver);
+
+    emit LogResolverAdded(_resolver);
   }
 
   /**
@@ -106,7 +111,7 @@ contract League001 is Ownable, ILeague001 {
   {
     // TODO:pre:think Manan => Think about case where _payload.length is 0 and payload is 0x00..00
     require(_fixtureId <= fixtures.length + 1, "Given Fixture is not scheduled in league");
-    require(resolvers[_resolver] == true, "League does not support given resolver");
+    require(registeredResolvers[_resolver] == true, "League does not support given resolver");
     if (!resolved[_fixtureId]) resolved[_fixtureId] = true;
     resolutions[_fixtureId][_resolver] = _payload;
     emit LogFixtureResolved(_fixtureId, _resolver, _payload);
@@ -224,7 +229,7 @@ contract League001 is Ownable, ILeague001 {
    * @return `true` if resolver is registered with league, `false` otherwise
    */
   function isResolverRegistered(address _resolver) external view returns (bool) {
-    return resolvers[_resolver];
+    return registeredResolvers[_resolver];
   }
 
   /**
