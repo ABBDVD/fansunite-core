@@ -40,7 +40,7 @@ contract ILeague001 is ILeague {
    * @notice Gets the season with year `_year`
    * @param _year Year of the season
    * @return Year of the season
-   * @return Ids fixtures scheduled in on-going season
+   * @return Ids fixtures scheduled in season `_year`
    */
   function getSeason(uint16 _year) external view returns (uint16, uint[]);
 

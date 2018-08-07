@@ -135,7 +135,7 @@ contract League001 is Ownable, ILeague001 {
    * @param _start Start time (unix timestamp)
    */
   function scheduleFixture(uint16 _season, uint[] _participants, uint _start) external {
-    // TODO:pre:gth Manan => Avoid duplication (DoS attacks possible if hash collisions)
+    // TODO:pre:gth Manan => Avoid ordered duplication (DoS attacks possible if hash collisions)
     require(supportedSeasons[_season] == true, "League does not support given season");
     L.Fixture memory _fixture;
     _fixture.id = fixtures.length + 1;
@@ -153,6 +153,7 @@ contract League001 is Ownable, ILeague001 {
    * @param _details Off-chain hash of participant details
    */
   function addParticipant(string _name, bytes _details) external onlyOwner {
+    // TODO:pre:gth Manan => Avoid name+details duplication?
     L.Participant memory _participant;
     _participant.name = _name;
     _participant.details = _details;
@@ -198,7 +199,7 @@ contract League001 is Ownable, ILeague001 {
    * @notice Gets the season with year `_year`
    * @param _year Year of the season
    * @return Year of the season
-   * @return Ids fixtures scheduled in on-going season
+   * @return Ids fixtures scheduled in season `_year`
    */
   function getSeason(uint16 _year) external view returns (uint16, uint[]) {
     require(supportedSeasons[_year] == true, "League does not support given season");
@@ -212,7 +213,11 @@ contract League001 is Ownable, ILeague001 {
    * @return Participant Ids
    * @return Start time
    */
-  function getFixture(uint _id) external view returns (uint, uint[], uint);
+  function getFixture(uint _id) external view returns (uint, uint[], uint) {
+    require(_id <= fixtures.length + 1, "Given fixture is not scheduled in league");
+    L.Fixture storage _fixture = fixtures[_id - 1];
+    return (_fixture.id, _fixture.participants, _fixture.start);
+  }
 
   /**
    * @notice Gets participant in league with id `_id`
@@ -221,7 +226,11 @@ contract League001 is Ownable, ILeague001 {
    * @return Participant name
    * @return Details of Participant (hash)
    */
-  function getParticipant(uint _id) external view returns (uint, string, bytes);
+  function getParticipant(uint _id) external view returns (uint, string, bytes) {
+    require(_id <= participants.length + 1, "Given participant is not in league");
+    L.Participant storage _participant = participants[_id - 1];
+    return (_participant.id, _participant.name, _participant.details);
+  }
 
   /**
    * @notice Checks if resolver with address `_resolver` is registered with league
@@ -237,7 +246,9 @@ contract League001 is Ownable, ILeague001 {
    * @param _id Id of the fixture
    * @return `true` if fixture with id `_id` is scheduled, `false` otherwise
    */
-  function isFixtureScheduled(uint _id) external view returns (bool);
+  function isFixtureScheduled(uint _id) external view returns (bool) {
+    return _id <= fixtures.length + 1;
+  }
 
   /**
    * @notice Checks if fixture with id `_id` has been resolved for resolver `_resolver`
@@ -261,7 +272,9 @@ contract League001 is Ownable, ILeague001 {
    * @param _id Id of the participant
    * @return `true` if participant id `_id` is valid, `false` otherwise
    */
-  function isParticipant(uint _id) external view returns (bool);
+  function isParticipant(uint _id) external view returns (bool) {
+    return _id <= participants.length + 1;
+  }
 
   /**
    * @notice Gets the name of the league
