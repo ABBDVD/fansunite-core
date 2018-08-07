@@ -24,11 +24,17 @@ contract ILeagueRegistry {
   function createLeague(string _class, string _name, bytes _leagueDetails) external;
 
   /**
-   * @notice Updates leagueFactoryVersion to `_version` and factoryAddress to `_leagueFactory`
+   * @notice Upsert version `_version` to correspond factoryAddress `_leagueFactory`
    * @param _leagueFactory Address of the LeagueFactory for `_version`
    * @param _version Version string for leagueFactory
    */
-  function setLeagueFactoryVersion(address _leagueFactory, string _version) external;
+  function addLeagueFactory(address _leagueFactory, string _version) external;
+
+  /**
+   * @notice Updates leagueFactoryVersion to `_version` if supported
+   * @param _version Version string for leagueFactory
+   */
+  function setLeagueFactoryVersion(string _version) external;
 
   /**
    * @notice Gets Class with name `_class`
