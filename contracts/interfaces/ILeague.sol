@@ -9,6 +9,13 @@ pragma solidity ^0.4.24;
 contract ILeague {
 
   /**
+   * @notice Sets consensus contract of the league to `_consensus`
+   * @dev Only consensus contract will be able to call pushResolution
+   * @param _consensus address of the consensus contract
+   */
+  function updateConsensusContract(address _consensus) external;
+
+  /**
    * @notice Adds resolver with address `_resolver` to league
    * @dev fails if `_resolver` is not registered with FansUnite's Resolver Registry
    * @param _resolver Address of the resolver contract
@@ -25,7 +32,7 @@ contract ILeague {
 
   /**
    * @notice Sets league details
-   * @param _details IPFS hash with league details
+   * @param _details Off-chain hash of league details
    */
   function setDetails(bytes _details) external;
 

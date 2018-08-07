@@ -12,8 +12,9 @@ contract Registry is Ownable, IRegistry {
   Valid Address Keys
   leagueRegistry = getAddress("LeagueRegistry")
   resolverRegistry = getAddress("ResolverRegistry")
-  fanToken = getAddress("FanToken")
   betManager = getAddress("BetManager")
+  consensusManager = getAddress("ConsensusManager")
+  fanToken = getAddress("FanToken")
   fanVault = getAddress("FanVault")
   */
 
