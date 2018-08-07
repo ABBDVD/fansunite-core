@@ -151,7 +151,8 @@ contract League001 is Ownable, ILeague001 {
     L.Participant memory _participant;
     _participant.name = _name;
     _participant.details = _details;
-    _participant.id = participants.length;
+    _participant.id = participants.length + 1;
+    participants.push(_participant);
 
     emit LogParticipantAdded(_participant.id);
   }
