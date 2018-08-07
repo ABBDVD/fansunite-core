@@ -16,6 +16,7 @@ contract Registry is Ownable, IRegistry {
   consensusManager = getAddress("ConsensusManager")
   fanToken = getAddress("FanToken")
   fanVault = getAddress("FanVault")
+  fanOrg = getAddress("FanOrg")
   */
 
   mapping (bytes32 => address) public storedAddresses;

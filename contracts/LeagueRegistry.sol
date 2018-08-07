@@ -1,6 +1,7 @@
 pragma solidity ^0.4.24;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "./interfaces/IRegistry.sol";
 import "./interfaces/ILeagueRegistry.sol";
 import "./interfaces/ILeague.sol";
 import "./interfaces/ILeagueFactory.sol";
@@ -15,6 +16,8 @@ import "./interfaces/ILeagueFactory.sol";
  */
 contract LeagueRegistry is Ownable, ILeagueRegistry {
 
+  // Address of the Registry contract
+  address internal registry;
   // Factory version
   string internal factoryVersion;
   // Map of factory version to factory address
@@ -28,6 +31,8 @@ contract LeagueRegistry is Ownable, ILeagueRegistry {
   // Evaluates to `true` if league supported, `false` otherwise
   mapping(address => bool) internal supportedLeagues;
 
+  // Emit when Registry contract updated
+  event LogRegistryUpdated(address indexed _old, address indexed _new);
   // Emit when new class added
   event LogClassCreated(string _class);
   // Emit when new league added
@@ -58,7 +63,8 @@ contract LeagueRegistry is Ownable, ILeagueRegistry {
   function createLeague(string _class, string _name, bytes _leagueDetails) external onlyOwner {
     require(supportedClasses[_class] == true, "Class not supported by Registry");
     ILeagueFactory _factory = ILeagueFactory(factories[factoryVersion]);
-    address _league = _factory.deployLeague(_class, _name, _leagueDetails);
+    address _consensus = IRegistry(registry).getAddress("ConsensusManager");
+    address _league = _factory.deployLeague(_class, _name, _leagueDetails, _consensus, msg.sender);
     leagues[_class].push(_league);
     supportedLeagues[_league] = true;
 
@@ -83,6 +89,17 @@ contract LeagueRegistry is Ownable, ILeagueRegistry {
     require(factories[_version] != address(0), "Version is not supported by Registry");
     factoryVersion = _version;
     emit LogFactoryVersionUpdated(_version);
+  }
+
+  /**
+   * @notice Updates registry contract address to `_reg`
+   * @param _reg Address of the FansUnite Registry contract
+   */
+  function setRegistryContract(address _reg) external onlyOwner {
+    require(_reg != address(0), "Registry address cannot be 0x");
+    address _old = registry;
+    registry = _reg;
+    emit LogRegistryUpdated(_old, _reg);
   }
 
   /**
@@ -144,4 +161,13 @@ contract LeagueRegistry is Ownable, ILeagueRegistry {
   function isClassSupported(string _class) external view returns (bool) {
     return supportedClasses[_class];
   }
+
+  /**
+   * @notice Gets registry contract address
+   * @return Address of the FansUnite Registry contract
+   */
+  function getRegistryContract() external view returns (address) {
+    return registry;
+  }
+
 }

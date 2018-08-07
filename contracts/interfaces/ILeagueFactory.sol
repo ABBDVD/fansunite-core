@@ -15,7 +15,13 @@ contract ILeagueFactory {
    * @param _owner Owner of the league (FansUnite)
    * @return Address of the created league contract
    */
-  function deployLeague(string _class, string _name, bytes _details, address _consensus, address _owner)
+  function deployLeague(
+    string _class,
+    string _name,
+    bytes _details,
+    address _consensus,
+    address _owner
+  )
     external
     returns (address);
 }
