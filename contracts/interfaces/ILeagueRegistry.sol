@@ -40,9 +40,9 @@ contract ILeagueRegistry {
    * @notice Gets Class with name `_class`
    * @param _class Class name
    * @return Class name
-   * @return Ids of league in class
+   * @return Address of all leagues in class
    */
-  function getClass(string _class) external view returns (string, uint[]);
+  function getClass(string _class) external view returns (string, address[]);
 
   /**
    * @notice Gets league with id `_id`
