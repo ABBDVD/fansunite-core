@@ -31,13 +31,12 @@ contract ILeagueRegistry {
   function setLeagueFactoryVersion(address _leagueFactory, string _version) external;
 
   /**
-   * @notice Gets Class with id `_id`
-   * @param _id id of the class
-   * @return Class id
+   * @notice Gets Class with name `_class`
+   * @param _class Class name
    * @return Class name
    * @return Ids of league in class
    */
-  function getClass(uint _id) external view returns (uint, string, uint[]);
+  function getClass(string _class) external view returns (string, uint[]);
 
   /**
    * @notice Gets league with id `_id`

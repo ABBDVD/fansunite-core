@@ -13,11 +13,29 @@ import "./interfaces/ILeagueRegistry.sol";
  */
 contract LeagueRegistry is Ownable, ILeagueRegistry {
 
+  // Factory version
+  string internal factoryVersion = "0.0.1";
+  // Map of factory version to factory address
+  mapping(string => address) internal factories;
+  // Corresponds to `true` if class supported, false otherwise
+  mapping(string => bool) internal supportedClasses;
+  // List of all classes
+  string[] internal classes;
+
+  // Emit when new class added
+  event LogClassCreated(string _class);
+
   /**
    * @notice Creates a new league class
    * @param _class Class of the league (eg. tennis)
    */
-  function createClass(string _class) external onlyOwner;
+  function createClass(string _class) external onlyOwner {
+    require(supportedClasses[_class] == false, "Registry already supports class");
+    supportedClasses[_class] = true;
+    classes.push(_class);
+
+    emit LogClassCreated(_class);
+  }
 
   /**
    * @notice Creates a new League Contract and saves it to the registry
@@ -35,13 +53,12 @@ contract LeagueRegistry is Ownable, ILeagueRegistry {
   function setLeagueFactoryVersion(address _leagueFactory, string _version) external onlyOwner;
 
   /**
-   * @notice Gets Class with id `_id`
-   * @param _id id of the class
-   * @return Class id
+   * @notice Gets Class with name `_class`
+   * @param _class Class name
    * @return Class name
    * @return Ids of league in class
    */
-  function getClass(uint _id) external view returns (uint, string, uint[]);
+  function getClass(string _class) external view returns (string, uint[]);
 
   /**
    * @notice Gets league with id `_id`
