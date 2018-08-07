@@ -46,13 +46,12 @@ contract ILeagueRegistry {
 
   /**
    * @notice Gets league with id `_id`
-   * @param _id id of the league
-   * @return League id
+   * @param _league Address of the league
    * @return League address
    * @return League name
    * @return League details (hash)
    */
-  function getLeague(uint _id) external view returns (uint, address, string, bytes);
+  function getLeague(address _league) external view returns (address, string, bytes);
 
   /**
    * @notice Gets the current version used to deploy new leagues contracts
