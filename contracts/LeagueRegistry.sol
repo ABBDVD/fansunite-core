@@ -24,9 +24,9 @@ contract LeagueRegistry is Ownable, ILeagueRegistry {
   // List of all classes
   string[] internal classes;
   // Map of classes to corresponding league addresses
-  mapping(string => address[]) leagues;
+  mapping(string => address[]) internal leagues;
   // Evaluates to `true` if league supported, `false` otherwise
-  mapping(address => bool) supportedLeagues;
+  mapping(address => bool) internal supportedLeagues;
 
   // Emit when new class added
   event LogClassCreated(string _class);
