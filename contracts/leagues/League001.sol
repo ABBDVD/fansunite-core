@@ -247,7 +247,7 @@ contract League001 is Ownable, ILeague001 {
    * @return `true` if fixture with id `_id` is scheduled, `false` otherwise
    */
   function isFixtureScheduled(uint _id) external view returns (bool) {
-    return _id <= fixtures.length + 1;
+    return _id > 0 && _id < fixtures.length + 1;
   }
 
   /**
@@ -273,7 +273,7 @@ contract League001 is Ownable, ILeague001 {
    * @return `true` if participant id `_id` is valid, `false` otherwise
    */
   function isParticipant(uint _id) external view returns (bool) {
-    return _id <= participants.length + 1;
+    return _id > 0 && _id < participants.length + 1;
   }
 
   /**
