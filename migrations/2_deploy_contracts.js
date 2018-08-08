@@ -17,7 +17,7 @@ module.exports = function(deployer, networks, accounts) {
           return LeagueRegistry.deployed().then((_leagueRegistry) => {
             leagueRegistry = _leagueRegistry;
             return _leagueRegistry.setRegistryContract(Registry.address);
-          })
+          });
         })
         .then(() => {
           return deployer.deploy(LeagueLib);
@@ -45,6 +45,7 @@ module.exports = function(deployer, networks, accounts) {
             });
         })
         .then(() => {
+          /* eslint no-console: "off" */
           console.log('\n');
           console.log('----- FansUnite Core Contracts -----');
           console.log('*** FansUnite Organization: ', accounts[0], '***');
@@ -54,5 +55,5 @@ module.exports = function(deployer, networks, accounts) {
           console.log('\n');
         });
     });
-  })
+  });
 };

@@ -63,6 +63,6 @@ contract('Registry', async accounts => {
     }
 
     assert.fail('Expected throw not received');
-  })
+  });
 
 });
