@@ -88,4 +88,10 @@ contract ILeague {
    */
   function getDetails() external view returns (bytes);
 
+  /**
+   * @notice Gets the league version (matches LeagueFactory version)
+   * @return version of the league protocol
+   */
+  function getVersion() external view returns (string);
+
 }
