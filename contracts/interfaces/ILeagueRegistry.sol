@@ -37,6 +37,12 @@ contract ILeagueRegistry {
   function setLeagueFactoryVersion(string _version) external;
 
   /**
+   * @notice Updates registry contract address to `_reg`
+   * @param _reg Address of the FansUnite Registry contract
+   */
+  function setRegistryContract(address _reg) external;
+
+  /**
    * @notice Gets Class with name `_class`
    * @param _class Class name
    * @return Class name
@@ -80,4 +86,10 @@ contract ILeagueRegistry {
    * @return `true` if `_class` is supported by FansUnite, `false` otherwise
    */
   function isClassSupported(string _class) external view returns (bool);
+
+  /**
+   * @notice Gets registry contract address
+   * @return Address of the FansUnite Registry contract
+   */
+  function getRegistryContract() external view returns (address);
 }
