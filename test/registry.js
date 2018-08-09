@@ -1,4 +1,4 @@
-/* global assert, contract, it */
+/* global assert, contract, it, artifacts */
 
 const Registry = artifacts.require('./Registry.sol');
 const { ensureException } = require('./helpers/utils');
