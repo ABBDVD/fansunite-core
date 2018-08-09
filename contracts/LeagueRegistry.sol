@@ -76,7 +76,7 @@ contract LeagueRegistry is Ownable, ILeagueRegistry {
  * @param _leagueFactory Address of the LeagueFactory for `_version`
  * @param _version Version string for leagueFactory
  */
-  function addLeagueFactory(address _leagueFactory, string _version) external onlyOwner {
+  function addFactory(address _leagueFactory, string _version) external onlyOwner {
     factories[_version] = _leagueFactory;
     emit LogFactoryUpdated(_version, _leagueFactory);
   }
@@ -85,7 +85,7 @@ contract LeagueRegistry is Ownable, ILeagueRegistry {
    * @notice Updates factoryVersion to `_version` if supported
    * @param _version Version string for leagueFactory
    */
-  function setLeagueFactoryVersion(string _version) external onlyOwner {
+  function setFactoryVersion(string _version) external onlyOwner {
     require(factories[_version] != address(0), "Version is not supported by Registry");
     factoryVersion = _version;
     emit LogFactoryVersionUpdated(_version);
