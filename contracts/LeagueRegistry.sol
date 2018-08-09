@@ -19,7 +19,7 @@ contract LeagueRegistry is Ownable, ILeagueRegistry {
   // Address of the Registry contract
   address internal registry;
   // Factory version
-  string internal factoryVersion;
+  string internal factoryVersion; // TODO:pre:think Manan => Edge case of version not set
   // Map of factory version to factory address
   mapping(string => address) internal factories;
   // Corresponds to `true` if class supported, false otherwise
