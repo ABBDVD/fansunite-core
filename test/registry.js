@@ -5,13 +5,16 @@ const { ensureException } = require('./helpers/utils');
 
 contract('Registry', async accounts => {
 
-  let owner = accounts[0];
-  let dummyAddressA = "0x1111111111111111111111111111111111111111";
-  let dummyAddressB = "0x2222222222222222222222222222222222222222";
+  let owner = accounts[0]
+    , dummyAddressA = "0x1111111111111111111111111111111111111111"
+    , dummyAddressB = "0x2222222222222222222222222222222222222222"
+    , instance;
+
+  before('setup contract instance', async () => {
+    instance = await Registry.deployed();
+  });
 
   it('should successfully add address for new namekey', async () => {
-    let instance = await Registry.deployed();
-
     let namekey = "BetManager";
     let address = dummyAddressA;
 
@@ -22,8 +25,6 @@ contract('Registry', async accounts => {
 
 
   it('should successfully change address for existing namekey', async () => {
-    let instance = await Registry.deployed();
-
     let namekey = "LeagueRegistry";
     let address = dummyAddressA;
     let newAddress = dummyAddressB;
@@ -38,8 +39,6 @@ contract('Registry', async accounts => {
   });
 
   it('should throw exception when retrieving address for namekey that dne', async () => {
-    let instance = await Registry.deployed();
-
     let namekey = "DoesNotExist";
     try {
       await instance.getAddress.call(namekey);
@@ -52,8 +51,6 @@ contract('Registry', async accounts => {
   });
 
   it('should fail when non-owner tries to update address', async () => {
-    let instance = await Registry.deployed();
-
     let namekey = "DoesNotExist";
     try {
       await instance.changeAddress(namekey, dummyAddressA, { from: accounts[1] }); // Non-owner
