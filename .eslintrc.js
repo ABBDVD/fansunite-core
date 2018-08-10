@@ -13,6 +13,7 @@ module.exports = {
     "assert": false,
     "it": false,
     "afterEach": false,
+    "before": false,
     "beforeEach": false,
     "require": false,
     "console": false

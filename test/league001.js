@@ -22,4 +22,36 @@ contract('League', async accounts => {
     assert.equal(await instance.getName.call(), "FIFA", "cannot set up league");
   });
 
+  describe('Test cases for adding seasons', async () => {
+
+  });
+
+  describe('Test cases for adding participants', async () => {
+
+  });
+
+  describe('Test cases for scheduling fixtures', async () => {
+
+  });
+
+  describe('Test cases for league information', async () => {
+
+  });
+
+  describe('Test cases for setting up resolvers', async () => {
+
+  });
+
+  describe('Test cases for ConsensusManager', async () => {
+
+    describe('Test cases for updating consensus contract', async () => {
+
+    });
+
+    describe('Test cases for pushing consensus', async () => {
+
+    });
+
+  });
+
 });
