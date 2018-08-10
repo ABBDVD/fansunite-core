@@ -6,11 +6,9 @@ let League = artifacts.require('./leagues/League001')
 let { ensureException } = require("./helpers/utils");
 
 
-/* eslint no-unused-vars: "off" */
 contract('League', async accounts => {
 
   let owner = accounts[0];
-  let dummyAddressA = "0x1111111111111111111111111111111111111111";
   let instance;
 
   before('setup contract instance', async () => {
