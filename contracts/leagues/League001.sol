@@ -122,7 +122,7 @@ contract League001 is Ownable, ILeague001 {
    * @param _year Year of the first fixture in new season
    */
   function addSeason(uint16 _year) external {
-    require(supportedSeasons[_year] == true, "Season already supported");
+    require(!supportedSeasons[_year], "Season already supported");
     supportedSeasons[_year] = true;
     seasonList.push(_year);
     emit LogSeasonAdded(_year);
@@ -136,7 +136,7 @@ contract League001 is Ownable, ILeague001 {
    */
   function scheduleFixture(uint16 _season, uint[] _participants, uint _start) external {
     // TODO:pre:gth Manan => Avoid ordered duplication (DoS attacks possible if hash collisions)
-    require(supportedSeasons[_season] == true, "League does not support given season");
+    require(supportedSeasons[_season], "League does not support given season");
     L.Fixture memory _fixture;
     _fixture.id = fixtures.length + 1;
     _fixture.start = _start;
@@ -202,7 +202,7 @@ contract League001 is Ownable, ILeague001 {
    * @return Ids fixtures scheduled in season `_year`
    */
   function getSeason(uint16 _year) external view returns (uint16, uint[]) {
-    require(supportedSeasons[_year] == true, "League does not support given season");
+    require(supportedSeasons[_year], "League does not support given season");
     return (_year, seasons[_year]);
   }
 

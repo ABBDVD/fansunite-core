@@ -3,6 +3,9 @@
 let League = artifacts.require('./leagues/League001')
   , LeagueRegistry = artifacts.require('./LeagueRegistry');
 
+let { ensureException } = require("./helpers/utils");
+
+
 /* eslint no-unused-vars: "off" */
 contract('League', async accounts => {
 
@@ -23,6 +26,30 @@ contract('League', async accounts => {
   });
 
   describe('Test cases for adding seasons', async () => {
+
+    it("should successfully create a new season", async () => {
+      let result = await instance.getSeasons.call();
+      assert.isArray(result, "unexpected return type on getSeasons");
+      assert.lengthOf(result, 0, "new league has unexpected seasons");
+
+      await instance.addSeason(2018, { from: accounts[1] }); // any address (non-owner)
+      result = await instance.getSeasons.call();
+      assert.isArray(result, "unexpected return type on getSeasons");
+      assert.lengthOf(result, 1, "season not added / cannot be retrieved");
+
+      await instance.getSeason.call(2018); // throws exception on failure
+    });
+
+    it("should throw exception on duplicate season years", async () => {
+      try {
+        await instance.addSeason(2018, { from: owner });
+      } catch (err) {
+        ensureException(err);
+        return;
+      }
+
+      assert.fail('Expected throw not received');
+    });
 
   });
 
