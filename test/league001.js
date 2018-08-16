@@ -70,11 +70,11 @@ contract('League', async accounts => {
   describe('Test cases for ConsensusManager', async () => {
 
     describe('Test cases for updating consensus contract', async () => {
-
+      // TODO:pre:blocked Manan => Blocked by resolver implementation
     });
 
     describe('Test cases for pushing consensus', async () => {
-
+      // TODO:pre:blocked Manan => Blocked by resolver implementation
     });
 
   });
