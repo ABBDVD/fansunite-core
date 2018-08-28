@@ -12,17 +12,23 @@ library SignatureLib {
    * @notice Validates that a hash was signed by a specified signer.
    * @param hash Hash which was signed.
    * @param signer Address of the signer.
-   * @param signature ECDSA signature along with the mode (0 = Typed (EIP712), 1 = Geth, 2 = Trezor) {mode}{v}{r}{s}.
+   * @param signature ECDSA signature along with the mode
+   *  (0 = Typed (EIP712), 1 = Geth, 2 = Trezor) {mode}{v}{r}{s}.
    * @return Returns whether signature is from a specified user.
    */
-  function isValidSignature(bytes32 hash, address signer, bytes signature) internal view returns (bool) {
+  function isValidSignature(bytes32 hash, address signer, bytes signature)
+    internal
+    view
+    returns (bool)
+  {
     return recover(hash, signature) == signer;
   }
 
   /**
    * @notice Recovers signer from signature.
    * @param hash Hash which was signed.
-   * @param signature ECDSA signature along with the mode (0 = Typed (EIP712), 1 = Geth, 2 = Trezor) {mode}{v}{r}{s}.
+   * @param signature ECDSA signature along with the mode
+   *  (0 = Typed (EIP712), 1 = Geth, 2 = Trezor) {mode}{v}{r}{s}.
    * @return Returns Address of the signer.
    */
   function recover(bytes32 hash, bytes signature) internal pure returns (address) {
@@ -37,13 +43,14 @@ library SignatureLib {
       s := mload(add(signature, 66))
     }
 
+    bytes32 _hash;
     if (mode == SignatureMode.GETH) {
-      hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
+      _hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
     } else if (mode == SignatureMode.TREZOR) {
-      hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n\x20", hash));
+      _hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n\x20", hash));
     }
 
-    return ecrecover(hash, v, r, s);
+    return ecrecover(_hash, v, r, s);
   }
 
 }

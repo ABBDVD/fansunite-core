@@ -18,6 +18,9 @@
     ],
     "no-empty-blocks": [
       "off"
+    ],
+    "security/no-inline-assembly": [
+      "off"
     ]
   }
 }

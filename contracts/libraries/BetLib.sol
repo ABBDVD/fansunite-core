@@ -7,23 +7,24 @@ library BetLib {
   using SafeMath for uint;
 
   // Hash for the EIP712 Bet Schema
-  bytes32 constant BET_SCHEMA_HASH = keccak256(abi.encodePacked(
-    "Bet(",
-    "address backer,",
-    "address layer,",
-    "address backerToken,",
-    "address layerToken,",
-    "address feeRecipient,",
-    "address league,",
-    "address resolver,",
-    "uint256 backerStake,",
-    "uint256 backerFee,",
-    "uint256 layerFee,",
-    "uint256 expiration,",
-    "uint256 fixture,",
-    "uint256 odds,",
-    "bytes payload",
-    ")"
+  bytes32 constant BET_SCHEMA_HASH = keccak256(
+    abi.encodePacked(
+      "Bet(",
+      "address backer,",
+      "address layer,",
+      "address backerToken,",
+      "address layerToken,",
+      "address feeRecipient,",
+      "address league,",
+      "address resolver,",
+      "uint256 backerStake,",
+      "uint256 backerFee,",
+      "uint256 layerFee,",
+      "uint256 expiration,",
+      "uint256 fixture,",
+      "uint256 odds,",
+      "bytes payload",
+      ")"
   ));
 
   struct Bet {
@@ -70,15 +71,14 @@ library BetLib {
       _bet.odds
     );
 
-    return keccak256(abi.encodePacked(
-      _nonce,
-      abi.encodePacked(
-        BET_SCHEMA_HASH,
-        _addresses,
-        _params,
-        keccak256(_bet.payload)
-      )
-    ));
+    bytes memory _hash = abi.encodePacked(
+      BET_SCHEMA_HASH,
+      _addresses,
+      _params,
+      keccak256(_bet.payload)
+    );
+
+    return keccak256(abi.encodePacked(_nonce, _hash));
   }
 
   /**
@@ -88,7 +88,11 @@ library BetLib {
    * @param _payload Bet payload for resolver
    * @return Returns the bet struct
    */
-  function createBet(address[7] _addresses, uint[6] _values, bytes _payload) internal pure returns (Bet) {
+  function createBet(address[7] _addresses, uint[6] _values, bytes _payload)
+    internal
+    pure
+    returns (Bet)
+  {
     return Bet({
       backer: _addresses[0],
       layer: _addresses[1],

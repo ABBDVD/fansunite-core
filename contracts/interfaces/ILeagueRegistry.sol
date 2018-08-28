@@ -1,5 +1,7 @@
 pragma solidity ^0.4.24;
 
+import "../utils/RegistryAccessible.sol";
+
 
 /**
  * @title Interface for the fansunite league registry contract
@@ -7,7 +9,7 @@ pragma solidity ^0.4.24;
  * @dev LeagueRegistry stores addresses to versioned factories responsible for deploying new
  *  league contracts
  */
-contract ILeagueRegistry {
+contract ILeagueRegistry is RegistryAccessible {
 
   /**
    * @notice Creates a new league class
@@ -35,12 +37,6 @@ contract ILeagueRegistry {
    * @param _version Version string for leagueFactory
    */
   function setLeagueFactoryVersion(string _version) external;
-
-  /**
-   * @notice Updates registry contract address to `_reg`
-   * @param _reg Address of the FansUnite Registry contract
-   */
-  function setRegistryContract(address _reg) external;
 
   /**
    * @notice Gets Class with name `_class`
@@ -86,10 +82,4 @@ contract ILeagueRegistry {
    * @return `true` if `_class` is supported by FansUnite, `false` otherwise
    */
   function isClassSupported(string _class) external view returns (bool);
-
-  /**
-   * @notice Gets registry contract address
-   * @return Address of the FansUnite Registry contract
-   */
-  function getRegistryContract() external view returns (address);
 }

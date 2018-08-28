@@ -1,9 +1,11 @@
 pragma solidity ^0.4.24;
 
+import "../utils/RegistryAccessible.sol";
+
 /**
  * @title Interface for the Vault contract
  */
-contract IVault {
+contract IVault is RegistryAccessible {
 
   /**
    * @notice Deposits a specific token or ETH
