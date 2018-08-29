@@ -12,6 +12,10 @@ module.exports = {
     "contract": false,
     "assert": false,
     "it": false,
+    "after": false,
+    "afterEach": false,
+    "before": false,
+    "beforeEach": false,
     "require": false,
     "console": false
   },

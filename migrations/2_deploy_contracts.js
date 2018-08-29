@@ -39,9 +39,9 @@ module.exports = function(deployer, networks, accounts) {
           return registry.changeAddress("LeagueRegistry", LeagueRegistry.address);
         })
         .then(() => {
-          return leagueRegistry.addLeagueFactory(LeagueFactory.address, "0.0.1")
+          return leagueRegistry.addFactory(LeagueFactory.address, "0.0.1")
             .then(() => {
-              return leagueRegistry.setLeagueFactoryVersion("0.0.1");
+              return leagueRegistry.setFactoryVersion("0.0.1");
             });
         })
         .then(() => {

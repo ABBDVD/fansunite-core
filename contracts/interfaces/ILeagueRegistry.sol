@@ -30,13 +30,13 @@ contract ILeagueRegistry is RegistryAccessible {
    * @param _leagueFactory Address of the LeagueFactory for `_version`
    * @param _version Version string for leagueFactory
    */
-  function addLeagueFactory(address _leagueFactory, string _version) external;
+  function addFactory(address _leagueFactory, string _version) external;
 
   /**
    * @notice Updates leagueFactoryVersion to `_version` if supported
    * @param _version Version string for leagueFactory
    */
-  function setLeagueFactoryVersion(string _version) external;
+  function setFactoryVersion(string _version) external;
 
   /**
    * @notice Gets Class with name `_class`
