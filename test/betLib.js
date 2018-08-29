@@ -2,11 +2,11 @@
 
 const BetLibMock = artifacts.require('./mocks/BetLibMock.sol');
 const web3 = require('web3');
-const { BetFactory } = require('./helpers/betfactory');
+const { BetFactory } = require('./helpers/betFactory');
 
 contract('BetLib', (accounts) => {
 
-  describe('Gas costs for deploying League related contracts', async () => {
+  describe('Common BetLib tests', async () => {
 
     let mock;
 
