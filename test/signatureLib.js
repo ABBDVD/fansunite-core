@@ -26,7 +26,7 @@ contract('SignatureValidator', function (accounts) {
 
     let signature = '0x' + Buffer.concat([mode, v, r, s]).toString('hex');
 
-    assert.equal(true, await mock.isValidSignature(data, accounts[0], signature));
+    assert.equal(true, await mock.isValidSignature.call(data, accounts[0], signature));
   });
 
   it('should return correct signer', async () => {
@@ -39,7 +39,7 @@ contract('SignatureValidator', function (accounts) {
 
     let signature = '0x' + Buffer.concat([mode, v, r, s]).toString('hex');
 
-    assert.equal(accounts[0], await mock.recover(data, signature));
+    assert.equal(accounts[0], await mock.recover.call(data, signature));
   });
 
 });
