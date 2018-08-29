@@ -33,13 +33,13 @@ contract BetLibMock {
       );
   }
 
-  function hash(address[7] addresses, uint[6] values, uint salt, bytes betPayload)
+  function hash(address[7] addresses, uint[6] values, uint nonce, bytes betPayload)
     external
     pure
     returns (bytes32)
   {
     BetLib.Bet memory bet = BetLib.createBet(addresses, values, betPayload);
-    return bet.hash(salt);
+    return bet.hash(nonce);
   }
 
   function backerTokenReturn(address[7] addresses, uint[6] values, bytes betPayload)
