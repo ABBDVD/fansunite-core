@@ -71,11 +71,13 @@ library BetLib {
       _bet.odds
     );
 
-    bytes memory _hash = abi.encodePacked(
-      BET_SCHEMA_HASH,
-      _addresses,
-      _params,
-      keccak256(_bet.payload)
+    bytes32 _hash = keccak256(
+      abi.encodePacked(
+        BET_SCHEMA_HASH,
+        _addresses,
+        _params,
+        keccak256(_bet.payload)
+      )
     );
 
     return keccak256(abi.encodePacked(_nonce, _hash));

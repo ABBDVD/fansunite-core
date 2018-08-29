@@ -17,9 +17,10 @@ module.exports = {
     "before": false,
     "beforeEach": false,
     "require": false,
-    "console": false
+    "console": false,
+    "Buffer": false,
   },
   "parserOptions": {
-    "ecmaVersion": 2017
+    "ecmaVersion": 2018
   }
 };
