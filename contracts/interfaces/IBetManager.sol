@@ -1,10 +1,12 @@
 pragma solidity ^0.4.24;
 
+import "../utils/RegistryAccessible.sol";
+
 
 /**
  * @title Interface for Bet Manger Contract
  */
-contract IBetManager {
+contract IBetManager is RegistryAccessible {
 
   /**
    * @notice Claims a bet, transfers tokens and fees based on fixture resolution

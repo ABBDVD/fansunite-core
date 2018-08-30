@@ -6,17 +6,16 @@ contract BetLibMock {
 
   using BetLib for BetLib.Bet;
 
-  function createBet(address[7] addresses, uint[6] values, bytes betPayload)
+  function createBet(address[6] addresses, uint[6] values, bytes betPayload)
     external
     pure
-    returns (address[7], uint[6], bytes)
+    returns (address[6], uint[6], bytes)
   {
     BetLib.Bet memory bet =  BetLib.createBet(addresses, values, betPayload);
     return ([
         bet.backer,
         bet.layer,
-        bet.backerToken,
-        bet.layerToken,
+        bet.token,
         bet.feeRecipient,
         bet.league,
         bet.resolver
@@ -33,7 +32,7 @@ contract BetLibMock {
       );
   }
 
-  function hash(address[7] addresses, uint[6] values, uint nonce, bytes betPayload)
+  function hash(address[6] addresses, uint[6] values, uint nonce, bytes betPayload)
     external
     pure
     returns (bytes32)
@@ -42,7 +41,7 @@ contract BetLibMock {
     return bet.hash(nonce);
   }
 
-  function backerTokenReturn(address[7] addresses, uint[6] values, bytes betPayload)
+  function backerTokenReturn(address[6] addresses, uint[6] values, bytes betPayload)
     external
     pure
     returns (uint)

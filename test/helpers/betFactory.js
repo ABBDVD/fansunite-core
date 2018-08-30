@@ -21,8 +21,7 @@ class BetFactory {
       addresses: [
         b.backer,
         b.layer,
-        b.backerToken,
-        b.layerToken,
+        b.token,
         b.feeRecipient,
         b.league,
         b.resolver
@@ -48,8 +47,7 @@ class BetFactory {
       "Bet(",
       "address backer,",
       "address layer,",
-      "address backerToken,",
-      "address layerToken,",
+      "address token,",
       "address feeRecipient,",
       "address league,",
       "address resolver,",
@@ -66,8 +64,7 @@ class BetFactory {
     const newBet = {
       backer: bet.backer,
       layer: bet.layer,
-      backerToken: bet.backerToken,
-      layerToken: bet.layerToken,
+      token: bet.token,
       feeRecipient: bet.feeRecipient,
       league: bet.league,
       resolver: bet.resolver,

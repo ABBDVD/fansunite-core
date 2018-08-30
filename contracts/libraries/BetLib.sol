@@ -12,8 +12,7 @@ library BetLib {
       "Bet(",
       "address backer,",
       "address layer,",
-      "address backerToken,",
-      "address layerToken,",
+      "address token,",
       "address feeRecipient,",
       "address league,",
       "address resolver,",
@@ -30,8 +29,7 @@ library BetLib {
   struct Bet {
     address backer;
     address layer;
-    address backerToken;
-    address layerToken;
+    address token;
     address feeRecipient;
     address league;
     address resolver;
@@ -55,8 +53,7 @@ library BetLib {
     bytes memory _addresses = abi.encodePacked(
       _bet.backer,
       _bet.layer,
-      _bet.backerToken,
-      _bet.layerToken,
+      _bet.token,
       _bet.feeRecipient,
       _bet.league,
       _bet.resolver
@@ -90,7 +87,7 @@ library BetLib {
    * @param _payload Bet payload for resolver
    * @return Returns the bet struct
    */
-  function createBet(address[7] _addresses, uint[6] _values, bytes _payload)
+  function createBet(address[6] _addresses, uint[6] _values, bytes _payload)
     internal
     pure
     returns (Bet)
@@ -98,11 +95,10 @@ library BetLib {
     return Bet({
       backer: _addresses[0],
       layer: _addresses[1],
-      backerToken: _addresses[2],
-      layerToken: _addresses[3],
-      feeRecipient: _addresses[4],
-      league: _addresses[5],
-      resolver: _addresses[6],
+      token: _addresses[2],
+      feeRecipient: _addresses[3],
+      league: _addresses[4],
+      resolver: _addresses[5],
       backerStake: _values[0],
       backerFee: _values[1],
       layerFee: _values[2],
