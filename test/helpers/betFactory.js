@@ -19,7 +19,29 @@ class BetFactory {
     let hash = this.hashBet(_bet);
     let signature = this.signBet(_bet, hash);
 
-    return
+    return {
+      addresses: [
+        _bet.backer,
+        _bet.layer,
+        _bet.token,
+        _bet.feeRecipient,
+        _bet.league,
+        _bet.resolver
+      ],
+      values: [
+        _bet.backerStake,
+        _bet.backerFee,
+        _bet.layerFee,
+        _bet.expiration,
+        _bet.fixture,
+        _bet.odds
+      ],
+      payload: _bet.payload,
+      bet: _bet,
+      nonce: this._nonce,
+      hash,
+      signature
+    };
   }
 
   hashBet(bet) {
