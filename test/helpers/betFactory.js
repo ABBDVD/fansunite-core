@@ -10,35 +10,16 @@ class BetFactory {
 
   async newSignedBet(betParams) {
     this._nonce++;
-    const b = {
+
+    const _bet = {
       ...this._defaultBetParams,
       ...betParams
     };
 
-    const betHash = this.hashBet(b);
+    let hash = this.hashBet(_bet);
+    let signature = this.signBet(_bet, hash);
 
-    return {
-      addresses: [
-        b.backer,
-        b.layer,
-        b.token,
-        b.feeRecipient,
-        b.league,
-        b.resolver
-      ],
-      values: [
-        b.backerStake,
-        b.backerFee,
-        b.layerFee,
-        b.expiration,
-        b.fixture,
-        b.odds
-      ],
-      payload: b.payload,
-      nonce: this._nonce,
-      signature: await this.signBet(b, betHash),
-      betHash
-    };
+    return
   }
 
   hashBet(bet) {
@@ -61,30 +42,32 @@ class BetFactory {
       ")"
     ];
 
-    const newBet = {
-      backer: bet.backer,
-      layer: bet.layer,
-      token: bet.token,
-      feeRecipient: bet.feeRecipient,
-      league: bet.league,
-      resolver: bet.resolver,
-      backerStake: bet.backerStake,
-      backerFee: bet.backerFee,
-      layerFee: bet.layerFee,
-      expiration: bet.expiration,
-      fixture: bet.fixture,
-      odds: bet.odds
-    };
+    let _addresses = [
+      bet.backer,
+      bet.layer,
+      bet.token,
+      bet.feeRecipient,
+      bet.league,
+      bet.resolver
+    ];
+
+    let _values = [
+      bet.backerStake,
+      bet.backerFee,
+      bet.layerFee,
+      bet.expiration,
+      bet.fixture,
+      bet.odds
+    ];
 
     let payloadHash = Web3.utils.soliditySha3.apply(null, [ bet.payload ]);
     let schemaHash = Web3.utils.soliditySha3.apply(null, schema);
-    let values = [ schemaHash, ...Object.values(newBet), payloadHash ];
-    let hash = Web3.utils.soliditySha3.apply(null, values);
-    return Web3.utils.soliditySha3.apply(null, [ this._nonce, hash ]);
+    let eip712Hash = Web3.utils.soliditySha3.apply(null, [ schemaHash, ..._addresses, ..._values, payloadHash ]);
+    return Web3.utils.soliditySha3.apply(null, [ this._nonce, eip712Hash ]);
   }
 
-  async signBet(bet, betHash) {
-    let sig = (await web3.eth.sign(betHash, bet.backer)).slice(2);
+  async signBet(bet, hash) {
+    let sig = (await web3.eth.sign(hash, bet.backer)).slice(2);
 
     let r = Buffer.from(sig.substring(0, 64), 'hex');
     let s = Buffer.from(sig.substring(64, 128), 'hex');

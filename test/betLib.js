@@ -8,7 +8,8 @@ contract('BetLib', (accounts) => {
 
   describe('Common BetLib tests', async () => {
 
-    let mock;
+    let mock
+      , bet;
 
     const betParams = {
       backer: accounts[0],
@@ -25,9 +26,8 @@ contract('BetLib', (accounts) => {
       odds: 2 * 10 ** 8,
       payload: web3.utils.randomHex(4)
     };
-
     const betFactory = new BetFactory(betParams);
-    let bet;
+
 
     before(async () => {
       mock = await BetLibMock.new();
@@ -48,7 +48,7 @@ contract('BetLib', (accounts) => {
 
     it('should hash bet parameters successfully', async () => {
       const hash = await mock.hash.call(bet.addresses, bet.values, bet.nonce, bet.payload);
-      assert.equal(hash, bet.betHash);
+      assert.equal(hash, bet.hash);
     });
 
     it('should return the correct backer token return', async () => {
