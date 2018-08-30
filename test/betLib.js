@@ -9,7 +9,7 @@ contract('BetLib', (accounts) => {
   describe('Common BetLib tests', async () => {
 
     let mock
-      , superBet;
+      , betProps;
 
     const baseBet = {
       backer: accounts[0],
@@ -31,28 +31,28 @@ contract('BetLib', (accounts) => {
 
     before(async () => {
       mock = await BetLibMock.new();
-      superBet = await betFactory.generate({});
+      betProps = await betFactory.generate({});
     });
 
     it('should create a bet struct successfully', async () => {
 
-      const result = await mock.generate.call(superBet.subjects, superBet.params, superBet.payload);
-      assert.deepEqual(result[0], superBet.subjects);
-      assert.equal(result[1][0], superBet.params[0]);
-      assert.equal(result[1][1], superBet.params[1]);
-      assert.equal(result[1][2], superBet.params[2]);
-      assert.equal(result[1][3], superBet.params[3]);
-      assert.equal(result[1][4], superBet.params[4]);
-      assert.equal(result[2], superBet.payload);
+      const result = await mock.generate.call(betProps.subjects, betProps.params, betProps.payload);
+      assert.deepEqual(result[0], betProps.subjects);
+      assert.equal(result[1][0], betProps.params[0]);
+      assert.equal(result[1][1], betProps.params[1]);
+      assert.equal(result[1][2], betProps.params[2]);
+      assert.equal(result[1][3], betProps.params[3]);
+      assert.equal(result[1][4], betProps.params[4]);
+      assert.equal(result[2], betProps.payload);
     });
 
     it('should hash bet parameters successfully', async () => {
-      const hash = await mock.hash.call(superBet.subjects, superBet.params, superBet.payload, superBet.nonce);
-      assert.equal(hash, superBet.hash);
+      const hash = await mock.hash.call(betProps.subjects, betProps.params, betProps.payload, betProps.nonce);
+      assert.equal(hash, betProps.hash);
     });
 
     it('should return the correct backer token return', async () => {
-      const result = await mock.backerTokenReturn.call(superBet.subjects, superBet.params, superBet.payload);
+      const result = await mock.backerTokenReturn.call(betProps.subjects, betProps.params, betProps.payload);
       assert.equal(result, (baseBet.backerStake * baseBet.odds) / (10 ** 8));
     });
 
