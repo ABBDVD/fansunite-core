@@ -6,12 +6,12 @@ contract BetLibMock {
 
   using BetLib for BetLib.Bet;
 
-  function createBet(address[6] addresses, uint[6] values, bytes betPayload)
+  function generate(address[6] _subjects, uint[6] _params, bytes _payload)
     external
     pure
     returns (address[6], uint[6], bytes)
   {
-    BetLib.Bet memory bet =  BetLib.createBet(addresses, values, betPayload);
+    BetLib.Bet memory bet =  BetLib.generate(_subjects, _params, _payload);
     return ([
         bet.backer,
         bet.layer,
@@ -29,26 +29,26 @@ contract BetLibMock {
         bet.odds
       ],
         bet.payload
-      );
+    );
   }
 
-  function hash(address[6] addresses, uint[6] values, uint nonce, bytes betPayload)
+  function hash(address[6] _subjects, uint[6] _params, bytes _payload, uint _nonce)
     external
     pure
     returns (bytes32)
   {
-    BetLib.Bet memory bet = BetLib.createBet(addresses, values, betPayload);
-    return bet.hash(nonce);
+    BetLib.Bet memory bet = BetLib.generate(_subjects, _params, _payload);
+    return bet.hash(_nonce);
   }
 
-  function backerTokenReturn(address[6] addresses, uint[6] values, bytes betPayload)
+  function backerTokenReturn(address[6] _subjects, uint[6] _params, bytes _payload)
     external
     pure
     returns (uint)
   {
-    BetLib.Bet memory bet = BetLib.createBet(addresses, values, betPayload);
-    uint decimals = 8;
-    return bet.backerTokenReturn(decimals);
+    BetLib.Bet memory bet = BetLib.generate(_subjects, _params, _payload);
+    uint _decimals = 8;
+    return bet.backerTokenReturn(_decimals);
   }
 
 }

@@ -43,6 +43,35 @@ library BetLib {
   }
 
   /**
+   * @notice Creates a bet struct
+   * @param _subjects Associated subjects (check IBetManager for specifics)
+   * @param _params Associated parameters (check IBetManager for specifics)
+   * @param _payload Payload for resolver
+   * @return Returns the bet struct
+   */
+  function generate(address[6] _subjects, uint[6] _params, bytes _payload)
+    internal
+    pure
+    returns (Bet)
+  {
+    return Bet({
+      backer: _subjects[0],
+      layer: _subjects[1],
+      token: _subjects[2],
+      feeRecipient: _subjects[3],
+      league: _subjects[4],
+      resolver: _subjects[5],
+      backerStake: _params[0],
+      backerFee: _params[1],
+      layerFee: _params[2],
+      expiration: _params[3],
+      fixture: _params[4],
+      odds: _params[5],
+      payload: _payload
+    });
+  }
+
+  /**
    * @notice Calculates Keccak-256 hash of the bet struct
    * @param _bet The bet struct
    * @param _nonce Arbitrary number to ensure uniqueness of bet hash
@@ -50,7 +79,7 @@ library BetLib {
    */
   function hash(Bet _bet, uint _nonce) internal pure returns (bytes32) {
 
-    bytes memory _addresses = abi.encodePacked(
+    bytes memory _subjects = abi.encodePacked(
       _bet.backer,
       _bet.layer,
       _bet.token,
@@ -71,42 +100,13 @@ library BetLib {
     bytes32 _hash = keccak256(
       abi.encodePacked(
         BET_SCHEMA_HASH,
-        _addresses,
+        _subjects,
         _params,
         keccak256(_bet.payload)
       )
     );
 
     return keccak256(abi.encodePacked(_nonce, _hash));
-  }
-
-  /**
-   * @notice Creates the bet structure
-   * @param _addresses Array of bet address parameters
-   * @param _values Array of bet value parameters
-   * @param _payload Bet payload for resolver
-   * @return Returns the bet struct
-   */
-  function createBet(address[6] _addresses, uint[6] _values, bytes _payload)
-    internal
-    pure
-    returns (Bet)
-  {
-    return Bet({
-      backer: _addresses[0],
-      layer: _addresses[1],
-      token: _addresses[2],
-      feeRecipient: _addresses[3],
-      league: _addresses[4],
-      resolver: _addresses[5],
-      backerStake: _values[0],
-      backerFee: _values[1],
-      layerFee: _values[2],
-      expiration: _values[3],
-      fixture: _values[4],
-      odds: _values[5],
-      payload: _payload
-    });
   }
 
   /**
