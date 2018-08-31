@@ -9,22 +9,50 @@ import "../utils/RegistryAccessible.sol";
 contract IBetManager is RegistryAccessible {
 
   /**
+   * @notice Submits a bet
+   * @param _subjects Subjects associated with bet
+   *  [backer, layer, token, feeRecipient, league, resolver]
+   * @param _params Parameters associated with bet
+   *  [backerStake, backerFee, layerFee, expiration, fixture, odds]
+   * @param _layerFill The number of tokens that they layer intends to bet
+   * @param _nonce Nonce, to ensure hash uniqueness
+   * @param _payload Payload for resolver
+   * @param _signature ECDSA signature along with the mode
+   *  (0 = Typed (EIP712), 1 = Geth, 2 = Trezor) {mode}{v}{r}{s}.
+   */
+  function submitBet(
+    address[6] _subjects,
+    uint[6] _params,
+    uint _layerFill,
+    uint _nonce,
+    bytes _payload,
+    bytes _signature
+  )
+    external;
+
+  /**
    * @notice Claims a bet, transfers tokens and fees based on fixture resolution
+   * @param _bet Keccak-256 EIP712 hash of the bet struct
+   */
+  function claimBet(bytes32 _bet) external;
+
+  /**
+   * @notice Cancels bet `_bet`, if not filled
+   * @param _bet Keccak-256 EIP712 hash of the bet
+   */
+  function cancelBet(bytes32 _bet) external;
+
+  /**
+   * @notice Gets the bet result
    * @param _bet Keccak-256 EIP712 hash of the bet struct
    * @return Result of bet (refer to IResolver for specifics of the return type)
    */
-  function claimBet(bytes32 _bet) external returns (uint8);
+  function getResult(bytes32 _bet) external view returns (uint8);
 
   /**
-   * @notice Cancels a bet, if not filled
-   * @param _bet Keccak-256 EIP712 hash of the bet
-   * @return Returns `true` if bet successfully cancelled, `false` otherwise
-   */
-  function cancelBet(bytes32 _bet) external returns (bool);
-
-  /**
-   * @notice Returns all the bet identifiers for address `_subject`
+   * @notice Gets all the bet identifiers for address `_subject`
    * @param _subject Address of a layer or backer
+   * @return Returns list of bet ids for backer / layer `_subject`
    */
   function getBetsBySubject(address _subject) external view returns (bytes32[]);
 
@@ -36,7 +64,7 @@ contract IBetManager is RegistryAccessible {
    * @return Params associated with `_bet`
    *  [backerStake, backerFee, layerFee, expiration, fixture, odds]
    * @return Payload associated with `_bet`
-  */
+   */
   function getBet(bytes32 _bet) external view returns (address[6], uint[6], bytes);
 
 }
