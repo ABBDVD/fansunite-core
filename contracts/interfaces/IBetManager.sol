@@ -10,10 +10,8 @@ contract IBetManager is RegistryAccessible {
 
   /**
    * @notice Submits a bet
-   * @param _subjects Subjects associated with bet
-   *  [backer, layer, token, feeRecipient, league, resolver]
-   * @param _params Parameters associated with bet
-   *  [backerStake, backerFee, layerFee, expiration, fixture, odds]
+   * @param _subjects Subjects associated with bet [backer, layer, token, league, resolver]
+   * @param _params Parameters associated with bet [backerStake, fixture, odds, expiration]
    * @param _layerFill The number of tokens that they layer intends to bet
    * @param _nonce Nonce, to ensure hash uniqueness
    * @param _payload Payload for resolver
@@ -21,8 +19,8 @@ contract IBetManager is RegistryAccessible {
    *  (0 = Typed (EIP712), 1 = Geth, 2 = Trezor) {mode}{v}{r}{s}.
    */
   function submitBet(
-    address[6] _subjects,
-    uint[6] _params,
+    address[5] _subjects,
+    uint[4] _params,
     uint _layerFill,
     uint _nonce,
     bytes _payload,
@@ -65,6 +63,6 @@ contract IBetManager is RegistryAccessible {
    *  [backerStake, backerFee, layerFee, expiration, fixture, odds]
    * @return Payload associated with `_bet`
    */
-  function getBet(bytes32 _bet) external view returns (address[6], uint[6], bytes);
+  function getBet(bytes32 _bet) external view returns (address[5], uint[4], bytes);
 
 }

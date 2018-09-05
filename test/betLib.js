@@ -15,15 +15,12 @@ contract('BetLib', (accounts) => {
       backer: accounts[0],
       layer: accounts[1],
       token: accounts[2],
-      feeRecipient: accounts[3],
       league: accounts[4],
       resolver: accounts[5],
       backerStake: 1000,
-      backerFee: 1,
-      layerFee: 2,
-      expiration: Math.round(new Date().getTime() / 1000),
       fixture: 1,
       odds: 2 * 10 ** 8,
+      expiration: Math.round(new Date().getTime() / 1000),
       payload: web3.utils.randomHex(4)
     };
 
@@ -52,7 +49,7 @@ contract('BetLib', (accounts) => {
     });
 
     it('should return the correct backer token return', async () => {
-      const result = await mock.backerTokenReturn.call(betProps.subjects, betProps.params, betProps.payload);
+      const result = await mock.backerReturn.call(betProps.subjects, betProps.params, betProps.payload);
       assert.equal(result, (baseBet.backerStake * baseBet.odds) / (10 ** 8));
     });
 

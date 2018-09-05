@@ -24,17 +24,14 @@ class BetFactory {
         _bet.backer,
         _bet.layer,
         _bet.token,
-        _bet.feeRecipient,
         _bet.league,
         _bet.resolver
       ],
       params: [
         _bet.backerStake,
-        _bet.backerFee,
-        _bet.layerFee,
-        _bet.expiration,
         _bet.fixture,
-        _bet.odds
+        _bet.odds,
+        _bet.expiration
       ],
       payload: _bet.payload,
       bet: _bet,
@@ -51,15 +48,12 @@ class BetFactory {
       "address backer,",
       "address layer,",
       "address token,",
-      "address feeRecipient,",
       "address league,",
       "address resolver,",
       "uint256 backerStake,",
-      "uint256 backerFee,",
-      "uint256 layerFee,",
-      "uint256 expiration,",
       "uint256 fixture,",
       "uint256 odds,",
+      "uint256 expiration,",
       "bytes payload",
       ")"
     ];
@@ -68,18 +62,15 @@ class BetFactory {
       bet.backer,
       bet.layer,
       bet.token,
-      bet.feeRecipient,
       bet.league,
       bet.resolver
     ];
 
     let params = [
       bet.backerStake,
-      bet.backerFee,
-      bet.layerFee,
-      bet.expiration,
       bet.fixture,
-      bet.odds
+      bet.odds,
+      bet.expiration,
     ];
 
     let payloadHash = Web3.utils.soliditySha3.apply(null, [ bet.payload ]);

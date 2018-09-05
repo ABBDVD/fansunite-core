@@ -13,15 +13,12 @@ library BetLib {
       "address backer,",
       "address layer,",
       "address token,",
-      "address feeRecipient,",
       "address league,",
       "address resolver,",
       "uint256 backerStake,",
-      "uint256 backerFee,",
-      "uint256 layerFee,",
-      "uint256 expiration,",
       "uint256 fixture,",
       "uint256 odds,",
+      "uint256 expiration,",
       "bytes payload",
       ")"
   ));
@@ -30,15 +27,12 @@ library BetLib {
     address backer;
     address layer;
     address token;
-    address feeRecipient;
     address league;
     address resolver;
     uint256 backerStake;
-    uint256 backerFee;
-    uint256 layerFee;
-    uint256 expiration;
     uint256 fixture;
     uint256 odds;
+    uint256 expiration;
     bytes payload;
   }
 
@@ -49,7 +43,7 @@ library BetLib {
    * @param _payload Payload for resolver
    * @return Returns the bet struct
    */
-  function generate(address[6] _subjects, uint[6] _params, bytes _payload)
+  function generate(address[5] _subjects, uint[4] _params, bytes _payload)
     internal
     pure
     returns (Bet)
@@ -58,15 +52,12 @@ library BetLib {
       backer: _subjects[0],
       layer: _subjects[1],
       token: _subjects[2],
-      feeRecipient: _subjects[3],
-      league: _subjects[4],
-      resolver: _subjects[5],
+      league: _subjects[3],
+      resolver: _subjects[4],
       backerStake: _params[0],
-      backerFee: _params[1],
-      layerFee: _params[2],
+      fixture: _params[1],
+      odds: _params[2],
       expiration: _params[3],
-      fixture: _params[4],
-      odds: _params[5],
       payload: _payload
     });
   }
@@ -83,18 +74,15 @@ library BetLib {
       _bet.backer,
       _bet.layer,
       _bet.token,
-      _bet.feeRecipient,
       _bet.league,
       _bet.resolver
     );
 
     bytes memory _params = abi.encodePacked(
       _bet.backerStake,
-      _bet.backerFee,
-      _bet.layerFee,
-      _bet.expiration,
       _bet.fixture,
-      _bet.odds
+      _bet.odds,
+      _bet.expiration
     );
 
     bytes32 _hash = keccak256(
@@ -115,7 +103,7 @@ library BetLib {
    * @param _decimals Decimals of the odds
    * @return Returns the amount that backer wins based on the odds
    */
-  function backerTokenReturn(Bet _bet, uint _decimals) internal pure returns (uint) {
+  function backerReturn(Bet _bet, uint _decimals) internal pure returns (uint) {
     return _bet.backerStake.mul(_bet.odds).div(10 ** _decimals);
   }
 
