@@ -6,6 +6,8 @@ contract BetLibMock {
 
   using BetLib for BetLib.Bet;
 
+  uint public chainId = 1;
+
   function generate(address[5] _subjects, uint[4] _params, bytes _payload)
     external
     pure
@@ -31,11 +33,11 @@ contract BetLibMock {
 
   function hash(address[5] _subjects, uint[4] _params, bytes _payload, uint _nonce)
     external
-    pure
+    view
     returns (bytes32)
   {
     BetLib.Bet memory bet = BetLib.generate(_subjects, _params, _payload);
-    return bet.hash(_nonce);
+    return bet.hash(chainId, _nonce);
   }
 
   function backerReturn(address[5] _subjects, uint[4] _params, bytes _payload)

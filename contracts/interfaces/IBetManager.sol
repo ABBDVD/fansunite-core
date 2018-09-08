@@ -1,12 +1,9 @@
 pragma solidity ^0.4.24;
 
-import "../utils/RegistryAccessible.sol";
-
-
 /**
  * @title Interface for Bet Manger Contract
  */
-contract IBetManager is RegistryAccessible {
+contract IBetManager {
 
   /**
    * @notice Submits a bet
@@ -16,7 +13,7 @@ contract IBetManager is RegistryAccessible {
    * @param _nonce Nonce, to ensure hash uniqueness
    * @param _payload Payload for resolver
    * @param _signature ECDSA signature along with the mode
-   *  (0 = Typed (EIP712), 1 = Geth, 2 = Trezor) {mode}{v}{r}{s}.
+   *  (0 = Typed, 1 = Geth, 2 = Trezor) {mode}{v}{r}{s}.
    */
   function submitBet(
     address[5] _subjects,
@@ -30,19 +27,19 @@ contract IBetManager is RegistryAccessible {
 
   /**
    * @notice Claims a bet, transfers tokens and fees based on fixture resolution
-   * @param _bet Keccak-256 EIP712 hash of the bet struct
+   * @param _bet Keccak-256 hash of the bet struct, along with chainId and nonce
    */
   function claimBet(bytes32 _bet) external;
 
   /**
    * @notice Cancels bet `_bet`, if not filled
-   * @param _bet Keccak-256 EIP712 hash of the bet
+   * @param _bet Keccak-256 hash of the bet struct, along with chainId and nonce
    */
   function cancelBet(bytes32 _bet) external;
 
   /**
    * @notice Gets the bet result
-   * @param _bet Keccak-256 EIP712 hash of the bet struct
+   * @param _bet Keccak-256 hash of the bet struct, along with chainId and nonce
    * @return Result of bet (refer to IResolver for specifics of the return type)
    */
   function getResult(bytes32 _bet) external view returns (uint8);
@@ -56,7 +53,7 @@ contract IBetManager is RegistryAccessible {
 
   /**
    * @notice Gets subjects, params and payload associated with bet `_bet`
-   * @param _bet Keccak-256 EIP712 hash of the bet struct
+   * @param _bet Keccak-256 hash of the bet struct, along with chainId and nonce
    * @return Subjects associated with `_bet`
    *  [backer, layer, backerToken, layerToken, feeRecipient, league, resolver]
    * @return Params associated with `_bet`

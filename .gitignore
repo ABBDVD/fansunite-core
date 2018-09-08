@@ -33,4 +33,5 @@ node_modules/
 # Project Specific
 build/
 TODO.md
+ISSUES.md
 .swp

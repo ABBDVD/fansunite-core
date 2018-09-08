@@ -4,7 +4,7 @@ let LeagueLib = artifacts.require('./leagues/LeagueLib001.sol');
 let LeagueFactory = artifacts.require('./leagues/LeagueFactory001.sol');
 let Vault = artifacts.require('./vault/Vault.sol');
 
-module.exports = function(deployer, networks, accounts) {
+module.exports = function(deployer, network, accounts) {
   let registry;
 
   return deployer.deploy(Registry).then(() => {

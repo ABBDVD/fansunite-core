@@ -1,7 +1,5 @@
 pragma solidity ^0.4.24;
 
-import "../utils/RegistryAccessible.sol";
-
 
 /**
  * @title Interface for the fansunite league registry contract
@@ -9,7 +7,7 @@ import "../utils/RegistryAccessible.sol";
  * @dev LeagueRegistry stores addresses to versioned factories responsible for deploying new
  *  league contracts
  */
-contract ILeagueRegistry is RegistryAccessible {
+contract ILeagueRegistry {
 
   /**
    * @notice Creates a new league class

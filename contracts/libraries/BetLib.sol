@@ -6,7 +6,7 @@ library BetLib {
 
   using SafeMath for uint;
 
-  // Hash for the EIP712 Bet Schema
+  // Hash for the Bet Schema
   bytes32 constant BET_SCHEMA_HASH = keccak256(
     abi.encodePacked(
       "Bet(",
@@ -66,9 +66,9 @@ library BetLib {
    * @notice Calculates Keccak-256 hash of the bet struct
    * @param _bet The bet struct
    * @param _nonce Arbitrary number to ensure uniqueness of bet hash
-   * @return Keccak-256 EIP712 hash of the bet.
+   * @return Keccak-256 hash of (_chainId | _nonce | _bet)
    */
-  function hash(Bet _bet, uint _nonce) internal pure returns (bytes32) {
+  function hash(Bet _bet, uint _chainId, uint _nonce) internal pure returns (bytes32) {
 
     bytes memory _subjects = abi.encodePacked(
       _bet.backer,
@@ -94,7 +94,7 @@ library BetLib {
       )
     );
 
-    return keccak256(abi.encodePacked(_nonce, _hash));
+    return keccak256(abi.encodePacked(_chainId, _nonce, _hash));
   }
 
   /**

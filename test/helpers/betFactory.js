@@ -58,6 +58,8 @@ class BetFactory {
       ")"
     ];
 
+    const chainId = 1;
+
     let subjects = [
       bet.backer,
       bet.layer,
@@ -75,8 +77,8 @@ class BetFactory {
 
     let payloadHash = Web3.utils.soliditySha3.apply(null, [ bet.payload ]);
     let schemaHash = Web3.utils.soliditySha3.apply(null, schema);
-    let eip712Hash = Web3.utils.soliditySha3.apply(null, [ schemaHash, ...subjects, ...params, payloadHash ]);
-    return Web3.utils.soliditySha3.apply(null, [ this._nonce, eip712Hash ]);
+    let preHash = Web3.utils.soliditySha3.apply(null, [ schemaHash, ...subjects, ...params, payloadHash ]);
+    return Web3.utils.soliditySha3.apply(null, [ chainId, this._nonce, preHash ]);
   }
 
   static async signBet(bet, hash) {

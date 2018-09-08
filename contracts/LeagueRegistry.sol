@@ -1,9 +1,13 @@
 pragma solidity ^0.4.24;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+
 import "./interfaces/ILeagueRegistry.sol";
 import "./interfaces/ILeague.sol";
 import "./interfaces/ILeagueFactory.sol";
+
+import "./utils/RegistryAccessible.sol";
+
 
 
 /**
@@ -13,7 +17,7 @@ import "./interfaces/ILeagueFactory.sol";
  * @dev LeagueRegistry stores addresses to versioned factories responsible for deploying new
  *  league contracts
  */
-contract LeagueRegistry is Ownable, ILeagueRegistry {
+contract LeagueRegistry is Ownable, ILeagueRegistry, RegistryAccessible {
 
   // Factory version
   string internal factoryVersion; // TODO:pre:think Manan => Edge case of version not set

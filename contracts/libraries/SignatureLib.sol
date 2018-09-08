@@ -13,7 +13,7 @@ library SignatureLib {
    * @param hash Hash which was signed.
    * @param signer Address of the signer.
    * @param signature ECDSA signature along with the mode
-   *  (0 = Typed (EIP712), 1 = Geth, 2 = Trezor) {mode}{v}{r}{s}.
+   *  (0 = Typed, 1 = Geth, 2 = Trezor) {mode}{v}{r}{s}.
    * @return Returns whether signature is from a specified user.
    */
   function isValidSignature(bytes32 hash, address signer, bytes signature)
@@ -28,7 +28,7 @@ library SignatureLib {
    * @notice Recovers signer from signature.
    * @param hash Hash which was signed.
    * @param signature ECDSA signature along with the mode
-   *  (0 = Typed (EIP712), 1 = Geth, 2 = Trezor) {mode}{v}{r}{s}.
+   *  (0 = Typed, 1 = Geth, 2 = Trezor) {mode}{v}{r}{s}.
    * @return Returns Address of the signer.
    */
   function recover(bytes32 hash, bytes signature) internal pure returns (address) {

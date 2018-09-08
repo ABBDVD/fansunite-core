@@ -3,13 +3,17 @@ pragma solidity ^0.4.24;
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+
 import "../interfaces/IVault.sol";
+
+import "../utils/RegistryAccessible.sol";
+
 
 /*
  * @title Vault Contract
  * @dev Vault contract manages all deposits and withdrawals and keep calculated exposures in check
  */
-contract Vault is Ownable, IVault {
+contract Vault is Ownable, IVault, RegistryAccessible {
 
   using SafeMath for uint;
 
