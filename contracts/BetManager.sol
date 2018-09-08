@@ -31,6 +31,9 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
   // Mapping of Hash to corresponding BetLib.Bet struct
   mapping (bytes32 => BetLib.Bet) public bets;
 
+  // Resolves to `true` if hash is used, `false` otherwise
+  mapping(bytes32 => bool) public accepted;
+
   /**
    * @notice Constructor
    * @param _chainId ChainId to be set
@@ -59,18 +62,9 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
   )
     external
   {
-    BetLib.Bet memory bet = BetLib.generate(_subjects, _params, _payload);
+    BetLib.Bet memory _bet = BetLib.generate(_subjects, _params, _payload);
+    bytes32 _hash = BetLib.hash(_bet, chainId, _nonce);
     // TODO: Manan
-    // + Verify layer is msg.sender (layer verification)
-    // + Verify `_signature` is valid (backer verification)
-    // + Verify unique `_nonce`
-    // + Verify league
-    // + Verify resolver? Registered with league, allowed for backer?
-    // + Verify fixture
-    // + Verify `_payload` with resolver
-    // + Verify expiration > now
-    // + Verify stakes in Vault / alter stakes?
-    // + Store bet
   }
 
   /**
@@ -111,40 +105,48 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
   function getBet(bytes32 _bet) external view returns (address[5], uint[4], bytes);
 
   /**
-   * @dev Carries out the following checks:
-   *  + `msg.sender` is `_bet.layer` || `_bet.layer == 0x00` (hence, bet is approved by layer)
-   *  + `_hash` is valid
-   *  + `_bet.backer` has signed `_hash` (hence, bet is approved by backer)
+   * @dev Throws if any of the following checks fail
+   *  + `msg.sender` is `_bet.layer` || `_bet.layer == 0x00`
+   *  + `_bet.backer` has signed `_hash`
    *  + `_hash` is unique (preventing replay attacks)
    * @param _bet Bet struct
+   * @param _hash Keccak-256 hash of the bet struct, along with chainId and nonce
    * @param _signature ECDSA signature along with the mode
-   * @return Returns `true` if all mentioned conditions are met, `false` otherwise
    */
-  function _authenticateBet(BetLib.Bet _bet, bytes _signature)
-    internal
-    returns (bool);
+  function _authenticateBet(BetLib.Bet _bet, bytes32 _hash, bytes _signature) internal {
+    require(
+      msg.sender == _bet.layer || _bet.layer == address(0),
+      "Bet is not permitted for the msg.sender to take"
+    );
+    require(
+      SignatureLib.isValidSignature(_hash, _bet.backer, _signature),
+      "Tx is sent with an invalid signature"
+    );
+    require(
+      !accepted[_hash],
+      "Bet with same hash been submitted before"
+    );
+  }
 
   /**
-   * @dev Carries out the following checks:
+   * @dev Throws if any of the following checks fail
    *  + `_bet.backer` has appropriate amount staked in vault
    *  + `_bet.layer` has appropriate amount staked in vault
    *  + `address(this)` is an approved spender by both backer and layer
    * @param _bet Bet struct
-   * @return Returns `true` if all mentioned conditions are met, `false` otherwise
    */
-  function _authorizeBet(BetLib.Bet _bet) internal returns (bool);
+  function _authorizeBet(BetLib.Bet _bet) internal;
 
   /**
-   * @dev The function validates the following:
+   * @dev Throws if any of the following checks fail
    *  + `_bet.league` is a registered league with FansUnite
    *  + `_bet.resolver` is registered with league
    *  + `_bet.fixture` is scheduled with league
    *  + `_bet.payload` is valid according to resolver
    *  + `_bet.expiration` is greater than `now`
    * @param _bet Bet struct
-   * @return Returns `true` if all mentioned conditions are met, `false` otherwise
    */
-  function _validateBet(BetLib.Bet _bet) internal returns (bool);
+  function _validateBet(BetLib.Bet _bet) internal;
 
   /**
    * @dev Processes the funds and stores the bet

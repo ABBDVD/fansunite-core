@@ -72,7 +72,7 @@ class BetFactory {
       bet.backerStake,
       bet.fixture,
       bet.odds,
-      bet.expiration,
+      bet.expiration
     ];
 
     let payloadHash = Web3.utils.soliditySha3.apply(null, [ bet.payload ]);
