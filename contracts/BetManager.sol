@@ -29,13 +29,15 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
   uint public constant ODDS_DECIMALS = 4;
 
   // Mapping of Hash to corresponding BetLib.Bet struct
-  mapping (bytes32 => BetLib.Bet) public bets;
-
+  mapping (bytes32 => BetLib.Bet) internal bets;
   // Resolves to `true` if hash is used, `false` otherwise
-  mapping(bytes32 => bool) public accepted;
+  mapping(bytes32 => bool) internal accepted;
+  // Mapping of user address to Bet Hashes (ids)
+  mapping(address => bytes32[]) internal betsByUser;
 
   /**
    * @notice Constructor
+   * @dev Change chainId in case of a fork, making sure txs cannot be replayed on forked chains
    * @param _chainId ChainId to be set
    */
   constructor(uint _chainId) public ChainSpecifiable(_chainId) {
@@ -64,7 +66,11 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
   {
     BetLib.Bet memory _bet = BetLib.generate(_subjects, _params, _payload);
     bytes32 _hash = BetLib.hash(_bet, chainId, _nonce);
-    // TODO: Manan
+
+    _authenticateBet(_bet, _hash, _signature);
+    _authorizeBet(_bet);
+    _validateBet(_bet);
+    _processBet(_bet);
   }
 
   /**
@@ -107,46 +113,109 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
   /**
    * @dev Throws if any of the following checks fail
    *  + `msg.sender` is `_bet.layer` || `_bet.layer == 0x00`
+   *  + `msg.sender` is not `_bet.backer`
    *  + `_bet.backer` has signed `_hash`
    *  + `_hash` is unique (preventing replay attacks)
    * @param _bet Bet struct
    * @param _hash Keccak-256 hash of the bet struct, along with chainId and nonce
    * @param _signature ECDSA signature along with the mode
    */
-  function _authenticateBet(BetLib.Bet _bet, bytes32 _hash, bytes _signature) internal {
+  function _authenticateBet(BetLib.Bet memory _bet, bytes32 _hash, bytes _signature)
+    internal
+    view
+  {
     require(
       msg.sender == _bet.layer || _bet.layer == address(0),
       "Bet is not permitted for the msg.sender to take"
     );
     require(
-      SignatureLib.isValidSignature(_hash, _bet.backer, _signature),
-      "Tx is sent with an invalid signature"
+      _bet.backer != address(0) && _bet.backer != msg.sender,
+      "Bet is not permitted for the msg.sender to take"
     );
     require(
       !accepted[_hash],
       "Bet with same hash been submitted before"
     );
+    require(
+      SignatureLib.isValidSignature(_hash, _bet.backer, _signature),
+      "Tx is sent with an invalid signature"
+    );
   }
 
   /**
    * @dev Throws if any of the following checks fail
+   *  + `address(this)` is an approved spender by both backer and layer
    *  + `_bet.backer` has appropriate amount staked in vault
    *  + `_bet.layer` has appropriate amount staked in vault
-   *  + `address(this)` is an approved spender by both backer and layer
    * @param _bet Bet struct
    */
-  function _authorizeBet(BetLib.Bet _bet) internal;
+  function _authorizeBet(BetLib.Bet memory _bet) internal view {
+    IVault _vault = IVault(registry.getAddress("FanVault"));
+
+    require(
+      _vault.isApproved(_bet.backer, address(this)),
+      "Backer has not approved BetManager to move funds in Vault"
+    );
+    require(
+      _vault.isApproved(msg.sender, address(this)),
+      "Layer has not approved BetManager to move funds in Vault"
+    );
+    require(
+      _vault.balanceOf(_bet.token, _bet.backer) >= _bet.backerStake,
+      "Backer does not have sufficient tokens"
+    );
+    require(
+      _vault.balanceOf(_bet.token, _bet.layer) >= BetLib.backerReturn(_bet, ODDS_DECIMALS),
+      "Layer does not have sufficient tokens"
+    );
+  }
 
   /**
    * @dev Throws if any of the following checks fail
    *  + `_bet.league` is a registered league with FansUnite
    *  + `_bet.resolver` is registered with league
    *  + `_bet.fixture` is scheduled with league
-   *  + `_bet.payload` is valid according to resolver
+   *  + `_bet.resolver` is not resolved for `_bet.fixture`
+   *  + `_bet.backerStake` must belong to set ℝ+
+   *  + `_bet.odds` must belong to set ℝ+
    *  + `_bet.expiration` is greater than `now`
+   *  + `_bet.payload` is valid according to resolver
    * @param _bet Bet struct
    */
-  function _validateBet(BetLib.Bet _bet) internal;
+  function _validateBet(BetLib.Bet memory _bet) internal view {
+    ILeagueRegistry _leagueRegistry = ILeagueRegistry(registry.getAddress("LeagueRegistry"));
+    ILeague _league = ILeague(_bet.league);
+
+    require(
+      _leagueRegistry.isLeagueRegistered(_bet.league),
+      "League is not registered with FansUnite"
+    );
+    require(
+      _league.isResolverRegistered(_bet.resolver),
+      "Resolver is not registered with FansUnite"
+    );
+    require(
+      _league.isFixtureScheduled(_bet.fixture),
+      "Fixture is not scheduled with League"
+    );
+    require(
+      _league.isFixtureResolved(_bet.fixture, _bet.resolver) != 1,
+      "Fixture is already resolved"
+    );
+    require(
+      _bet.backerStake > 0,
+      "Stake does not belong to set ℝ+"
+    );
+    require(
+      _bet.odds > 0,
+      "Odds does not belong to set ℝ+"
+    );
+    require(
+      _bet.expiration > block.timestamp,
+      "Bet has expired"
+    );
+    // TODO:pre:blocked Manan => Validate `_bet.payload` through resolver
+  }
 
   /**
    * @dev Processes the funds and stores the bet

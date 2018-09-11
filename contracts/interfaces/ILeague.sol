@@ -65,8 +65,8 @@ contract ILeague {
    * @dev It is possible that some resolvers do not get resolution payloads from oracles
    * @param _id Id of the fixture
    * @param _resolver Address of the resolver
-   * @return `0` if fixture is not resolved, `1` if fixture is resolved and for resolver `_resolver`,
-   *  `2` if fixture is resolved but resolver `_resolver
+   * @return `0` if fixture is not resolved, `1` if fixture is resolved and resolver `_resolver`
+   *   is resolved, `2` if fixture is resolved but resolver `_resolver` is not
    */
   function isFixtureResolved(uint _id, address _resolver) external view returns (uint8);
 
