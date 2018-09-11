@@ -21,6 +21,9 @@
     ],
     "security/no-inline-assembly": [
       "off"
+    ],
+    "no-unused-vars": [
+      "warning"
     ]
   }
 }

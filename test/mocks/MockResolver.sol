@@ -49,7 +49,7 @@ contract MockResolver is IResolver, BaseResolver {
    * @dev Probably don't need this function as getInitSignature can be used to compute selector
    * @return Selector for the init function
    */
-  function getInitSelector() external view returns (bytes4) {
+  function getInitSelector() external pure returns (bytes4) {
     return this.resolve.selector;
   }
 
@@ -66,7 +66,7 @@ contract MockResolver is IResolver, BaseResolver {
    * @dev Probably don't need this function as getValidatorSignature can be used to compute selector
    * @return Selector for the validator function
    */
-  function getValidatorSelector() external view returns (bytes4) {
+  function getValidatorSelector() external pure returns (bytes4) {
     return this.validate.selector;
   }
 
@@ -82,7 +82,7 @@ contract MockResolver is IResolver, BaseResolver {
    * @notice Gets the bet type the resolver resolves
    * @return Type of the bet the resolver resolves
    */
-  function getType() external pure returns (string) {
+  function getType() external view returns (string) {
     return "Result";
   }
 

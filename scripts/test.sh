@@ -41,7 +41,7 @@ init() {
   if is_running; then
     echo "Using existing ethrpc instance"
   else
-    echo "Starting our own ethrpc instance"
+    echo "Starting new ethrpc instance"
     start_ethrpc
   fi
 

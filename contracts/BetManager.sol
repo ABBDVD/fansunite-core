@@ -214,7 +214,13 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
       _bet.expiration > block.timestamp,
       "Bet has expired"
     );
+    // TODO:pre Manan => Check if resolver supports league version doesSupportVersion()
     // TODO:pre:blocked Manan => Validate `_bet.payload` through resolver
+    bool result;
+
+    assembly {
+
+    }
   }
 
   /**
