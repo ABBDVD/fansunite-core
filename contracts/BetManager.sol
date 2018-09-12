@@ -215,12 +215,9 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
       "Bet has expired"
     );
     // TODO:pre Manan => Check if resolver supports league version doesSupportVersion()
-    // TODO:pre:blocked Manan => Validate `_bet.payload` through resolver
-    bool result;
 
-    assembly {
+    __validatePayload(_bet);
 
-    }
   }
 
   /**
@@ -228,5 +225,61 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
    * @param _bet Bet struct
    */
   function _processBet(BetLib.Bet _bet) internal;
+
+  /**
+   * @dev Throws if `_payload` is not valid
+   * @param _bet Bet struct
+   */
+  function __validatePayload(BetLib.Bet memory _bet) private view {
+    bool _isPayloadValid;
+    address _resolver = _bet.resolver;
+    address _league = _bet.league;
+    uint256 _fixture = _bet.fixture;
+    bytes4 _selector = IResolver(_resolver).getValidatorSelector();
+    bytes memory _payload = _bet.payload;
+
+    assembly {
+      let _plen := mload(_payload)               // _plen = length of _payload
+      let _tlen := add(_plen, 0x44)              // _tlen = total length of calldata
+      let _p    := add(_payload, 0x20)           // _p    = encoded bytes of _payload
+
+      let _ptr   := mload(0x40)                  // _ptr   = free memory pointer
+      let _index := mload(0x40)                  // _index = same as _ptr
+      mstore(0x40, add(_ptr, _tlen))             // update free memory pointer
+
+      mstore(_index, _selector)                  // store selector at _index
+      _index := add(_index, 0x04)                // _index = _index + 0x04
+      _index := add(_index, 0x0C)                // _index = _index + 0x0C
+      mstore(_index, _league)                    // store address at _index
+      _index := add(_index, 0x14)                // _index = _index + 0x14
+      mstore(_index, _fixture)                   // store _fixture at _index
+      _index := add(_index, 0x20)                // _index = _index + 0x20
+
+      for
+      { let _end := add(_p, _plen) }             // init: _end = _p + _plen
+      lt(_p, _end)                               // cond: _p < _end
+      { _p := add(_p, 0x20) }                    // incr: _p = _p + 0x20
+      {
+        mstore(_index, mload(_p))                // store _p to _index
+        _index := add(_index, 0x20)              // _index = _index + 0x20
+      }
+
+      let result := staticcall(30000, _resolver, _ptr, _tlen, _ptr, 0x20)
+
+      switch result
+      case 0 {
+      // revert(_ptr, 0x20) dealt with outside of assembly
+        _isPayloadValid := mload(_ptr)
+      }
+      default {
+        _isPayloadValid := mload(_ptr)
+      }
+    }
+
+    require(
+      _isPayloadValid,
+      "Bet payload is not valid"
+    );
+  }
 
 }
