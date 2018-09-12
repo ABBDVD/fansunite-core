@@ -19,6 +19,7 @@ contract Vault is Ownable, IVault, RegistryAccessible {
 
   address constant public ETH = 0x0;
 
+  // TODO:v1:security Manan => Safer to set allowance limits, in case of exploits
   // Mapping of approved spenders by user
   mapping (address => mapping (address => bool)) private approved; // user => sender => bool
   // Mapping of tokens balances by token address, by user
@@ -56,11 +57,11 @@ contract Vault is Ownable, IVault, RegistryAccessible {
       "If depositing ether, ether sent must be non-zero, otherwise _amount must be non-zero"
     );
 
-    uint value = _token == ETH ? msg.value : _amount;
-    balances[_token][msg.sender] = balances[_token][msg.sender].add(value);
+    uint _value = _token == ETH ? msg.value : _amount;
+    balances[_token][msg.sender] = balances[_token][msg.sender].add(_value);
     if (_token != ETH)
       require(
-        ERC20(_token).transferFrom(msg.sender, address(this), value),
+        ERC20(_token).transferFrom(msg.sender, address(this), _value),
         "Vault must be a approved spender for token to withdraw"
       );
   }
@@ -111,7 +112,10 @@ contract Vault is Ownable, IVault, RegistryAccessible {
    * @param _spender Address of spender being added
    */
   function addSpender(address _spender) external onlyOwner {
-    require(registry.getAddress("BetManager") == _spender, "Spender must be a active Bet Manager");
+    require(
+      registry.getAddress("BetManager") == _spender,
+      "Spender must be an active Bet Manager"
+    );
     spenders[_spender] = true;
     emit LogSpenderAdded(_spender);
   }

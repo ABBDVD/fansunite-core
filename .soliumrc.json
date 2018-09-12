@@ -24,6 +24,9 @@
     ],
     "no-unused-vars": [
       "warning"
+    ],
+    "no-experimental": [
+      "off"
     ]
   }
 }
