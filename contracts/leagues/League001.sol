@@ -94,6 +94,7 @@ contract League001 is Ownable, ILeague001 {
    */
   function registerResolver(address _resolver) external {
     // TODO:pre:blocked Manan => Finish implementation (blocked by Registry)
+    // TODO:pre:blocked Manan => Check if resolver supports league version doesSupportVersion()
     resolvers.push(_resolver);
 
     emit LogResolverAdded(_resolver);
