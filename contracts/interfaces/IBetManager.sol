@@ -9,7 +9,6 @@ contract IBetManager {
    * @notice Submits a bet
    * @param _subjects Subjects associated with bet [backer, layer, token, league, resolver]
    * @param _params Parameters associated with bet [backerStake, fixture, odds, expiration]
-   * @param _layerFill The number of tokens that they layer intends to bet
    * @param _nonce Nonce, to ensure hash uniqueness
    * @param _payload Payload for resolver
    * @param _signature ECDSA signature along with the mode
@@ -18,7 +17,6 @@ contract IBetManager {
   function submitBet(
     address[5] _subjects,
     uint[4] _params,
-    uint _layerFill,
     uint _nonce,
     bytes _payload,
     bytes _signature
@@ -30,12 +28,6 @@ contract IBetManager {
    * @param _bet Keccak-256 hash of the bet struct, along with chainId and nonce
    */
   function claimBet(bytes32 _bet) external;
-
-  /**
-   * @notice Cancels bet `_bet`, if not filled
-   * @param _bet Keccak-256 hash of the bet struct, along with chainId and nonce
-   */
-  function cancelBet(bytes32 _bet) external;
 
   /**
    * @notice Gets the bet result
