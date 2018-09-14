@@ -88,14 +88,16 @@ contract Vault is Ownable, IVault, RegistryAccessible {
    * @param _to Address to which tokens are being transferred to
    * @param _amount Number of tokens being transferred
    */
-  function transfer(address _token, address _from, address _to, uint _amount)
+  function transferFrom(address _token, address _from, address _to, uint _amount)
     external
     onlyApproved(_from)
+    returns (bool)
   {
     require(_amount > 0, "Amount must be greater than zero");
 
     balances[_token][_from] = balances[_token][_from].sub(_amount);
     balances[_token][_to] = balances[_token][_to].add(_amount);
+    return true;
   }
 
   /**

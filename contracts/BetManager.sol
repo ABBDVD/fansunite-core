@@ -32,8 +32,13 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
   mapping (bytes32 => BetLib.Bet) internal bets;
   // Resolves to `true` if hash is used, `false` otherwise
   mapping(bytes32 => bool) internal accepted;
+  // Resolves to `true` if bet has been claimed, `false` otherwise
+  mapping(bytes32 => bool) internal claimed;
   // Mapping of user address to Bet Hashes (ids)
   mapping(address => bytes32[]) internal betsByUser;
+
+  // Emit when a Bet has been submitted
+  event LogBetSubmitted(bytes32 indexed _hash, address indexed _league, uint indexed _fixture);
 
   /**
    * @notice Constructor
@@ -68,21 +73,21 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
     _authenticateBet(_bet, _hash, _signature);
     _authorizeBet(_bet);
     _validateBet(_bet);
-    _processBet(_bet);
+    _processBet(_bet, _hash);
   }
 
   /**
    * @notice Claims a bet, transfers tokens and fees based on fixture resolution
-   * @param _bet Keccak-256 hash of the bet struct, along with chainId and nonce
+   * @param _id Keccak-256 hash of the bet struct, along with chainId and nonce
    */
-  function claimBet(bytes32 _bet) external;
+  function claimBet(bytes32 _id) external;
 
   /**
    * @notice Gets the bet result
-   * @param _bet Keccak-256 hash of the bet struct, along with chainId and nonce
+   * @param _id Keccak-256 hash of the bet struct, along with chainId and nonce
    * @return Result of bet (refer to IResolver for specifics of the return type)
    */
-  function getResult(bytes32 _bet) external view returns (uint8);
+  function getResult(bytes32 _id) external view returns (uint8);
 
   /**
    * @notice Gets all the bet identifiers for address `_subject`
@@ -92,15 +97,30 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
   function getBetsBySubject(address _subject) external view returns (bytes32[]);
 
   /**
-   * @notice Gets subjects, params and payload associated with bet `_bet`
-   * @param _bet Keccak-256 hash of the bet struct, along with chainId and nonce
-   * @return Subjects associated with `_bet`
-   *  [backer, layer, backerToken, layerToken, feeRecipient, league, resolver]
-   * @return Params associated with `_bet`
-   *  [backerStake, backerFee, layerFee, expiration, fixture, odds]
-   * @return Payload associated with `_bet`
+   * @notice Gets subjects, params and payload associated with bet `_id`
+   * @param _id Keccak-256 hash of the bet struct, along with chainId and nonce
+   * @return Subjects associated with `_id` [backer, layer, token, league, resolver]
+   * @return Params associated with `_id` [backerStake, expiration, fixture, odds]
+   * @return Payload associated with `_id`
    */
-  function getBet(bytes32 _bet) external view returns (address[5], uint[4], bytes);
+  function getBet(bytes32 _id) external view returns (address[5], uint[4], bytes) {
+    BetLib.Bet storage _bet = bets[_id];
+
+    return ([
+      _bet.backer,
+      _bet.layer,
+      _bet.token,
+      _bet.league,
+      _bet.resolver
+    ], [
+      _bet.backerStake,
+      _bet.expiration,
+      _bet.fixture,
+      _bet.odds
+    ],
+      _bet.payload
+    );
+  }
 
   /**
    * @dev Throws if any of the following checks fail
@@ -214,8 +234,31 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
   /**
    * @dev Processes the funds and stores the bet
    * @param _bet Bet struct
+   * @param _hash Keccak-256 hash of the bet struct, along with chainId and nonce
    */
-  function _processBet(BetLib.Bet _bet) internal;
+  function _processBet(BetLib.Bet _bet, bytes32 _hash) internal {
+    IVault _vault = IVault(registry.getAddress("FanVault"));
+    uint _backerStake = _bet.backerStake;
+    uint _layerStake = BetLib.backerReturn(_bet, ODDS_DECIMALS);
+
+    require(
+      _vault.transferFrom(_bet.token, _bet.backer, address(this), _backerStake),
+      "Cannot transfer backer's stake to pool"
+    );
+
+    require(
+      _vault.transferFrom(_bet.token, _bet.layer, address(this), _layerStake),
+      "Cannot transfer layer's stake to pool"
+    );
+
+    bets[_hash] = _bet;
+    accepted[_hash] = true;
+
+    betsByUser[_bet.backer].push(_hash);
+    betsByUser[msg.sender].push(_hash);
+
+    emit LogBetSubmitted(_hash, _bet.league, _bet.fixture);
+  }
 
   /**
    * @dev Throws if `_payload` is not valid
