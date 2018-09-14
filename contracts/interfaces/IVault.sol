@@ -27,7 +27,9 @@ contract IVault {
    * @param _to Address to which tokens are being transferred to
    * @param _amount Number of tokens being transferred
    */
-  function transferFrom(address _token, address _from, address _to, uint _amount) external returns (bool);
+  function transferFrom(address _token, address _from, address _to, uint _amount)
+    external
+    returns (bool);
 
   /**
    * @notice Approves address `_spender` to transfer balances of the sender
