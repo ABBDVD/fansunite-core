@@ -140,9 +140,9 @@ contract League001 is Ownable, ILeague001 {
     L.Fixture memory _fixture;
     _fixture.id = fixtures.length + 1;
     _fixture.start = _start;
+    _fixture.participants = _participants;
     seasons[_season].push(_fixture.id);
     fixtures.push(_fixture);
-    _fixture.participants = _participants;
 
     emit LogFixtureAdded(_fixture.id);
   }
