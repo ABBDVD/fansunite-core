@@ -28,6 +28,26 @@ contract('League', async accounts => {
     assert.equal(await instance.getName.call(), league, "cannot set up league");
   });
 
+  describe('Test cases for league information', async () => {
+
+    it('should successfully retrieve the league name', async () => {
+      assert.equal(await instance.getName.call(), league, "name was not retrieved");
+    });
+
+    it('should successfully retrieve the league details', async () => {
+      assert.equal(await instance.getDetails.call(), details, "details was not retrieved");
+    });
+
+    it('should successfully retrieve the league class', async () => {
+      assert.equal(await instance.getClass.call(), className, "class was not retrieved");
+    });
+
+    it('should successfully retrieve the league version', async () => {
+      assert.equal(await instance.getVersion.call(), '0.0.1', "version was not retrieved");
+    });
+
+  });
+
   describe('Test cases for adding seasons', async () => {
 
     it("should successfully create a new season", async () => {
