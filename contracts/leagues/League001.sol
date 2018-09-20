@@ -24,7 +24,7 @@ contract League001 is Ownable, ILeague001 {
 
   // Resolver addresses correspond to `true` if registered with league, `false` otherwise
   mapping(address => bool) internal registeredResolvers;
-  // List of resolver addresses registered with league
+  // List of resolver addresses registered with leaguef
   address[] internal resolvers;
   // Season corresponds to `true` if exists, `false` otherwise
   mapping(uint16 => bool) internal supportedSeasons;
@@ -96,6 +96,7 @@ contract League001 is Ownable, ILeague001 {
     // TODO:pre:blocked Manan => Finish implementation (blocked by Registry)
     // TODO:pre:blocked Manan => Check if resolver supports league version doesSupportVersion()
     resolvers.push(_resolver);
+    registeredResolvers[_resolver] = true;
 
     emit LogResolverAdded(_resolver);
   }

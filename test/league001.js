@@ -5,6 +5,8 @@ let League = artifacts.require('./leagues/League001')
 
 let { ensureException } = require("./helpers/utils");
 
+const { NULL_ADDRESS } = require('./helpers/constants');
+
 
 contract('League', async accounts => {
 
@@ -193,18 +195,60 @@ contract('League', async accounts => {
   describe('Test cases for setting up resolvers', async () => {
 
     it('should successfully register a resolver', async () => {
+      await instance.registerResolver(accounts[2], { from: owner });
+      const isResolverRegistered = await instance.isResolverRegistered(accounts[2]);
 
+      assert.isTrue(isResolverRegistered, 'resolver was not registered');
     });
 
   });
 
+
   describe('Test cases for ConsensusManager', async () => {
 
     describe('Test cases for updating consensus contract', async () => {
-      // TODO:pre:blocked Manan => Blocked by resolver implementation
+
+      describe('Test cases for valid consensus contract updates', async () => {
+
+        it('should successfully update consensus contract', async () => {
+
+          await instance.updateConsensusContract(accounts[4], {from: owner});
+          // TODO: do we need a function for checking what the current consensus contract is?
+
+        });
+
+      });
+
+      describe('Test cases for invalid consensus contract updates', async () => {
+
+        it('should revert if called by non-owner', async () => {
+          try {
+            await instance.updateConsensusContract(accounts[4], {from: accounts[1]});
+          } catch (err) {
+            ensureException(err);
+            return;
+          }
+
+          assert.fail('Expected throw not received');
+        });
+
+        it('should revert if 0x address was provided', async () => {
+          try {
+            await instance.updateConsensusContract(NULL_ADDRESS, {from: accounts[1]});
+          } catch (err) {
+            ensureException(err);
+            return;
+          }
+
+          assert.fail('Expected throw not received');
+        });
+
+      });
     });
 
     describe('Test cases for pushing consensus', async () => {
+
+
       // TODO:pre:blocked Manan => Blocked by resolver implementation
     });
 
