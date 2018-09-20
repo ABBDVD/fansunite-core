@@ -82,8 +82,11 @@ contract('League', async accounts => {
 
       it('should successfully create a new participant', async () => {
         await instance.addParticipant('Canada', '0x0123', {from:owner});
-        const participant = await instance.getParticipant.call(1);
 
+        const isParticipant = await instance.isParticipant.call(1);
+        assert.isTrue(isParticipant, 'participant does not exist');
+
+        const participant = await instance.getParticipant.call(1);
         assert.equal(participant[0], 1, 'participant id did not start at 1');
         assert.equal(participant[1], 'Canada', 'participant name was not set');
         assert.equal(participant[2], '0x0123', 'participant details was not set');
@@ -125,6 +128,9 @@ contract('League', async accounts => {
       it('should successfully schedule a fixture', async () => {
         await instance.scheduleFixture(2019, [2,3], 153737000, { from: owner});
 
+        const isFixtureScheduled = await instance.isFixtureScheduled.call(1);
+        assert.isTrue(isFixtureScheduled, 'fixture was not scheduled');
+
         const fixture = await instance.getFixture.call(1);
 
         assert.equal(fixture[0], 1, 'fixture ids did not start at 1');
@@ -134,7 +140,6 @@ contract('League', async accounts => {
         assert.equal(fixture[1][1], 3, 'fixture participant was not set');
 
         assert.equal(fixture[2], 153737000, 'fixture start time was not set');
-
       });
 
     });
