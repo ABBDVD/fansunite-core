@@ -70,6 +70,9 @@ module.exports = function(deployer, network, accounts) {
           return registry.changeAddress("FanVault", Vault.address);
         })
         .then(() => {
+          return registry.changeAddress("BetManager", BetManager.address);
+        })
+        .then(() => {
           /* eslint no-console: "off" */
           console.log('\n');
           console.log('----- FansUnite Core Contracts -----');
