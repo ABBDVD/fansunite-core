@@ -87,6 +87,7 @@ contract ResolverRegistry is Ownable, IRegistry, RegistryAccessible {
    * @param _class Class of league that resolver will be removed for
    */
   function nukeResolver(string _class, uint _index) external onlyOwner {
+    // TODO:pre Manan => Nuke from all leagues?
     address[] storage _resolvers = resolvers[_class];
     require(_index < _resolvers.length, "Index out of bounds.");
 
