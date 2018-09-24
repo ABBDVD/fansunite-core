@@ -51,7 +51,7 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
    * @dev Change chainId in case of a fork, making sure txs cannot be replayed on forked chains
    * @param _chainId ChainId to be set
    */
-  constructor(uint _chainId) public ChainSpecifiable(_chainId) {
+  constructor(uint _chainId, address _registry) public ChainSpecifiable(_chainId) RegistryAccessible(_registry) {
 
   }
 

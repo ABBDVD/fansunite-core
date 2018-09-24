@@ -31,6 +31,14 @@ contract Vault is Ownable, IVault, RegistryAccessible {
   event LogSpenderAdded(address indexed _spender);
 
   /**
+   * @notice Constructor
+   * @param _registry Address of the Registry contract
+   */
+  constructor(address _registry) public RegistryAccessible(_registry) {
+
+  }
+
+  /**
    * @dev Throw is called by any account other than from spenders
    */
   modifier onlySpender {

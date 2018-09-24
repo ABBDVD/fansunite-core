@@ -20,7 +20,7 @@ import "./utils/RegistryAccessible.sol";
 contract LeagueRegistry is Ownable, ILeagueRegistry, RegistryAccessible {
 
   // Factory version
-  string internal factoryVersion; // TODO:pre:think Manan => Edge case of version not set
+  string internal factoryVersion; // TODO Manan => Edge case - version not set
   // Map of factory version to factory address
   mapping(string => address) internal factories;
   // Corresponds to `true` if class supported, false otherwise
@@ -40,6 +40,14 @@ contract LeagueRegistry is Ownable, ILeagueRegistry, RegistryAccessible {
   event LogFactoryUpdated(string _version, address indexed _factory);
   // Emit when version updated
   event LogFactoryVersionUpdated(string _version);
+
+  /**
+   * @notice Constructor
+   * @param _registry Address of the Registry contract
+   */
+  constructor(address _registry) public RegistryAccessible(_registry) {
+
+  }
 
   /**
    * @notice Creates a new league class
@@ -62,8 +70,7 @@ contract LeagueRegistry is Ownable, ILeagueRegistry, RegistryAccessible {
   function createLeague(string _class, string _name, bytes _leagueDetails) external onlyOwner {
     require(supportedClasses[_class] == true, "Class not supported by Registry");
     ILeagueFactory _factory = ILeagueFactory(factories[factoryVersion]);
-    address _consensus = registry.getAddress("ConsensusManager");
-    address _league = _factory.deployLeague(_class, _name, _leagueDetails, _consensus, msg.sender);
+    address _league = _factory.deployLeague(_class, _name, _leagueDetails, registry, msg.sender);
     leagues[_class].push(_league);
     supportedLeagues[_league] = true;
 

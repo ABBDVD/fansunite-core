@@ -14,36 +14,6 @@ contract('LeagueRegistry', async accounts => {
     instance = await LeagueRegistry.deployed();
   });
 
-  describe('Test cases for setting registry', async () => {
-    let registryContract;
-
-    before(async () => {
-      registryContract = await instance.getRegistryContract.call();
-    });
-
-    afterEach(async () => {
-      await instance.setRegistryContract(registryContract);
-    });
-
-    it('should successfully set registry contract', async () => {
-      await instance.setRegistryContract(dummyAddressA, { from: owner });
-      let result = await instance.getRegistryContract.call();
-      assert.equal(result, dummyAddressA, "registry contract cannot be updated");
-    });
-
-    it('should throw exception when non-owner tries to set registry contact', async () => {
-      try {
-        await instance.setRegistryContract(dummyAddressA, { from: accounts[1] });
-      } catch (err) {
-        ensureException(err);
-        return;
-      }
-
-      assert.fail('Expected throw not received');
-    });
-
-  });
-
   describe('Test cases for class creation', async () => {
 
     before('create two new classes', async () => {

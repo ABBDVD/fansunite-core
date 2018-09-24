@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-import "./interfaces/IRegistry.sol";
+import "./interfaces/IResolverRegistry.sol";
 import "./interfaces/ILeagueRegistry.sol";
 
 import "./utils/RegistryAccessible.sol";
@@ -12,7 +12,7 @@ import "./utils/RegistryAccessible.sol";
  * @title FansUnite ResolverRegistry Contract
  * @dev ResolverRegistry keeps track of all the resolvers registered on the FansUnite Platform
  */
-contract ResolverRegistry is Ownable, IRegistry, RegistryAccessible {
+contract ResolverRegistry is Ownable, IResolverRegistry, RegistryAccessible {
 
   // class => resolver => registered
   // Resolves to `true` if resolver is registered for class, `false` otherwise
@@ -30,6 +30,14 @@ contract ResolverRegistry is Ownable, IRegistry, RegistryAccessible {
   event LogResolverRegistered(string _class, address indexed _resolver);
   // Emit when resolver is rejected
   event LogResolverRejected(string _class, address indexed _resolver);
+
+  /**
+   * @notice Constructor
+   * @param _registry Address of the Registry contract
+   */
+  constructor(address _registry) public RegistryAccessible(_registry) {
+
+  }
 
   /*
    * @title Adds resolver `_resolver` to FansUnite's ResolverRegistry, pending registration
