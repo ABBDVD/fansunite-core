@@ -140,8 +140,8 @@ contract League001 is Ownable, ILeague001, BaseLeague, RegistryAccessible {
    * @param _start Start time (unix timestamp)
    */
   function scheduleFixture(uint16 _season, uint[] _participants, uint _start) external {
-    // TODO:pre Manan => Avoid ordered duplication (DoS attacks possible if hash collisions)
-
+    // TODO: Manan => Prevent ordered duplication
+    // NOTE Not validating whether _participants are valid or not
     require(_isSeasonSupported(_season), "League does not support given season");
 
     L.Fixture memory _fixture;
@@ -160,7 +160,7 @@ contract League001 is Ownable, ILeague001, BaseLeague, RegistryAccessible {
    * @param _details Off-chain hash of participant details
    */
   function addParticipant(string _name, bytes _details) external onlyOwner {
-    // TODO:pre Manan => Avoid name+details duplication?
+    // TODO: Manan => Avoid duplication
 
     L.Participant memory _participant;
     _participant.name = _name;
