@@ -1,15 +1,16 @@
 pragma solidity ^0.4.24;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "../utils/RegistryAccessible.sol";
 
 
 /**
  * @title League Contract
  */
-contract BaseLeague is Ownable {
+contract BaseLeague is Ownable, RegistryAccessible {
 
   // Version of the league
-  string internal version = "0.0.1";
+  string internal version;
   // Name of the league
   string internal name;
   // Class to which the league belongs
@@ -17,43 +18,22 @@ contract BaseLeague is Ownable {
   // Hash of league details stored off-chain (eg. IPFS multihash)
   bytes internal details;
 
-  // Address of the resolution contract (contact responsible for consensus / oracles)
-  address internal consensus;
-
-  // Emit when a Fixture is resolved, by resolver
-  event LogConsensusContractUpdated(address indexed _old, address indexed _new);
-
   /**
    * @notice Constructor
    * @param _class Class of league
    * @param _name Name of league
+   * @param _version Version of league
    * @param _details Off-chain hash of league details
+   * @param _registry Address of the FansUnite Registry Contact
    */
-  constructor(string _class, string _name, bytes _details, address _consensus) public {
-    name = _name;
+  constructor(string _class, string _name, string _version, bytes _details, address _registry)
+    public
+    RegistryAccessible(_registry)
+  {
     class = _class;
+    name = _name;
+    version = _version;
     details = _details;
-    consensus = _consensus;
-  }
-
-  /**
-   * @dev Throw is called by any account other than consensus
-   */
-  modifier onlyConsensus() {
-    require(msg.sender == consensus);
-    _;
-  }
-
-  /**
-   * @notice Sets consensus contract of the league to `_consensus`
-   * @dev Only consensus contract will be able to call pushResolution
-   * @param _consensus address of the consensus contract
-   */
-  function updateConsensusContract(address _consensus) external onlyOwner {
-    require(_consensus != address(0), "Consensus contract cannot be set to 0x");
-    address _old = consensus;
-    consensus = _consensus;
-    emit LogConsensusContractUpdated(_old, _consensus);
   }
 
   /**

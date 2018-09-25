@@ -6,7 +6,6 @@ import "./ILeague001.sol";
 import "./BaseLeague.sol";
 import "../interfaces/IResolverRegistry.sol";
 import "../interfaces/IResolver.sol";
-import "../utils/RegistryAccessible.sol";
 
 import { LeagueLib001 as L } from "./LeagueLib001.sol";
 
@@ -14,7 +13,7 @@ import { LeagueLib001 as L } from "./LeagueLib001.sol";
 /**
  * @title League Contract
  */
-contract League001 is Ownable, ILeague001, BaseLeague, RegistryAccessible {
+contract League001 is Ownable, ILeague001, BaseLeague {
 
   // Resolver addresses correspond to `true` if registered with league, `false` otherwise
   mapping(address => bool) internal registeredResolvers;
@@ -55,18 +54,29 @@ contract League001 is Ownable, ILeague001, BaseLeague, RegistryAccessible {
    * @notice Constructor
    * @param _class Class of league
    * @param _name Name of league
+   * @param _version Version of league
    * @param _details Off-chain hash of league details
+   * @param _registry Address of the FansUnite Registry Contact
    */
   constructor(
     string _class,
     string _name,
+    string _version,
     bytes _details,
-    address _consensus
+    address _registry
   )
     public
-    BaseLeague(_class, _name, _details, _consensus)
+    BaseLeague(_class, _name, _version, _details, _registry)
   {
 
+  }
+
+  /**
+   * @dev Throw is called by any account other than consensus
+   */
+  modifier onlyConsensus() {
+    require(msg.sender == registry.getAddress("ConsensusManager"));
+    _;
   }
 
   ///////////////////////////////////////////////////////////////////////////////
