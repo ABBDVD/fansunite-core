@@ -3,6 +3,7 @@ let LeagueRegistry = artifacts.require('./LeagueRegistry.sol');
 let LeagueLib = artifacts.require('./leagues/LeagueLib001.sol');
 let LeagueFactory = artifacts.require('./leagues/LeagueFactory001.sol');
 let Vault = artifacts.require('./vault/Vault.sol');
+let ResolverRegistry = artifacts.require('./vault/ResolverRegistry.sol');
 
 module.exports = function(deployer, network, accounts) {
   let registry;
@@ -46,6 +47,15 @@ module.exports = function(deployer, network, accounts) {
             });
         })
         .then(() => {
+          return deployer.deploy(ResolverRegistry)
+            .then(() => {
+              return ResolverRegistry.deployed();
+            })
+            .then(_resolverRegistry => {
+              return _resolverRegistry.setRegistryContract(Registry.address);
+            });
+        })
+        .then(() => {
           // FanOrg is ConsensusManager until Oracles are in place
           return registry.changeAddress("ConsensusManager", accounts[0]);
         })
@@ -57,6 +67,9 @@ module.exports = function(deployer, network, accounts) {
         })
         .then(() => {
           return registry.changeAddress("FanVault", Vault.address);
+        })
+        .then(() => {
+          return registry.changeAddress("ResolverRegistry", Vault.address);
         })
         .then(() => {
           /* eslint no-console: "off" */
