@@ -1,44 +1,68 @@
 /* global assert, contract, it, before, afterEach, after, artifacts, describe */
 
 let League = artifacts.require('./leagues/League001')
-  , LeagueRegistry = artifacts.require('./LeagueRegistry');
-
-let { ensureException } = require("./helpers/utils");
-
+  , LeagueRegistry = artifacts.require('./LeagueRegistry')
+  , ResolverRegistry = artifacts.require('./ResolverRegistry')
+  , RMoneyLine = artifacts.require('./RMoneyLine')
+  , { ensureException } = require('./helpers/utils');
 
 contract('League', async accounts => {
 
   let owner = accounts[0];
   let instance;
 
+  const className = 'soccer';
+  const league = 'FIFA';
+  const details = '0x00';
+  
   before('setup contract instance', async () => {
-    let leagueRegistry = await LeagueRegistry.deployed();
+    const leagueRegistry = await LeagueRegistry.deployed();
 
-    await leagueRegistry.createClass("soccer", { from: owner });
-    await leagueRegistry.createLeague("soccer", "FIFA", "0x00", { from: owner });
+    await leagueRegistry.createClass(className, { from: owner });
+    await leagueRegistry.createLeague(className, league, details, { from: owner });
 
-    let result = await leagueRegistry.getClass.call("soccer");
+    const result = await leagueRegistry.getClass.call(className);
 
     instance = await League.at(result[1][0]);
-    assert.equal(await instance.getName.call(), "FIFA", "cannot set up league");
+    assert.equal(await instance.getName.call(), league, 'cannot set up league');
+  });
+
+  describe('Test cases for league information', async () => {
+
+    it('should successfully retrieve the league name', async () => {
+      assert.equal(await instance.getName.call(), league, 'name was not retrieved');
+    });
+
+    it('should successfully retrieve the league details', async () => {
+      assert.equal(await instance.getDetails.call(), details, 'details were not retrieved');
+    });
+
+    it('should successfully retrieve the league class', async () => {
+      assert.equal(await instance.getClass.call(), className, 'class was not retrieved');
+    });
+
+    it('should successfully retrieve the league version', async () => {
+      assert.equal(await instance.getVersion.call(), '0.0.1', 'version was not retrieved');
+    });
+
   });
 
   describe('Test cases for adding seasons', async () => {
 
-    it("should successfully create a new season", async () => {
+    it('should successfully create a new season', async () => {
       let result = await instance.getSeasons.call();
-      assert.isArray(result, "unexpected return type on getSeasons");
-      assert.lengthOf(result, 0, "new league has unexpected seasons");
+      assert.isArray(result, 'unexpected return type on getSeasons');
+      assert.lengthOf(result, 0, 'new league has unexpected seasons');
 
       await instance.addSeason(2018, { from: accounts[1] }); // any address (non-owner)
       result = await instance.getSeasons.call();
-      assert.isArray(result, "unexpected return type on getSeasons");
-      assert.lengthOf(result, 1, "season not added / cannot be retrieved");
+      assert.isArray(result, 'unexpected return type on getSeasons');
+      assert.lengthOf(result, 1, 'season not added / cannot be retrieved');
 
       await instance.getSeason.call(2018); // throws exception on failure
     });
 
-    it("should throw exception on duplicate season years", async () => {
+    it('should throw exception on duplicate season years', async () => {
       try {
         await instance.addSeason(2018, { from: owner });
       } catch (err) {
@@ -53,28 +77,255 @@ contract('League', async accounts => {
 
   describe('Test cases for adding participants', async () => {
 
+    describe('Test cases for valid participant creation', async () => {
+
+      it('should successfully create a new participant', async () => {
+        await instance.addParticipant('Canada', '0x0123', { from: owner });
+
+        const isParticipant = await instance.isParticipant.call(1);
+        assert.isTrue(isParticipant, 'participant does not exist');
+
+        const participant = await instance.getParticipant.call(1);
+        assert.equal(participant[0], 1, 'participant id did not start at 1');
+        assert.equal(participant[1], 'Canada', 'participant name was not set');
+        assert.equal(participant[2], '0x0123', 'participant details was not set');
+      });
+
+    });
+
+    describe('Test cases for invalid participant creation', async () => {
+
+      it('should revert if participant already exists', async () => {
+        // TODO
+      });
+
+      it('should revert if called by non-owner', async () => {
+        try {
+          await instance.addParticipant('Poland', '0x0123', { from: accounts[1] });  // non-owner
+        } catch (err) {
+          ensureException(err);
+          return;
+        }
+
+        assert.fail('Expected throw not received');
+      });
+
+    });
+
   });
 
   describe('Test cases for scheduling fixtures', async () => {
 
+    before('Create participants and season', async() => {
+      await instance.addSeason(2019, { from: owner });
+      await instance.addParticipant('Italy', '0x00', { from: owner });
+      await instance.addParticipant('England', '0x00', { from: owner });
+    });
+
+    describe('Test cases for valid fixture scheduling', async () => {
+
+      it('should successfully schedule a fixture', async () => {
+        await instance.scheduleFixture(2019, [2,3], 153737000, { from: owner});
+
+        const isFixtureScheduled = await instance.isFixtureScheduled.call(1);
+        assert.isTrue(isFixtureScheduled, 'fixture was not scheduled');
+
+        const fixture = await instance.getFixture.call(1);
+
+        assert.equal(fixture[0], 1, 'fixture ids did not start at 1');
+        assert.isArray(fixture[1], 'unexpected return type');
+        assert.lengthOf(fixture[1], 2, 'invalid number of participants');
+        assert.equal(fixture[1][0], 2, 'fixture participant was not set');
+        assert.equal(fixture[1][1], 3, 'fixture participant was not set');
+
+        assert.equal(fixture[2], 153737000, 'fixture start time was not set');
+      });
+
+    });
+
+    describe('Test cases for invalid fixture scheduling', async () => {
+
+      it('should revert if season is not supported', async () => {
+        try {
+          await instance.scheduleFixture(2020, [2,3], 153737000, { from: owner});
+        } catch (err) {
+          ensureException(err);
+          return;
+        }
+
+        assert.fail('Expected throw not received');
+      });
+
+      it('should revert if event already exists', async () => {
+        // TODO
+      });
+
+      it('should revert if participants do not exist', async () => {
+        // TODO
+      });
+
+    });
   });
 
-  describe('Test cases for league information', async () => {
+  describe('Test cases for setting league details', async () => {
+
+    it('should successfully set league details', async () => {
+      await instance.setDetails('0x001234', { from: owner });
+      const details = await instance.getDetails.call();
+
+      assert.equal(details, '0x001234', 'details were not updated');
+    });
+
+    it('should revert if non-owner attempts to set league details', async () => {
+      try {
+        await instance.setDetails('0x00', { from: accounts[1] }); // non-owner
+      } catch (err) {
+        ensureException(err);
+        return;
+      }
+
+      assert.fail('Expected throw not received');
+    });
 
   });
 
   describe('Test cases for setting up resolvers', async () => {
 
-  });
+    let resolver;
 
-  describe('Test cases for ConsensusManager', async () => {
-
-    describe('Test cases for updating consensus contract', async () => {
-      // TODO:pre:blocked Manan => Blocked by resolver implementation
+    beforeEach('register resolver in resolver registry', async () => {
+      resolver = await RMoneyLine.new('0.0.1');
+      const resolverReg = await ResolverRegistry.deployed();
+      await resolverReg.addResolver(className, resolver.address);
+      await resolverReg.registerResolver(className, resolver.address, {from: owner});
     });
 
-    describe('Test cases for pushing consensus', async () => {
-      // TODO:pre:blocked Manan => Blocked by resolver implementation
+    describe('Test cases for valid resolver registration', async () => {
+
+      it('should successfully register a resolver', async () => {
+        await instance.registerResolver(resolver.address, { from: owner });
+        const isResolverRegistered = await instance.isResolverRegistered(resolver.address);
+
+        assert.isTrue(isResolverRegistered, 'resolver was not registered');
+      });
+
+    });
+
+    describe('Test cases for invalid resolver registration', async () => {
+
+      it('should revert if resolver is already resolved', async () => {
+        await instance.registerResolver(resolver.address, { from: owner });
+        try {
+          await instance.registerResolver(resolver.address, { from: owner });
+        } catch (err) {
+          ensureException(err);
+          return;
+        }
+
+        assert.fail('Expected throw not received');
+      });
+
+      it('should revert if resolver cannot be used', async () => {
+        try {
+          await instance.registerResolver(accounts[1], { from: owner }); // invalid resolver address
+        } catch (err) {
+          ensureException(err);
+          return;
+        }
+
+        assert.fail('Expected throw not received');
+      });
+
+      it('should revert if resolver does not support current league version', async () => {
+        resolver = await RMoneyLine.new('0.0.2');
+        const resolverReg = await ResolverRegistry.deployed();
+        await resolverReg.addResolver(className, resolver.address);
+        await resolverReg.registerResolver(className, resolver.address, {from: owner});
+
+        try {
+          await instance.registerResolver(resolver.address, { from: owner });
+        } catch (err) {
+          ensureException(err);
+          return;
+        }
+
+        assert.fail('Expected throw not received');
+      });
+
+    });
+
+  });
+
+
+  describe('Test cases for resolution', async () => {
+
+    let resolver;
+    const fixtureId = 1;
+    const betPayload = '0x0123';
+
+    before('schedule fixture', async () => {
+      await instance.addSeason(2020, {from: owner});
+      await instance.scheduleFixture(2020, [1,2], 1546300800, {from: owner});
+    });
+
+    beforeEach('register resolver in resolver registry', async () => {
+      resolver = await RMoneyLine.new('0.0.1');
+      const resolverReg = await ResolverRegistry.deployed();
+      await resolverReg.addResolver(className, resolver.address);
+      await resolverReg.registerResolver(className, resolver.address, {from: owner});
+      await instance.registerResolver(resolver.address, {from: owner});
+    });
+
+
+    describe('Test cases for valid resolution pushed', async () => {
+
+      it('should successfully push a resolution', async () => {
+        await instance.pushResolution(fixtureId, resolver.address, betPayload, {from: owner}); // owner is also consensus manager
+
+        let result = await instance.isFixtureResolved.call(fixtureId, resolver.address);
+        assert.equal(result.toNumber(), 1, 'fixture was not resolved');
+
+        result = await instance.getResolution.call(fixtureId, resolver.address);
+        assert.equal(result, betPayload, 'payload was incorrectly set');
+      });
+
+    });
+
+    describe('Test cases for invalid resolution pushed', async () => {
+
+      it('should revert if fixture was not scheduled for the league', async () => {
+        try {
+          await instance.pushResolution(9999, resolver.address, betPayload, {from: owner}); // owner is also consensus manager
+        } catch (err) {
+          ensureException(err);
+          return;
+        }
+
+        assert.fail('Expected throw not received');
+      });
+
+      it('should revert if league does not support the given resolver', async () => {
+        try {
+          await instance.pushResolution(fixtureId, accounts[1], betPayload, {from: owner}); // accounts[1] is an invalid resolver
+        } catch (err) {
+          ensureException(err);
+          return;
+        }
+
+        assert.fail('Expected throw not received');
+      });
+
+      it('should revert if not called from non-consensus manager', async () => {
+        try {
+          await instance.pushResolution(fixtureId, accounts[1], betPayload, {from: accounts[1]});  // accounts[1] is not consensus manager
+        } catch (err) {
+          ensureException(err);
+          return;
+        }
+
+        assert.fail('Expected throw not received');
+      });
+
     });
 
   });
