@@ -18,8 +18,10 @@ contract RMoneyLine is IResolver, BaseResolver {
 
   /**
    * @notice Returns the Result of a Moneyline bet
+   * @param _league Address of league
+   * @param _fixture Id of fixture
    * @param _bWinner bet payload encoded winner participant id (backer's pick)
-   * @param _rWinner resolution payload encoded winner participant id (resolution data)
+   * @param _scores Array of scores, matching index as fixture.participants (resolution data)
    * @return `1` if backer loses and `2` if backer wins
    */
   function resolve(address _league, uint _fixture, uint _bWinner, uint[] _scores)
