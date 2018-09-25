@@ -63,6 +63,7 @@ module.exports = function(deployer, network, accounts) {
           console.log('*** FansUnite Organization: ', accounts[0], '***');
           console.log('*** FansUnite Registry Address: ', Registry.address, '***');
           console.log('*** LeagueRegistry Address: ', LeagueRegistry.address, '***');
+          console.log('*** ResolverRegistry Address: ', ResolverRegistry.address, '***');
           console.log('*** FansUnite Vault Address: ', Vault.address, '***');
           console.log('-----------------------------------');
           console.log('\n');

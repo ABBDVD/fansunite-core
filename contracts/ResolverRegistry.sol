@@ -70,6 +70,7 @@ contract ResolverRegistry is Ownable, IResolverRegistry, RegistryAccessible {
 
     pending[_class][_resolver] = false;
     registered[_class][_resolver] = true;
+    resolvers[_class].push(_resolver);
 
     emit LogResolverRegistered(_class, _resolver);
   }
