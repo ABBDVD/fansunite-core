@@ -15,7 +15,7 @@ contract LeagueFactory001 is ILeagueFactory {
    * @param _class Class of the league
    * @param _name Name of the league (approved by LeagueRegistry)
    * @param _details Off-chain hash of league details
-   * @param _consensus Address of the consensus contract
+   * @param _registry Address of the registry contract
    * @param _owner Owner of the league (FansUnite)
    * @return Address of the created league contract
    */
@@ -23,13 +23,13 @@ contract LeagueFactory001 is ILeagueFactory {
     string _class,
     string _name,
     bytes _details,
-    address _consensus,
+    address _registry,
     address _owner
   )
     external
     returns (address)
   {
-    League _league = new League(_class, _name, _details, _consensus);
+    League _league = new League(_class, _name, "0.0.1", _details, _registry);
     _league.transferOwnership(_owner);
     return _league;
   }
