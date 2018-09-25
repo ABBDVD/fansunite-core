@@ -31,6 +31,14 @@ contract ResolverRegistry is Ownable, IResolverRegistry, RegistryAccessible {
   // Emit when resolver is rejected
   event LogResolverRejected(string _class, address indexed _resolver);
 
+  /**
+   * @notice Constructor
+   * @param _registry Address of the Registry contract
+   */
+  constructor(address _registry) public RegistryAccessible(_registry) {
+
+  }
+
   /*
    * @title Adds resolver `_resolver` to FansUnite's ResolverRegistry, pending registration
    * @dev All resolvers will be manually verified by FansUnite before they are registered

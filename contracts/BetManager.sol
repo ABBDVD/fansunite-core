@@ -18,9 +18,9 @@ import "./utils/RegistryAccessible.sol";
 import "./utils/ChainSpecifiable.sol";
 
 /**
-  * @title Bet Manger Contract
-  * @notice BetManager is the core contract responsible for bet validations and bet submissions
-  */
+ * @title Bet Manger Contract
+ * @notice BetManager is the core contract responsible for bet validations and bet submissions
+ */
 contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiable {
 
   using SafeMath for uint;
@@ -51,7 +51,11 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
    * @dev Change chainId in case of a fork, making sure txs cannot be replayed on forked chains
    * @param _chainId ChainId to be set
    */
-  constructor(uint _chainId) public ChainSpecifiable(_chainId) {
+  constructor(uint _chainId, address _registry)
+    public
+    ChainSpecifiable(_chainId)
+    RegistryAccessible(_registry)
+  {
 
   }
 
@@ -100,7 +104,7 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
    * @param _payload Payload for resolver
    */
   function claimBet(address[5] _subjects, uint[4] _params, uint _nonce, bytes _payload) external {
-   // TODO:pre Manan
+   // TODO Manan
   }
 
   /**
@@ -121,7 +125,7 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
     view
     returns (uint8)
   {
-    // TODO:pre Manan
+    // TODO Manan
   }
 
   /**
