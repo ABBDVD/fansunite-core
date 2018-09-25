@@ -118,6 +118,7 @@ contract League001 is Ownable, ILeague001, BaseLeague {
     external
     onlyConsensus
   {
+    // TODO Reduce duplication when multiple resolvers use the same payload
     // _payload can be 0x, should result in bet cancellation
     // _payload can be 0x00..00, would be passed as valid resolution payload to resolvers
     require(_isFixtureScheduled(_fixtureId), "Given Fixture is not scheduled in league");

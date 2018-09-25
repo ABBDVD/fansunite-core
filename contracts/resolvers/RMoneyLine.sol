@@ -22,8 +22,12 @@ contract RMoneyLine is IResolver, BaseResolver {
    * @param _rWinner resolution payload encoded winner participant id (resolution data)
    * @return `1` if backer loses and `2` if backer wins
    */
-  function resolve(uint _bWinner, uint _rWinner) external pure returns (uint8) {
-    return _bWinner == _rWinner ? 2 : 1;
+  function resolve(address _league, uint _fixture, uint _bWinner, uint[] _scores)
+    external
+    pure
+    returns (uint8)
+  {
+    return 0;
   }
 
   /**
