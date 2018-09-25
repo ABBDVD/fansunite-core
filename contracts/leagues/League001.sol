@@ -17,7 +17,7 @@ contract League001 is Ownable, ILeague001, BaseLeague {
 
   // Resolver addresses correspond to `true` if registered with league, `false` otherwise
   mapping(address => bool) internal registeredResolvers;
-  // List of resolver addresses registered with leaguef
+  // List of resolver addresses registered with league
   address[] internal resolvers;
 
   // Season corresponds to `true` if exists, `false` otherwise
@@ -104,7 +104,6 @@ contract League001 is Ownable, ILeague001, BaseLeague {
 
     registeredResolvers[_resolver] = true;
     resolvers.push(_resolver);
-    registeredResolvers[_resolver] = true;
 
     emit LogResolverRegistered(_resolver);
   }

@@ -224,7 +224,7 @@ contract('Vault', async accounts => {
     });
 
     it('should successfully approve a valid spender', async () => {
-      instance.approve(spenderAddress, {from: accounts[1]});
+      await instance.approve(spenderAddress, {from: accounts[1]});
       const isApproved = await instance.isApproved.call(accounts[1], spenderAddress);
 
       assert.isTrue(isApproved, 'spender was not approved');
