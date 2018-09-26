@@ -4,8 +4,7 @@ library SignatureLib {
 
   enum SignatureMode {
     TYPED_SIGN,
-    GETH,
-    TREZOR
+    GETH
   }
 
   /**
@@ -13,7 +12,7 @@ library SignatureLib {
    * @param hash Hash which was signed.
    * @param signer Address of the signer.
    * @param signature ECDSA signature along with the mode
-   *  (0 = Typed, 1 = Geth, 2 = Trezor) {mode}{v}{r}{s}.
+   *  (0 = Typed, 1 = Geth) {mode}{v}{r}{s}.
    * @return Returns whether signature is from a specified user.
    */
   function isValidSignature(bytes32 hash, address signer, bytes signature)
@@ -28,7 +27,7 @@ library SignatureLib {
    * @notice Recovers signer from signature.
    * @param hash Hash which was signed.
    * @param signature ECDSA signature along with the mode
-   *  (0 = Typed, 1 = Geth, 2 = Trezor) {mode}{v}{r}{s}.
+   *  (0 = Typed, 1 = Geth) {mode}{v}{r}{s}.
    * @return Returns Address of the signer.
    */
   function recover(bytes32 hash, bytes signature) internal pure returns (address) {
@@ -46,8 +45,6 @@ library SignatureLib {
     bytes32 _hash;
     if (mode == SignatureMode.GETH) {
       _hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
-    } else if (mode == SignatureMode.TREZOR) {
-      _hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n\x20", hash));
     }
 
     return ecrecover(_hash, v, r, s);
