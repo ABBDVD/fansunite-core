@@ -39,14 +39,6 @@ contract Vault is Ownable, IVault, RegistryAccessible {
   }
 
   /**
-   * @dev Throw is called by any account other than from spenders
-   */
-  modifier onlySpender {
-    require(spenders[msg.sender], "Given spender is not registered with Vault");
-    _;
-  }
-
-  /**
    * @dev Throw is called by any account other than approved spenders for _user
    */
   modifier onlyApproved(address _user) {
