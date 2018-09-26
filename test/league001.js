@@ -13,13 +13,12 @@ contract('League', async accounts => {
 
   const className = 'soccer';
   const league = 'FIFA';
-  const details = '0x00';
   
   before('setup contract instance', async () => {
     const leagueRegistry = await LeagueRegistry.deployed();
 
-    await leagueRegistry.createClass(className, { from: owner });
-    await leagueRegistry.createLeague(className, league, details, { from: owner });
+    await leagueRegistry.createClass(className, 2, { from: owner });
+    await leagueRegistry.createLeague(className, league, { from: owner });
 
     const result = await leagueRegistry.getClass.call(className);
 
@@ -34,7 +33,7 @@ contract('League', async accounts => {
     });
 
     it('should successfully retrieve the league details', async () => {
-      assert.equal(await instance.getDetails.call(), details, 'details were not retrieved');
+      assert.equal(await instance.getDetails.call(), '0x', 'details were not retrieved');
     });
 
     it('should successfully retrieve the league class', async () => {
@@ -125,7 +124,9 @@ contract('League', async accounts => {
     describe('Test cases for valid fixture scheduling', async () => {
 
       it('should successfully schedule a fixture', async () => {
-        await instance.scheduleFixture(2019, [2,3], 153737000, { from: owner});
+        let _start = parseInt((Date.now() / 1000) + 3600);
+
+        await instance.scheduleFixture(2019, [2,3], _start, { from: owner});
 
         const isFixtureScheduled = await instance.isFixtureScheduled.call(1);
         assert.isTrue(isFixtureScheduled, 'fixture was not scheduled');
@@ -138,7 +139,7 @@ contract('League', async accounts => {
         assert.equal(fixture[1][0], 2, 'fixture participant was not set');
         assert.equal(fixture[1][1], 3, 'fixture participant was not set');
 
-        assert.equal(fixture[2], 153737000, 'fixture start time was not set');
+        assert.equal(fixture[2], _start, 'fixture start time was not set');
       });
 
     });
@@ -147,7 +148,7 @@ contract('League', async accounts => {
 
       it('should revert if season is not supported', async () => {
         try {
-          await instance.scheduleFixture(2020, [2,3], 153737000, { from: owner});
+          await instance.scheduleFixture(2020, [2,3], parseInt((Date.now() / 1000) + 3600), { from: owner});
         } catch (err) {
           ensureException(err);
           return;
@@ -265,7 +266,7 @@ contract('League', async accounts => {
 
     before('schedule fixture', async () => {
       await instance.addSeason(2020, {from: owner});
-      await instance.scheduleFixture(2020, [1,2], 1546300800, {from: owner});
+      await instance.scheduleFixture(2020, [1,2], parseInt((Date.now() / 1000) + 3600), {from: owner});
     });
 
     beforeEach('register resolver in resolver registry', async () => {

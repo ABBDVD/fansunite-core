@@ -23,17 +23,15 @@ contract BaseLeague is Ownable, RegistryAccessible {
    * @param _class Class of league
    * @param _name Name of league
    * @param _version Version of league
-   * @param _details Off-chain hash of league details
    * @param _registry Address of the FansUnite Registry Contact
    */
-  constructor(string _class, string _name, string _version, bytes _details, address _registry)
+  constructor(string _class, string _name, string _version, address _registry)
     public
     RegistryAccessible(_registry)
   {
     class = _class;
     name = _name;
     version = _version;
-    details = _details;
   }
 
   /**

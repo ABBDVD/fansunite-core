@@ -12,16 +12,16 @@ contract ILeagueRegistry {
   /**
    * @notice Creates a new league class
    * @param _class Class of the league (eg. tennis)
+   * @param _participantsPerFixture Number of participants per fixture in leagues of class `_class`
    */
-  function createClass(string _class) external;
+  function createClass(string _class, uint _participantsPerFixture) external;
 
   /**
    * @notice Creates a new League Contract and saves it to the registry
    * @param _class Class of the league (eg. tennis)
    * @param _name Name of the League (eg. Shanghai Masters)
-   * @param _leagueDetails Off-chain details of the league (eg. IPFS hash)
    */
-  function createLeague(string _class, string _name, bytes _leagueDetails) external;
+  function createLeague(string _class, string _name) external;
 
   /**
    * @notice Upsert version `_version` to correspond factoryAddress `_leagueFactory`

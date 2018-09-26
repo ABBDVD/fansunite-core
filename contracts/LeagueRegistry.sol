@@ -31,6 +31,8 @@ contract LeagueRegistry is Ownable, ILeagueRegistry, RegistryAccessible {
   mapping(string => address[]) internal leagues;
   // Evaluates to `true` if league supported, `false` otherwise
   mapping(address => bool) internal supportedLeagues;
+  // Mapping of class to number of participants per fixture in leagues of class
+  mapping(string => uint) internal participantsPerFixture;
 
   // Emit when new class added
   event LogClassCreated(string _class);
@@ -52,10 +54,12 @@ contract LeagueRegistry is Ownable, ILeagueRegistry, RegistryAccessible {
   /**
    * @notice Creates a new league class
    * @param _class Class of the league (eg. tennis)
+   * @param _participantsPerFixture Number of participants per fixture in leagues of class `_class`
    */
-  function createClass(string _class) external onlyOwner {
+  function createClass(string _class, uint _participantsPerFixture) external onlyOwner {
     require(supportedClasses[_class] == false, "Registry already supports class");
     supportedClasses[_class] = true;
+    participantsPerFixture[_class] = _participantsPerFixture;
     classes.push(_class);
 
     emit LogClassCreated(_class);
@@ -65,12 +69,19 @@ contract LeagueRegistry is Ownable, ILeagueRegistry, RegistryAccessible {
    * @notice Creates a new League Contract and saves it to the registry
    * @param _class Class of the league (eg. tennis)
    * @param _name Name of the League (eg. Shanghai Masters)
-   * @param _leagueDetails Off-chain details of the league (eg. IPFS hash)
    */
-  function createLeague(string _class, string _name, bytes _leagueDetails) external onlyOwner {
+  function createLeague(string _class, string _name) external onlyOwner {
     require(supportedClasses[_class] == true, "Class not supported by Registry");
+
     ILeagueFactory _factory = ILeagueFactory(factories[factoryVersion]);
-    address _league = _factory.deployLeague(_class, _name, _leagueDetails, registry, msg.sender);
+    address _league = _factory.deployLeague(
+      _class,
+      _name,
+      registry,
+      participantsPerFixture[_class],
+      msg.sender
+    );
+
     leagues[_class].push(_league);
     supportedLeagues[_league] = true;
 

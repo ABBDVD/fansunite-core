@@ -19,8 +19,8 @@
 //     it("Should deploy league with less than 4.7 mil gas", async () => {
 //       let registry = await LeagueRegistry.deployed();
 //
-//       await registry.createClass("soccer", { from: owner });
-//       let tx = await registry.createLeague("soccer", "FIFA", "0x00", { from: owner });
+//       await registry.createClass("soccer", 2, { from: owner });
+//       let tx = await registry.createLeague("soccer", "FIFA", { from: owner });
 //       assert.isBelow(tx.receipt.gasUsed, 4700000); // 1599294
 //     });
 //
