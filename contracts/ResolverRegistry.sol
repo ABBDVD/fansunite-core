@@ -101,7 +101,6 @@ contract ResolverRegistry is Ownable, IResolverRegistry, RegistryAccessible {
     require(_index < _resolvers.length, "Index out of bounds.");
 
     address _resolver = _resolvers[_index];
-    require(registered[_class][_resolver], "Resolver not registered");
 
     registered[_class][_resolver] = false;
     rejected[_class][_resolver] = true;
@@ -123,7 +122,7 @@ contract ResolverRegistry is Ownable, IResolverRegistry, RegistryAccessible {
     return registered[_class][_resolver];
   }
 
-  /*
+  /*yarn
    * @title Gets resolver registered for class `_class`
    * @param _class Class of league
    * @return Addresses of resolvers registered for `_class`
