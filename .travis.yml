@@ -4,16 +4,14 @@ node_js:
 cache:
   directories:
   - node_modules
-env:
-  - SOLIDITY_COVERAGE=false
-  - TEST_COMMAND=lint
-  - TEST_COMMAND=test
 install:
   - yarn
-before_script:
-- truffle version
-script:
-  - "yarn $TEST_COMMAND"
-  - "yarn $TEST_COMMAND"
+matrix:
+  include:
+    - name: "Lint"
+      script: yarn lint
+    - name: "Test"
+      env: SOLIDITY_COVERAGE=false
+      script: yarn test
 after_script:
   - yarn coverage && cat coverage/lcov.info | node_modules/.bin/coveralls
