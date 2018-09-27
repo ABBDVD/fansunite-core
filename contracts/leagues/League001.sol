@@ -319,6 +319,26 @@ contract League001 is Ownable, ILeague001, BaseLeague {
     return _isParticipant(_id);
   }
 
+  /**
+   * @notice Checks if participant `_participantId` is playing in fixture `_fixtureId`
+   * @param _participantId Id of the participant
+   * @param _fixtureId Id of the fixture
+   * @return `true` if participant `_participantId` is scheduled in for fixture `_fixtureId`
+   */
+  function isParticipantScheduled(uint _participantId, uint _fixtureId)
+    external
+    view
+    returns (bool)
+  {
+    require(_isParticipant(_participantId), "Given participant is not in league");
+    require(_isFixtureScheduled(_fixtureId), "Given fixture is not scheduled");
+
+    L.Fixture storage _fixture = fixtures[_fixtureId - 1];
+    for (uint i = 0; i < _fixture.participants.length; i++)
+      if (_fixture.participants[i] == _participantId) return true;
+    return false;
+  }
+
 
   ///////////////////////////////////////////////////////////////////////////////
   ///////////////////////////// internal view functions /////////////////////////
