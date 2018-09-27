@@ -1,6 +1,8 @@
 pragma solidity ^0.4.24;
 
 import "../interfaces/IResolver.sol";
+import "../interfaces/ILeague.sol";
+
 import "./BaseResolver.sol";
 
 
@@ -8,7 +10,7 @@ import "./BaseResolver.sol";
  * @title MoneyLine Resolver
  * @dev RMoneyLine is a simple Money line contract
  */
-contract RMoneyLine is IResolver, BaseResolver {
+contract RMoneyLine2 is IResolver, BaseResolver {
 
   /**
    * @notice Constructor
@@ -20,7 +22,7 @@ contract RMoneyLine is IResolver, BaseResolver {
    * @notice Returns the Result of a Moneyline bet
    * @param _league Address of league
    * @param _fixture Id of fixture
-   * @param _bWinner bet payload encoded winner participant id (backer's pick)
+   * @param _bWinner bet payload encoded winner participant id (backer's pick) or 0 (for draw)
    * @param _scores Array of scores, matching index as fixture.participants (resolution data)
    * @return `1` if backer loses and `2` if backer wins
    */
@@ -29,7 +31,13 @@ contract RMoneyLine is IResolver, BaseResolver {
     pure
     returns (uint8)
   {
-    return 0;
+    var (, _participants,) = ILeague(_league).getFixture(_fixture);
+
+    if (_bWinner == 0)
+      return _scores[0] == _scores[1] ? 2 : 1;
+
+    var _i = _participants[0] == _bWinner ? 0 : 1;
+    return _scores[_i] > _scores[1 - _i] ? 2 : 1;
   }
 
   /**
@@ -40,8 +48,7 @@ contract RMoneyLine is IResolver, BaseResolver {
    * @return `true` if bet payload valid, `false` otherwise
    */
   function validate(address _league, uint _fixture, uint _winner) external view returns (bool) {
-    // TODO: pre:Manan => Finish implementation (blocked by League implementation)
-    return true;
+    return _winner == 0 || ILeague(_league).isParticipantScheduled(_winner, _fixture);
   }
 
   /**
@@ -49,7 +56,7 @@ contract RMoneyLine is IResolver, BaseResolver {
    * @return The init function signature compliant with ABI Specification
    */
   function getInitSignature() external pure returns (string) {
-    return "resolve(uint256,uint256)";
+    return "resolve(address,uint256,uint256,uint256[])";
   }
 
   /**
