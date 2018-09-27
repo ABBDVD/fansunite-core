@@ -20,7 +20,7 @@ import "./utils/RegistryAccessible.sol";
 contract LeagueRegistry is Ownable, ILeagueRegistry, RegistryAccessible {
 
   // Factory version
-  string internal factoryVersion; // TODO Manan => Edge case - version not set
+  string internal factoryVersion;
   // Map of factory version to factory address
   mapping(string => address) internal factories;
   // Corresponds to `true` if class supported, false otherwise
@@ -72,6 +72,7 @@ contract LeagueRegistry is Ownable, ILeagueRegistry, RegistryAccessible {
    */
   function createLeague(string _class, string _name) external onlyOwner {
     require(supportedClasses[_class] == true, "Class not supported by Registry");
+    require(factories[factoryVersion] != address(0), "Factory version not set");
 
     ILeagueFactory _factory = ILeagueFactory(factories[factoryVersion]);
     address _league = _factory.deployLeague(
