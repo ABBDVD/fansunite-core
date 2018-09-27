@@ -11,6 +11,7 @@ install:
 before_script:
 - truffle version
 script:
+  - yarn lint
   - yarn test
 after_script:
   - yarn coverage && cat coverage/lcov.info | node_modules/.bin/coveralls
