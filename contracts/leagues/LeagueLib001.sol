@@ -20,4 +20,16 @@ library LeagueLib001 {
     bytes details;
   }
 
+  function hashRawFixture(uint[] _participants, uint _start) internal view returns (bytes32) {
+    // NOT EIP 712 Compliant, structs are not outward facing
+    bytes32 _hash = keccak256(
+      abi.encodePacked(
+        _participants,
+        _start
+      )
+    );
+
+    return _hash;
+  }
+
 }

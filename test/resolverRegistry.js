@@ -20,7 +20,7 @@ contract('LeagueRegistry', async accounts => {
 
     before('add class to league registry', async () => {
       const leagueRegInstance = await LeagueRegistry.deployed();
-      await leagueRegInstance.createClass(supportedClass);
+      await leagueRegInstance.createClass(supportedClass, 2);
 
     });
 

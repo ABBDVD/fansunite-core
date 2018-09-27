@@ -15,6 +15,9 @@ import { LeagueLib001 as L } from "./LeagueLib001.sol";
  */
 contract League001 is Ownable, ILeague001, BaseLeague {
 
+  // Number of Participants in each fixture
+  uint internal PARTICIPANTS_PER_FIXTURE;
+
   // Resolver addresses correspond to `true` if registered with league, `false` otherwise
   mapping(address => bool) internal registeredResolvers;
   // List of resolver addresses registered with league
@@ -30,6 +33,10 @@ contract League001 is Ownable, ILeague001, BaseLeague {
   L.Fixture[] internal fixtures;
   // List of participants ever played in league
   L.Participant[] internal participants;
+
+  // Mapping of fixture hashes to whether they exist, to avoid duplicates
+  // NOTE Think about converting uint fixture ids to bytes32 hashes?
+  mapping(bytes32 => bool) duplicateManager;
 
   // Fixture ids correspond to `true` if resolved, `false` if not resolved
   // Being resolved means at least one resolution has been pushed
@@ -55,20 +62,20 @@ contract League001 is Ownable, ILeague001, BaseLeague {
    * @param _class Class of league
    * @param _name Name of league
    * @param _version Version of league
-   * @param _details Off-chain hash of league details
    * @param _registry Address of the FansUnite Registry Contact
+   * @param _participantsPerFixture Number of participants allowed per fixture
    */
   constructor(
     string _class,
     string _name,
     string _version,
-    bytes _details,
-    address _registry
+    address _registry,
+    uint _participantsPerFixture
   )
     public
-    BaseLeague(_class, _name, _version, _details, _registry)
+    BaseLeague(_class, _name, _version, _registry)
   {
-
+    PARTICIPANTS_PER_FIXTURE = _participantsPerFixture;
   }
 
   /**
@@ -151,16 +158,36 @@ contract League001 is Ownable, ILeague001, BaseLeague {
    * @param _start Start time (unix timestamp)
    */
   function scheduleFixture(uint16 _season, uint[] _participants, uint _start) external {
-    // TODO: Manan => Prevent ordered duplication
-    // NOTE Not validating whether _participants are valid or not
-    require(_isSeasonSupported(_season), "League does not support given season");
+    bytes32 _hash = L.hashRawFixture(_participants, _start);
+
+    require(
+      _isSeasonSupported(_season),
+      "League does not support given season"
+    );
+    require(
+      _participants.length == PARTICIPANTS_PER_FIXTURE,
+      "Invalid number of participants in fixture"
+    );
+    require(
+      _areParticipants(_participants),
+      "Unknown participant scheduled for fixture"
+    );
+    require(
+      _start > block.timestamp,
+      "Fixture has already started"
+    );
+    require(
+      !duplicateManager[_hash],
+      "Fixture is duplicated in league"
+    );
 
     L.Fixture memory _fixture;
     _fixture.id = fixtures.length + 1;
     _fixture.start = _start;
-    seasons[_season].push(_fixture.id);
     fixtures.push(_fixture);
     fixtures[fixtures.length - 1].participants = _participants;
+    seasons[_season].push(_fixture.id);
+    duplicateManager[_hash] = true;
 
     emit LogFixtureAdded(_fixture.id);
   }
@@ -171,7 +198,7 @@ contract League001 is Ownable, ILeague001, BaseLeague {
    * @param _details Off-chain hash of participant details
    */
   function addParticipant(string _name, bytes _details) external onlyOwner {
-    // TODO: Manan => Avoid duplication
+    // TODO Prevent duplication
 
     L.Participant memory _participant;
     _participant.name = _name;
@@ -320,7 +347,16 @@ contract League001 is Ownable, ILeague001, BaseLeague {
     return _id > 0 && _id < participants.length + 1;
   }
 
-  // internal isParticipant
+  // validate all participants
+  function _areParticipants(uint[] _participants) internal view returns (bool) {
+    bool _valid = true;
+    for (uint i = 0; i < _participants.length; i++) {
+      _valid = _valid && _isParticipant(_participants[i]);
+    }
+    return _valid;
+  }
+
+  // internal isSeasonSupported
   function _isSeasonSupported(uint16 _year) internal view returns (bool) {
     return supportedSeasons[_year];
   }
