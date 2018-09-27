@@ -13,5 +13,5 @@ matrix:
     - name: "Test"
       env: SOLIDITY_COVERAGE=false
       script: yarn test
-after_script:
-  - yarn coverage && cat coverage/lcov.info | node_modules/.bin/coveralls
+    - name: "Coverage"
+      script: yarn coverage && cat coverage/lcov.info | node_modules/.bin/coveralls
