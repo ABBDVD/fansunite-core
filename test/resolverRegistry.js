@@ -102,11 +102,25 @@ contract('LeagueRegistry', async accounts => {
 
     describe('Test cases for valid resolver registration', async () => {
 
-      it('should successfully register a resolver', async () => {
+      it('should successfully register a pending resolver', async () => {
         const resolver = Web3.utils.randomHex(20);
         await instance.addResolver(supportedClass, resolver);
         await instance.registerResolver(supportedClass, resolver, {from: owner});
         const result = await instance.isResolverRegistered(supportedClass, resolver);
+
+        assert.equal(result.toNumber(), 2, 'Resolver was not registered');
+      });
+
+      it('should successfully register a rejected resolver', async () => {
+        const resolver = Web3.utils.randomHex(20);
+        await instance.addResolver(supportedClass, resolver);
+        await instance.rejectResolver(supportedClass, resolver);
+        let result = await instance.isResolverRegistered(supportedClass, resolver);
+
+        assert.equal(result.toNumber(), 0, 'Resolver was not registered');
+
+        await instance.registerResolver(supportedClass, resolver, {from: owner});
+        result = await instance.isResolverRegistered(supportedClass, resolver);
 
         assert.equal(result.toNumber(), 2, 'Resolver was not registered');
       });
@@ -130,7 +144,7 @@ contract('LeagueRegistry', async accounts => {
         assert.fail('Expected throw not received');
       });
 
-      it('should revert if class is not registers', async () => {
+      it('should revert if class is not registered', async () => {
         // TODO?
       });
 
@@ -229,7 +243,7 @@ contract('LeagueRegistry', async accounts => {
 
     describe('Test cases for valid resolver nuke', async () => {
 
-      it('should successfully nuke a resolver', async () => {
+      it('should successfully nuke a resolver when index is not last resolver in array', async () => {
         const resolverIndex = 1;
 
         const resolverListBefore = await instance.getResolvers.call(supportedClass);
@@ -241,6 +255,23 @@ contract('LeagueRegistry', async accounts => {
         assert.lengthOf(resolverListAfter, resolverListBefore.length - 1, "Resolver list length did not decrease");
 
         resolverListBefore.splice(resolverIndex, 1, resolverListBefore.pop());
+        assert.deepEqual(resolverListBefore, resolverListAfter, "Resolver was not removed from array");
+
+        const result = await instance.isResolverRegistered(supportedClass, unregisterResolver);
+        assert.equal(result.toNumber(), 0, "Resolver has not been set to rejected");
+      });
+
+      it('should successfully nuke a resolver when the index is last resolver in array', async () => {
+        const resolverListBefore = await instance.getResolvers.call(supportedClass);
+        const resolverIndex = resolverListBefore.length - 1;
+        const unregisterResolver = resolverListBefore[resolverIndex];
+
+        await instance.nukeResolver(supportedClass, resolverIndex, {from: owner});
+        const resolverListAfter = await instance.getResolvers.call(supportedClass);
+
+        assert.lengthOf(resolverListAfter, resolverListBefore.length - 1, "Resolver list length did not decrease");
+
+        resolverListBefore.splice(-1, 1);
         assert.deepEqual(resolverListBefore, resolverListAfter, "Resolver was not removed from array");
 
         const result = await instance.isResolverRegistered(supportedClass, unregisterResolver);
