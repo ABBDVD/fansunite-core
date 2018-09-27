@@ -10,7 +10,7 @@ let BetManager = artifacts.require('./BetManager')
   , Web3 = require('web3');
 
 const { ensureException } = require('./helpers/utils');
-const { BetFactory } = require('./helpers/betfactory');
+const { BetFactory } = require('./helpers/betFactory');
 
 const { NULL_ADDRESS, TOKEN_DECIMALS, ODDS_DECIMALS } = require('./helpers/constants');
 
@@ -64,8 +64,8 @@ contract('BetManager', async accounts => {
     await vault.deposit(token.address, layerStake, {from: layer});
 
     // populate league registry
-    await leagueRegistry.createClass(className, {from: owner});
-    await leagueRegistry.createLeague(className, 'EPL', '0x00', {from: owner});
+    await leagueRegistry.createClass(className, 2, {from: owner});
+    await leagueRegistry.createLeague(className, 'EPL', {from: owner});
     const classLeagues = await leagueRegistry.getClass.call(className);
     const leagueAddress = classLeagues[1][0];
 
