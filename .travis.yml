@@ -9,7 +9,7 @@ install:
 matrix:
   include:
     - name: "Lint"
-      script: yarn lint
+      script: yarn lint:all
     - name: "Test"
       env: SOLIDITY_COVERAGE=false
       script: yarn test

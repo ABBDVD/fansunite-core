@@ -71,6 +71,17 @@ contract ILeague {
   function isParticipant(uint _id) external view returns (bool);
 
   /**
+   * @notice Checks if participant `_participantId` is playing in fixture `_fixtureId`
+   * @param _participantId Id of the participant
+   * @param _fixtureId Id of the fixture
+   * @return `true` if participant `_participantId` is scheduled in for fixture `_fixtureId`
+   */
+  function isParticipantScheduled(uint _participantId, uint _fixtureId)
+    external
+    view
+    returns (bool);
+
+  /**
    * @notice Gets the name of the league
    * @return UTF-8 encoded name of league
    */
