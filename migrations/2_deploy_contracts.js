@@ -4,6 +4,8 @@ let ResolverRegistry = artifacts.require('./ResolverRegistry.sol');
 let LeagueLib = artifacts.require('./leagues/LeagueLib001.sol');
 let LeagueFactory = artifacts.require('./leagues/LeagueFactory001.sol');
 let Vault = artifacts.require('./vault/Vault.sol');
+let BetManager = artifacts.require('./BetManager.sol');
+let truffle = require('../truffle');
 
 module.exports = function(deployer, network, accounts) {
   let registry;
@@ -41,6 +43,9 @@ module.exports = function(deployer, network, accounts) {
           return deployer.deploy(Vault, Registry.address);
         })
         .then(() => {
+          return deployer.deploy(BetManager, truffle.networks[network].network_id, Registry.address);
+        })
+        .then(() => {
           // FanOrg is ConsensusManager until Oracles are in place
           return registry.changeAddress("ConsensusManager", accounts[0]);
         })
@@ -57,6 +62,9 @@ module.exports = function(deployer, network, accounts) {
           return registry.changeAddress("ResolverRegistry", ResolverRegistry.address);
         })
         .then(() => {
+          return registry.changeAddress("BetManager", BetManager.address);
+        })
+        .then(() => {
           /* eslint no-console: "off" */
           console.log('\n');
           console.log('----- FansUnite Core Contracts -----');
@@ -65,6 +73,7 @@ module.exports = function(deployer, network, accounts) {
           console.log('*** LeagueRegistry Address: ', LeagueRegistry.address, '***');
           console.log('*** ResolverRegistry Address: ', ResolverRegistry.address, '***');
           console.log('*** FansUnite Vault Address: ', Vault.address, '***');
+          console.log('*** BetManager Address: ', BetManager.address, '***');
           console.log('-----------------------------------');
           console.log('\n');
         });

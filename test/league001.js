@@ -14,7 +14,7 @@ contract('League', async accounts => {
   const className = 'soccer';
   const league = 'FIFA';
   const details = '0x00';
-  
+
   before('setup contract instance', async () => {
     const leagueRegistry = await LeagueRegistry.deployed();
 
