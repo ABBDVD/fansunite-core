@@ -113,28 +113,27 @@ contract('BetManager', async accounts => {
       it('should successfully submit a bet for each subject', async () => {
         const backerBets = await instance.getBetsBySubject.call(backer);
 
-        assert.isArray(backerBets);
-        assert.lengthOf(backerBets, 1);
-        assert.equal(backerBets[0], bet.hash);
+        assert.isArray(backerBets, 'unexpected return type for getBetsBySubject');
+        assert.lengthOf(backerBets, 1, 'bet was not added for backer');
+        assert.equal(backerBets[0], bet.hash, 'bet was not added for backer');
 
         const layerBets = await instance.getBetsBySubject.call(layer);
-        assert.equal(layerBets[0], bet.hash);
+        assert.equal(layerBets[0], bet.hash, 'bet was not added for layer');
       });
 
       it('should successfully transfer the correct tokens for the layer', async() => {
         const backerBalance = await vault.balanceOf(token.address, backer);
-        assert.equal(backerBalance, 0);
+        assert.equal(backerBalance, 0, 'on successful bet submission, tokens were not transferred for the layer');
       });
 
       it('should successfully transfer the correct tokens for the backer', async() => {
         const layerBalance = await vault.balanceOf(token.address, layer);
-        assert.equal(layerBalance, 0);
-
+        assert.equal(layerBalance, 0, 'on successful bet submission, tokens were not transferred for the backer');
       });
 
       it('should successfully transfer the correct tokens in the bet manager', async() => {
         const betManagerBalance = await vault.balanceOf(token.address, betManager.address);
-        assert.equal(betManagerBalance, backerStake + layerStake);
+        assert.equal(betManagerBalance, backerStake + layerStake,'on successful bet submission, correct token amount was not transferred to bet manager');
       });
 
     });
