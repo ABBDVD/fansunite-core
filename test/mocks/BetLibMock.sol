@@ -6,7 +6,7 @@ contract BetLibMock {
 
   using BetLib for BetLib.Bet;
 
-  uint public chainId = 1;
+  uint public chainId = 15;
 
   function generate(address[5] _subjects, uint[4] _params, bytes _payload)
     external

@@ -17,7 +17,7 @@ class BetFactory {
     };
 
     let hash = this.hashBet(_bet);
-    let signature = BetFactory.signBet(_bet, hash);
+    let signature = await BetFactory.signBet(_bet, hash);
 
     return {
       subjects: [
@@ -58,7 +58,7 @@ class BetFactory {
       ")"
     ];
 
-    const chainId = 1;
+    const chainId = 15;
 
     let subjects = [
       bet.backer,

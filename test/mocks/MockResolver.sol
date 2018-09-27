@@ -5,8 +5,8 @@ import "../../contracts/resolvers/BaseResolver.sol";
 
 
 /**
- * @title MoneyLine Resolver
- * @dev RMoneyLine is a simple Money line contract
+ * @title Mock Resolver
+ * @dev MockResolver is a resolver contract for testing the bet manager
  */
 contract MockResolver is IResolver, BaseResolver {
 
@@ -17,9 +17,9 @@ contract MockResolver is IResolver, BaseResolver {
   constructor(string _version) public BaseResolver(_version) { }
 
   /**
-   * @notice Returns the Result of a Moneyline bet
+   * @notice Simply returns the value that is provided
    * @param _result bet payload encoded result
-   * @return `1` if backer loses and `2` if backer wins
+   * @return `1` if backer loses, `2` if backer wins, `3` if backer half wins, `4` if backer half loses, `5` if push
    */
   function resolve(uint8 _result) external pure returns (uint8) {
     return _result;
@@ -33,7 +33,8 @@ contract MockResolver is IResolver, BaseResolver {
    * @return `true` if bet payload valid, `false` otherwise
    */
   function validate(address _league, uint _fixture, uint8 _result) external view returns (bool) {
-    return true;
+    return _result >= 1 && _result <= 5;
+//    return true;
   }
 
   /**
