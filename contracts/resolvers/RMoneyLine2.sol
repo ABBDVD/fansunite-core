@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 import "../interfaces/IResolver.sol";
-import "../interfaces/ILeague.sol";
+import { ILeague001 as ILeague } from "../leagues/ILeague001.sol";
 
 import "./BaseResolver.sol";
 
@@ -28,15 +28,15 @@ contract RMoneyLine2 is IResolver, BaseResolver {
    */
   function resolve(address _league, uint _fixture, uint _bWinner, uint[] _scores)
     external
-    pure
-    returns (uint8)
+    view
+    returns (uint)
   {
     var (, _participants,) = ILeague(_league).getFixture(_fixture);
 
     if (_bWinner == 0)
       return _scores[0] == _scores[1] ? 2 : 1;
 
-    var _i = _participants[0] == _bWinner ? 0 : 1;
+    uint _i = _participants[0] == _bWinner ? 0 : 1;
     return _scores[_i] > _scores[1 - _i] ? 2 : 1;
   }
 

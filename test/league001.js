@@ -3,7 +3,7 @@
 let League = artifacts.require('./leagues/League001')
   , LeagueRegistry = artifacts.require('./LeagueRegistry')
   , ResolverRegistry = artifacts.require('./ResolverRegistry')
-  , RMoneyLine = artifacts.require('./RMoneyLine')
+  , RMoneyLine = artifacts.require('./RMoneyLine2')
   , { ensureException } = require('./helpers/utils');
 
 contract('League', async accounts => {
