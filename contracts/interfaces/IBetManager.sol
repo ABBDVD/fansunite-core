@@ -12,7 +12,7 @@ contract IBetManager {
    * @param _nonce Nonce, to ensure hash uniqueness
    * @param _payload Payload for resolver
    * @param _signature ECDSA signature along with the mode
-   *  (0 = Typed, 1 = Geth, 2 = Trezor) {mode}{v}{r}{s}.
+   *  (0 = Typed, 1 = Geth) {mode}{v}{r}{s}.
    */
   function submitBet(
     address[5] _subjects,
@@ -48,7 +48,7 @@ contract IBetManager {
   )
     external
     view
-    returns (uint8);
+    returns (uint);
 
   /**
    * @notice Gets all the bet identifiers for address `_subject`

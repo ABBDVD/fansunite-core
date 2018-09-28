@@ -13,11 +13,11 @@ pragma solidity ^0.4.24;
  *        order, the BetManager contract would send the league and fixture. The init function must
  *        then consume all bet payload encoded function parameters followed by resolution encoded
  *        function parameters.
- *     5. The return value of init function MUST be of type uint8 and one of the following:
+ *     5. The return value of init function MUST be of type uint and one of the following:
  *        + 1 if backer loses bet
  *        + 2 if backer wins bet
- *        + 3 if backer half wins bet
- *        + 4 if backer half loses bet
+ *        + 3 if backer half loses bet
+ *        + 4 if backer half wins bet
  *        + 5 if results in a push
  *
  *     6. The resolver MUST implement validator function (the function is responsible for

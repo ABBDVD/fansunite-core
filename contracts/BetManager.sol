@@ -115,17 +115,12 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
    * @param _payload Payload for resolver
    * @return Result of bet (refer to IResolver for specifics of the return type)
    */
-  function getResult(
-    address[5] _subjects,
-    uint[4] _params,
-    uint _nonce,
-    bytes _payload
-  )
+  function getResult(address[5] _subjects, uint[4] _params, uint _nonce, bytes _payload)
     external
     view
-    returns (uint8)
+    returns (uint)
   {
-    // TODO Manan
+    return 0;
   }
 
   /**
@@ -270,6 +265,85 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
 
     bets[_bet.backer].push(_hash);
     bets[msg.sender].push(_hash);
+  }
+
+  /**
+   * @dev Gets the bet result based on arguments
+   * @param __league Address of league
+   * @param __resolver Address of resolver
+   * @param __fixture Id of fixture
+   * @param __payload bet payload encoded function parameters
+   * @param __resolution resolution encoded function parameters
+   * @return returns a number between 1 and 5 (check IResolver for details) or 0 (for failed call)
+   */
+  function _getResult(
+    address __league,
+    address __resolver,
+    uint __fixture,
+    bytes __payload,
+    bytes __resolution
+  )
+    internal
+    view
+    returns (uint)
+  {
+    uint _result;
+    bytes4 _selector = IResolver(_resolver).getInitSelector();
+    address _league = __league;
+    address _resolver = __resolver;
+    uint _fixture = __fixture;
+    bytes memory _payload = __payload;
+    bytes memory _resolution = __resolution;
+
+    assembly {
+      let _plen := mload(_payload)               // _plen = length of _payload
+      let _rlen := mload(_resolution)            // _rlen = length of _resolution
+      let _tlen := add(_rlen, add(_plen, 0x44))  // _tlen = total length of calldata
+      let _p    := add(_payload, 0x20)           // _p    = encoded bytes of _payload
+      let _r    := add(_payload, 0x20)           // _r    = encoded bytes of _resolution
+
+      let _ptr   := mload(0x40)                  // _ptr   = free memory pointer
+      let _index := mload(0x40)                  // _index = same as _ptr
+      mstore(0x40, add(_ptr, _tlen))             // update free memory pointer
+
+      mstore(_index, _selector)                  // store selector at _index
+      _index := add(_index, 0x04)                // _index = _index + 0x04
+      _index := add(_index, 0x0C)                // _index = _index + 0x0C
+      mstore(_index, _league)                    // store address at _index
+      _index := add(_index, 0x14)                // _index = _index + 0x14
+      mstore(_index, _fixture)                   // store _fixture at _index
+      _index := add(_index, 0x20)                // _index = _index + 0x20
+
+      for
+      { let _end := add(_p, _plen) }             // init: _end = _p + _plen
+      lt(_p, _end)                               // cond: _p < _end
+      { _p := add(_p, 0x20) }                    // incr: _p = _p + 0x20
+      {
+        mstore(_index, mload(_p))                // store _p to _index
+        _index := add(_index, 0x20)              // _index = _index + 0x20
+      }
+
+      for
+      { let _end := add(_r, _rlen) }                 // init: _end = _r + _rlen
+      lt(_r, _end)                               // cond: _r < _end
+      { _r := add(_r, 0x20) }                    // incr: _r = _r + 0x20
+      {
+        mstore(_index, mload(_r))                // store _r to _index
+        _index := add(_index, 0x20)              // _index = _index + 0x20
+      }
+
+      let result := staticcall(30000, _resolver, _ptr, _tlen, _ptr, 0x20)
+
+      switch result
+      case 0 {
+        // Nothing here
+      }
+      default {
+        _result := mload(_ptr)
+      }
+    }
+
+    return _result;
   }
 
   /**
