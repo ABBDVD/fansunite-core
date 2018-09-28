@@ -93,6 +93,17 @@ contract('LeagueRegistry', async accounts => {
       assert.notEqual(result, NULL_ADDRESS, "default factory has null address");
     });
 
+    it('should revert when invalid factory version is attempted to be retrieved', async () => {
+      try {
+        await instance.getFactory.call('0.0.9'); // no factory added for version
+      } catch (err) {
+        ensureException(err);
+        return;
+      }
+
+      assert.fail('Expected throw not received');
+    });
+
     describe('Test cases for valid factory additions', async () => {
 
       it('should successfully update a factory', async () => {
@@ -183,6 +194,17 @@ contract('LeagueRegistry', async accounts => {
     it('should throw exception when try to create new league for invalid class', async () => {
       try {
         await instance.createLeague("DoesNotExist", "FIFA", { from: owner });
+      } catch (err) {
+        ensureException(err);
+        return;
+      }
+
+      assert.fail('Expected throw not received');
+    });
+
+    it('should revert when attempting to retrieve a class that does not exist', async () => {
+      try {
+        await instance.getClass.call("DoesNotExist");
       } catch (err) {
         ensureException(err);
         return;
