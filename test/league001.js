@@ -3,7 +3,7 @@
 let League = artifacts.require('./leagues/League001')
   , LeagueRegistry = artifacts.require('./LeagueRegistry')
   , ResolverRegistry = artifacts.require('./ResolverRegistry')
-  , RMoneyLine = artifacts.require('./RMoneyLine2')
+  , MockResolver = artifacts.require('./mocks/MockResolver')
   , { ensureException } = require('./helpers/utils');
 
 contract('League', async accounts => {
@@ -115,6 +115,8 @@ contract('League', async accounts => {
 
   describe('Test cases for scheduling fixtures', async () => {
 
+    let _start = parseInt((Date.now() / 1000) + 3600);
+
     before('Create participants and season', async() => {
       await instance.addSeason(2019, { from: owner });
       await instance.addParticipant('Italy', '0x00', { from: owner });
@@ -124,7 +126,6 @@ contract('League', async accounts => {
     describe('Test cases for valid fixture scheduling', async () => {
 
       it('should successfully schedule a fixture', async () => {
-        let _start = parseInt((Date.now() / 1000) + 3600);
 
         await instance.scheduleFixture(2019, [2,3], _start, { from: owner});
 
@@ -157,12 +158,48 @@ contract('League', async accounts => {
         assert.fail('Expected throw not received');
       });
 
-      it('should revert if event already exists', async () => {
-        // TODO
+      it('should revert if the number of participants exceeds the maximum amount', async () => {
+        try {
+          await instance.scheduleFixture(2019, [1,2,3], _start, { from: owner});
+        } catch (err) {
+          ensureException(err);
+          return;
+        }
+
+        assert.fail('Expected throw not received');
       });
 
       it('should revert if participants do not exist', async () => {
-        // TODO
+        try {
+          await instance.scheduleFixture(2019, [98,99], _start, { from: owner});
+        } catch (err) {
+          ensureException(err);
+          return;
+        }
+
+        assert.fail('Expected throw not received');
+      });
+
+      it('should revert if fixture has already started', async () => {
+        try {
+          await instance.scheduleFixture(2019, [2,3], _start - 7200, { from: owner});
+        } catch (err) {
+          ensureException(err);
+          return;
+        }
+
+        assert.fail('Expected throw not received');
+      });
+
+      it('should revert if event already exists', async () => {
+        try {
+          await instance.scheduleFixture(2019, [2,3], _start, { from: owner});
+        } catch (err) {
+          ensureException(err);
+          return;
+        }
+
+        assert.fail('Expected throw not received');
       });
 
     });
@@ -195,7 +232,7 @@ contract('League', async accounts => {
     let resolver;
 
     beforeEach('register resolver in resolver registry', async () => {
-      resolver = await RMoneyLine.new('0.0.1');
+      resolver = await MockResolver.new('0.0.1');
       const resolverReg = await ResolverRegistry.deployed();
       await resolverReg.addResolver(className, resolver.address);
       await resolverReg.registerResolver(className, resolver.address, {from: owner});
@@ -238,7 +275,7 @@ contract('League', async accounts => {
       });
 
       it('should revert if resolver does not support current league version', async () => {
-        resolver = await RMoneyLine.new('0.0.2');
+        resolver = await MockResolver.new('0.0.2');
         const resolverReg = await ResolverRegistry.deployed();
         await resolverReg.addResolver(className, resolver.address);
         await resolverReg.registerResolver(className, resolver.address, {from: owner});
@@ -257,10 +294,10 @@ contract('League', async accounts => {
 
   });
 
-
   describe('Test cases for resolution', async () => {
 
     let resolver;
+    let resolverReg;
     const fixtureId = 1;
     const betPayload = '0x0123';
 
@@ -270,24 +307,27 @@ contract('League', async accounts => {
     });
 
     beforeEach('register resolver in resolver registry', async () => {
-      resolver = await RMoneyLine.new('0.0.1');
-      const resolverReg = await ResolverRegistry.deployed();
+      resolver = await MockResolver.new('0.0.1');
+      resolverReg = await ResolverRegistry.deployed();
       await resolverReg.addResolver(className, resolver.address);
       await resolverReg.registerResolver(className, resolver.address, {from: owner});
       await instance.registerResolver(resolver.address, {from: owner});
     });
-
 
     describe('Test cases for valid resolution pushed', async () => {
 
       it('should successfully push a resolution', async () => {
         await instance.pushResolution(fixtureId, resolver.address, betPayload, {from: owner}); // owner is also consensus manager
 
-        let result = await instance.isFixtureResolved.call(fixtureId, resolver.address);
+        let result = await instance.getResolution.call(fixtureId, resolver.address);
+        assert.equal(result, betPayload, 'payload was incorrectly set');
+
+        result = await instance.isFixtureResolved.call(fixtureId, resolver.address);
         assert.equal(result.toNumber(), 1, 'fixture was not resolved');
 
-        result = await instance.getResolution.call(fixtureId, resolver.address);
-        assert.equal(result, betPayload, 'payload was incorrectly set');
+        const resolvers = await resolverReg.getResolvers.call(className);
+        result = await instance.isFixtureResolved.call(fixtureId, resolvers[0]);
+        assert.equal(result.toNumber(), 2, 'fixture was not resolved');
       });
 
     });
@@ -327,6 +367,113 @@ contract('League', async accounts => {
         assert.fail('Expected throw not received');
       });
 
+    });
+
+    describe('Test cases for retrieving resolution', async () => {
+
+      it('should revert if resolver is not resolved for fixture', async () => {
+        try {
+          await instance.getResolution.call(1, resolver.address);
+        } catch (err) {
+          ensureException(err);
+          return;
+        }
+
+        assert.fail('Expected throw not received');
+      });
+
+    });
+
+  });
+
+  describe('Test cases for retrieving seasons', async () => {
+
+    it('should revert when retrieving a season that is not supported', async () => {
+      try {
+        await instance.getSeason.call(9999);
+      } catch (err) {
+        ensureException(err);
+        return;
+      }
+
+      assert.fail('Expected throw not received');
+    });
+
+  });
+
+  describe('Test cases for retrieving fixtures', async () => {
+
+    it('should revert when a fixture is not scheduled', async () => {
+      try {
+        await instance.getFixture.call(9999);
+      } catch (err) {
+        ensureException(err);
+        return;
+      }
+
+      assert.fail('Expected throw not received');
+    });
+
+  });
+
+  describe('Test cases for retrieving participants', async () => {
+
+    it('should revert when a participant does not exist', async () => {
+      try {
+        await instance.getParticipant.call(9999);
+      } catch (err) {
+        ensureException(err);
+        return;
+      }
+
+      assert.fail('Expected throw not received');
+    });
+
+  });
+
+  describe('Test cases for fixture participant validation', async () => {
+
+    const participants = [1,2];
+    let fixtureId;
+
+    before('create fixture', async () => {
+      const result = await instance.scheduleFixture(2019, participants, parseInt((Date.now() / 1000) + 3600), { from: owner});
+      fixtureId = result.logs[0].args._id;
+    });
+
+    it('should return `true` if participant is scheduled for the fixture', async () => {
+      let result = await instance.isParticipantScheduled.call(participants[0], fixtureId);
+      assert.isTrue(result);
+
+      result = await instance.isParticipantScheduled.call(participants[1], fixtureId);
+      assert.isTrue(result);
+    });
+
+    it('should return `false` if participant is not scheduled for the fixture', async () => {
+      let result = await instance.isParticipantScheduled.call(3, fixtureId);
+      assert.isFalse(result);
+    });
+
+    it('should revert if participant is not in league', async () => {
+      try {
+        await instance.isParticipantScheduled.call(9999, fixtureId);
+      } catch (err) {
+        ensureException(err);
+        return;
+      }
+
+      assert.fail('Expected throw not received');
+    });
+
+    it('should revert if fixture is not scheduled', async () => {
+      try {
+        await instance.isParticipantScheduled.call(1, 9999);
+      } catch (err) {
+        ensureException(err);
+        return;
+      }
+
+      assert.fail('Expected throw not received');
     });
 
   });
