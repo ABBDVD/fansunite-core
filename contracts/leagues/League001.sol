@@ -198,13 +198,19 @@ contract League001 is Ownable, ILeague001, BaseLeague {
    * @param _details Off-chain hash of participant details
    */
   function addParticipant(string _name, bytes _details) external onlyOwner {
-    // TODO Prevent duplication
+    bytes32 _hash = L.hashRawParticipant(_name);
+
+    require(
+      !duplicateManager[_hash],
+      "Participant already in league"
+    );
 
     L.Participant memory _participant;
     _participant.name = _name;
     _participant.details = _details;
     _participant.id = participants.length + 1;
     participants.push(_participant);
+    duplicateManager[_hash] = true;
 
     emit LogParticipantAdded(_participant.id);
   }
@@ -229,6 +235,14 @@ contract League001 is Ownable, ILeague001, BaseLeague {
     );
 
     return resolutions[_fixtureId][_resolver];
+  }
+
+  /**
+   * @notice Gets all resolvers in league
+   * @return Addresses of all resolvers registered in league
+   */
+  function getResolvers() external view returns (address[]) {
+    return resolvers;
   }
 
   /**

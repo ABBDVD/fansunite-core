@@ -62,4 +62,10 @@ contract ILeague001 is ILeague {
    */
   function getParticipant(uint _id) external view returns (uint, string, bytes);
 
+  /**
+   * @notice Gets all resolvers in league
+   * @return Addresses of all resolvers registered in league
+   */
+  function getResolvers() external view returns (address[]);
+
 }

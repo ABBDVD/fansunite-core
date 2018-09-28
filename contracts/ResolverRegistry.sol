@@ -64,9 +64,7 @@ contract ResolverRegistry is Ownable, IResolverRegistry, RegistryAccessible {
    * @param _class Class of league that resolver `_resolver` will be registered for
    */
   function registerResolver(string _class, address _resolver) external onlyOwner {
-    require(!registered[_class][_resolver], "Resolver already registered for class");
-
-    if (rejected[_class][_resolver]) rejected[_class][_resolver] = false;
+    require(pending[_class][_resolver], "Resolver must be in pending state");
 
     pending[_class][_resolver] = false;
     registered[_class][_resolver] = true;
@@ -81,8 +79,7 @@ contract ResolverRegistry is Ownable, IResolverRegistry, RegistryAccessible {
    * @param _class Class of league that resolver `_resolver` will be rejected for
    */
   function rejectResolver(string _class, address _resolver) external onlyOwner {
-    require(!rejected[_class][_resolver], "Resolver already rejected for class");
-    require(!registered[_class][_resolver], "Registered resolvers cannot be rejected");
+    require(pending[_class][_resolver], "Resolver must be in pending state");
 
     pending[_class][_resolver] = false;
     rejected[_class][_resolver] = true;

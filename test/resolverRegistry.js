@@ -111,20 +111,6 @@ contract('LeagueRegistry', async accounts => {
         assert.equal(result.toNumber(), 2, 'Resolver was not registered');
       });
 
-      it('should successfully register a rejected resolver', async () => {
-        const resolver = Web3.utils.randomHex(20);
-        await instance.addResolver(supportedClass, resolver);
-        await instance.rejectResolver(supportedClass, resolver);
-        let result = await instance.isResolverRegistered(supportedClass, resolver);
-
-        assert.equal(result.toNumber(), 0, 'Resolver was not registered');
-
-        await instance.registerResolver(supportedClass, resolver, {from: owner});
-        result = await instance.isResolverRegistered(supportedClass, resolver);
-
-        assert.equal(result.toNumber(), 2, 'Resolver was not registered');
-      });
-
     });
 
     describe('Test cases for invalid resolver registration', async () => {

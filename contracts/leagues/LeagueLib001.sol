@@ -20,16 +20,25 @@ library LeagueLib001 {
     bytes details;
   }
 
+  /**
+   * @dev Hashes the raw parameters of a fixture
+   * @param _participants Ids of participants in fixture
+   * @param _start Start time, unix timestamp (in seconds)
+   * @return hash of tightly packed [_participants, _start]
+   */
   function hashRawFixture(uint[] _participants, uint _start) internal view returns (bytes32) {
     // NOT EIP 712 Compliant, structs are not outward facing
-    bytes32 _hash = keccak256(
-      abi.encodePacked(
-        _participants,
-        _start
-      )
-    );
+    return keccak256(abi.encodePacked(_participants, _start));
+  }
 
-    return _hash;
+  /**
+   * @dev Hashes the raw parameters of a participant
+   * @param _name Name of the participant
+   * @return hash of tightly packed `_name`
+   */
+  function hashRawParticipant(string _name) internal view returns (bytes32) {
+    // NOT EIP 712 Compliant, structs are not outward facing
+    return keccak256(abi.encodePacked(_name));
   }
 
 }
