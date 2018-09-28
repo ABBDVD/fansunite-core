@@ -15,7 +15,6 @@ contract('ChainSpecifiable', async accounts => {
     await instance.setChainId(newChainId, {from: accounts[0]});
 
     assert.equal(await instance.getChainId.call(), newChainId, 'chain Id was not changed');
-
   });
 
 });
