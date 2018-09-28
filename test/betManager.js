@@ -207,6 +207,19 @@ contract('BetManager', async accounts => {
           assert.fail('Expected throw not received');
         });
 
+        it('should revert if signature is invalid', async () => {
+          const bet = await betFactory.generate();
+          const invalidSignature = Web3.utils.randomHex(66);
+          try {
+            await instance.submitBet(bet.subjects, bet.params, bet.nonce, bet.payload, invalidSignature, {from: layer});
+          } catch (err) {
+            ensureException(err);
+            return;
+          }
+
+          assert.fail('Expected throw not received');
+        });
+
       });
 
       describe('Test cases for invalid bet authorization', async () => {
