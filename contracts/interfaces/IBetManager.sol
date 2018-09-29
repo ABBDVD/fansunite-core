@@ -34,18 +34,13 @@ contract IBetManager {
 
   /**
    * @notice Gets the bet result
-   * @param _subjects Subjects associated with bet [backer, layer, token, league, resolver]
-   * @param _params Parameters associated with bet [backerStake, fixture, odds, expiration]
-   * @param _nonce Nonce, to ensure hash uniqueness
+   * @param _league Address of league
+   * @param _resolver Address of resolver
+   * @param _fixture Id of fixture
    * @param _payload Payload for resolver
-   * @return Result of bet (refer to IResolver for specifics of the return type)
+   * @return uint between 1 and 5 (check IResolver for details) or 0 (for unresolved fixtures)
    */
-  function getResult(
-    address[5] _subjects,
-    uint[4] _params,
-    uint _nonce,
-    bytes _payload
-  )
+  function getResult(address _league, address _resolver, uint _fixture, bytes _payload)
     external
     view
     returns (uint);

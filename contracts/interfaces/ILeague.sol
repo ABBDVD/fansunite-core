@@ -39,6 +39,13 @@ contract ILeague {
   function getResolution(uint _fixtureId, address _resolver) external view returns (bytes);
 
   /**
+   * @notice Gets start time for fixture `_fixture`
+   * @param _fixture Id of fixture
+   * @return start time of fixture `_fixture`
+   */
+  function getFixtureStart(uint _fixture) external view returns (uint);
+
+  /**
    * @notice Checks if resolver with address `_resolver` is registered with league
    * @param _resolver Address of the resolver
    * @return `true` if resolver is registered with league, `false` otherwise

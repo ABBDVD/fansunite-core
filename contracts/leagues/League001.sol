@@ -266,6 +266,17 @@ contract League001 is Ownable, ILeague001, BaseLeague {
   }
 
   /**
+   * @notice Gets start time for fixture `_fixture`
+   * @param _fixture Id of fixture
+   * @return start time of fixture `_fixture`
+   */
+  function getFixtureStart(uint _fixture) external view returns (uint) {
+    require(_isFixtureScheduled(_fixture), "Given fixture is not scheduled in league");
+
+    return fixtures[_fixture - 1].start;
+  }
+
+  /**
    * @notice Gets scheduled fixture with id `_id`
    * @param _id Id of the scheduled fixture
    * @return Fixture id

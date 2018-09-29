@@ -45,6 +45,11 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
     uint _nonce,
     bytes _payload
   );
+  // Emit when a Bet has been claimed
+  event LogBetClaimed(
+    bytes32 indexed _hash,
+    uint256 indexed _result
+  );
 
   /**
    * @notice Constructor
@@ -104,23 +109,31 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
    * @param _payload Payload for resolver
    */
   function claimBet(address[5] _subjects, uint[4] _params, uint _nonce, bytes _payload) external {
-   // TODO Manan
+    BetLib.Bet memory _bet = BetLib.generate(_subjects, _params, _payload);
+    bytes32 _hash = BetLib.hash(_bet, chainId, _nonce);
+
+    require(unclaimed[_hash], "Bet with given parameters either claimed or never submitted");
+
+    uint _result = _getResult(_bet.league, _bet.resolver, _bet.fixture, _payload);
+    _processClaim(_bet, _hash, _result);
+
+    emit LogBetClaimed(_hash, _result);
   }
 
   /**
    * @notice Gets the bet result
-   * @param _subjects Subjects associated with bet [backer, layer, token, league, resolver]
-   * @param _params Parameters associated with bet [backerStake, fixture, odds, expiration]
-   * @param _nonce Nonce, to ensure hash uniqueness
+   * @param _league Address of league
+   * @param _resolver Address of resolver
+   * @param _fixture Id of fixture
    * @param _payload Payload for resolver
-   * @return Result of bet (refer to IResolver for specifics of the return type)
+   * @return uint between 1 and 5 (check IResolver for details) or 0 (for unresolved fixtures)
    */
-  function getResult(address[5] _subjects, uint[4] _params, uint _nonce, bytes _payload)
+  function getResult(address _league, address _resolver, uint _fixture, bytes _payload)
     external
     view
     returns (uint)
   {
-    return 0;
+    return _getResult(_league, _resolver, _fixture, _payload);
   }
 
   /**
@@ -251,6 +264,11 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
     uint _backerStake = _bet.backerStake;
     uint _layerStake = BetLib.backerReturn(_bet, ODDS_DECIMALS);
 
+    unclaimed[_hash] = true;
+
+    bets[_bet.backer].push(_hash);
+    bets[msg.sender].push(_hash);
+
     require(
       _vault.transferFrom(_bet.token, _bet.backer, address(this), _backerStake),
       "Cannot transfer backer's stake to pool"
@@ -260,11 +278,104 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
       _vault.transferFrom(_bet.token, _bet.layer, address(this), _layerStake),
       "Cannot transfer layer's stake to pool"
     );
+  }
 
-    unclaimed[_hash] = true;
+  /**
+   * @dev Processes the funds based on result
+   * @param _bet Bet struct
+   * @param _hash Keccak-256 hash of the bet struct, along with chainId and nonce
+   * @param _result Result of the bet
+   */
+  function _processClaim(BetLib.Bet memory _bet, bytes32 _hash, uint _result) internal {
+    bool _expired = ILeague(_bet.league).getFixtureStart(_bet.fixture) + 7 days <= block.timestamp;
+    require(_result > 0 || _expired, "Bet cannot be resolved yet");
 
-    bets[_bet.backer].push(_hash);
-    bets[msg.sender].push(_hash);
+    unclaimed[_hash] = false;
+    claimed[_hash] = true;
+
+    if (_result == 0) __processRevert(_bet);
+    else if (_result == 1) __processLose(_bet);
+    else if (_result == 2) __processWin(_bet);
+    else if (_result == 3) __processHalfLose(_bet);
+    else if (_result == 4) __processHalfWin(_bet);
+    else if (_result == 5) __processPush(_bet);
+    else __processFallBack(_bet);
+  }
+
+
+  /**
+   * @notice Gets the bet result
+   * @param _league Address of league
+   * @param _resolver Address of resolver
+   * @param _fixture Id of fixture
+   * @param _payload Payload for resolver
+   * @return uint between 1 and 5 (check IResolver for details) or 0 (for unresolved fixtures)
+   */
+  function _getResult(address _league, address _resolver, uint _fixture, bytes _payload)
+    internal
+    view
+    returns (uint)
+  {
+    if (ILeague(_league).isFixtureResolved(_fixture, _resolver) != 1) return 0;
+
+    bytes memory _resolution = ILeague(_league).getResolution(_fixture, _resolver);
+    return __getResult(_league, _resolver, _fixture, _payload, _resolution);
+  }
+
+  /**
+   * @dev Throws if `_payload` is not valid
+   * @param _bet Bet struct
+   */
+  function __validatePayload(BetLib.Bet memory _bet) private view {
+    bool _isPayloadValid;
+    address _resolver = _bet.resolver;
+    address _league = _bet.league;
+    uint256 _fixture = _bet.fixture;
+    bytes4 _selector = IResolver(_resolver).getValidatorSelector();
+    bytes memory _payload = _bet.payload;
+
+    assembly {
+      let _plen := mload(_payload)               // _plen = length of _payload
+      let _tlen := add(_plen, 0x44)              // _tlen = total length of calldata
+      let _p    := add(_payload, 0x20)           // _p    = encoded bytes of _payload
+
+      let _ptr   := mload(0x40)                  // _ptr   = free memory pointer
+      let _index := mload(0x40)                  // _index = same as _ptr
+      mstore(0x40, add(_ptr, _tlen))             // update free memory pointer
+
+      mstore(_index, _selector)                  // store selector at _index
+      _index := add(_index, 0x04)                // _index = _index + 0x04
+      _index := add(_index, 0x0C)                // _index = _index + 0x0C
+      mstore(_index, _league)                    // store address at _index
+      _index := add(_index, 0x14)                // _index = _index + 0x14
+      mstore(_index, _fixture)                   // store _fixture at _index
+      _index := add(_index, 0x20)                // _index = _index + 0x20
+
+      for
+      { let _end := add(_p, _plen) }             // init: _end = _p + _plen
+      lt(_p, _end)                               // cond: _p < _end
+      { _p := add(_p, 0x20) }                    // incr: _p = _p + 0x20
+      {
+        mstore(_index, mload(_p))                // store _p to _index
+        _index := add(_index, 0x20)              // _index = _index + 0x20
+      }
+
+      let result := staticcall(30000, _resolver, _ptr, _tlen, _ptr, 0x20)
+
+      switch result
+      case 0 {
+        // revert(_ptr, 0x20) dealt with outside of assembly
+        _isPayloadValid := mload(_ptr)
+      }
+      default {
+        _isPayloadValid := mload(_ptr)
+      }
+    }
+
+    require(
+      _isPayloadValid,
+      "Bet payload is not valid"
+    );
   }
 
   /**
@@ -274,16 +385,16 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
    * @param __fixture Id of fixture
    * @param __payload bet payload encoded function parameters
    * @param __resolution resolution encoded function parameters
-   * @return returns a number between 1 and 5 (check IResolver for details) or 0 (for failed call)
+   * @return uint between 1 and 5 (check IResolver for details) or 0 (for failed call)
    */
-  function _getResult(
+  function __getResult(
     address __league,
     address __resolver,
     uint __fixture,
     bytes __payload,
     bytes __resolution
   )
-    internal
+    private
     view
     returns (uint)
   {
@@ -347,59 +458,71 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
   }
 
   /**
-   * @dev Throws if `_payload` is not valid
+   * @dev Processes the funds back to owners
    * @param _bet Bet struct
    */
-  function __validatePayload(BetLib.Bet memory _bet) private view {
-    bool _isPayloadValid;
-    address _resolver = _bet.resolver;
-    address _league = _bet.league;
-    uint256 _fixture = _bet.fixture;
-    bytes4 _selector = IResolver(_resolver).getValidatorSelector();
-    bytes memory _payload = _bet.payload;
-
-    assembly {
-      let _plen := mload(_payload)               // _plen = length of _payload
-      let _tlen := add(_plen, 0x44)              // _tlen = total length of calldata
-      let _p    := add(_payload, 0x20)           // _p    = encoded bytes of _payload
-
-      let _ptr   := mload(0x40)                  // _ptr   = free memory pointer
-      let _index := mload(0x40)                  // _index = same as _ptr
-      mstore(0x40, add(_ptr, _tlen))             // update free memory pointer
-
-      mstore(_index, _selector)                  // store selector at _index
-      _index := add(_index, 0x04)                // _index = _index + 0x04
-      _index := add(_index, 0x0C)                // _index = _index + 0x0C
-      mstore(_index, _league)                    // store address at _index
-      _index := add(_index, 0x14)                // _index = _index + 0x14
-      mstore(_index, _fixture)                   // store _fixture at _index
-      _index := add(_index, 0x20)                // _index = _index + 0x20
-
-      for
-      { let _end := add(_p, _plen) }             // init: _end = _p + _plen
-      lt(_p, _end)                               // cond: _p < _end
-      { _p := add(_p, 0x20) }                    // incr: _p = _p + 0x20
-      {
-        mstore(_index, mload(_p))                // store _p to _index
-        _index := add(_index, 0x20)              // _index = _index + 0x20
-      }
-
-      let result := staticcall(30000, _resolver, _ptr, _tlen, _ptr, 0x20)
-
-      switch result
-      case 0 {
-        // revert(_ptr, 0x20) dealt with outside of assembly
-        _isPayloadValid := mload(_ptr)
-      }
-      default {
-        _isPayloadValid := mload(_ptr)
-      }
-    }
+  function __processRevert(BetLib.Bet memory _bet) private {
+    IVault _vault = IVault(registry.getAddress("FanVault"));
+    uint _backerStake = _bet.backerStake;
+    uint _layerStake = BetLib.backerReturn(_bet, ODDS_DECIMALS);
 
     require(
-      _isPayloadValid,
-      "Bet payload is not valid"
+      _vault.transferFrom(_bet.token, address(this), _bet.backer, _backerStake),
+      "Cannot transfer backer's stake from pool"
     );
+
+    require(
+      _vault.transferFrom(_bet.token, address(this), _bet.layer, _layerStake),
+      "Cannot transfer layer's stake from pool"
+    );
+  }
+
+  /**
+   * @dev Processes funds when backer loses
+   * @param _bet Bet struct
+   */
+  function __processLose(BetLib.Bet memory _bet) private {
+
+  }
+
+  /**
+   * @dev Processes funds when backer wins
+   * @param _bet Bet struct
+   */
+  function __processWin(BetLib.Bet memory _bet) private {
+
+  }
+
+  /**
+   * @dev Processes funds when backer half loses bet
+   * @param _bet Bet struct
+   */
+  function __processHalfLose(BetLib.Bet memory _bet) private {
+
+  }
+
+  /**
+   * @dev Processes funds when backer half wins bet
+   * @param _bet Bet struct
+   */
+  function __processHalfWin(BetLib.Bet memory _bet) private {
+
+  }
+
+  /**
+   * @dev Processes funds when bet results in push
+   * @param _bet Bet struct
+   */
+  function __processPush(BetLib.Bet memory _bet) private {
+
+  }
+
+  /**
+   * @dev Processes funds in case of a fall back
+   * @param _bet Bet struct
+   */
+  function __processFallBack(BetLib.Bet memory _bet) private {
+
   }
 
 }
