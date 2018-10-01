@@ -537,6 +537,37 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
    * @param _bet Bet struct
    */
   function __processHalfLose(BetLib.Bet memory _bet) private {
+    IVault _vault = IVault(registry.getAddress("FanVault"));
+    address _consensusManager = registry.getAddress("ConsensusManager");
+
+    uint _backerStakeBeforeFee = _bet.backerStake;
+    uint _layerStakeBeforeFee = BetLib.backerReturn(_bet, ODDS_DECIMALS);
+
+    uint _backerOracleFee = _backerStakeBeforeFee.div(ORACLE_FEE);
+    uint _layerOracleFee = _layerStakeBeforeFee.div(ORACLE_FEE);
+
+    uint _backerReturnBeforeFee = _backerStakeBeforeFee.div(2);
+    uint _layerReturnBeforeFee = _layerStakeBeforeFee.add(_backerReturnBeforeFee);
+
+    uint _backerReturnAfterFee = _backerReturnBeforeFee.sub(_backerOracleFee);
+    uint _layerReturnAfterFee = _layerReturnBeforeFee.sub(_layerOracleFee);
+
+    uint _oracleFee = _backerOracleFee.add(_layerOracleFee);
+
+    require(
+      _vault.transfer(_bet.token, _bet.backer, _backerReturnAfterFee),
+      "Cannot transfer stake from pool"
+    );
+
+    require(
+      _vault.transfer(_bet.token, _bet.layer, _layerReturnAfterFee),
+      "Cannot transfer stake from pool"
+    );
+
+    require(
+      _vault.transfer(_bet.token, _consensusManager, _oracleFee),
+      "Cannot transfer stake from pool"
+    );
 
   }
 
@@ -545,7 +576,37 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
    * @param _bet Bet struct
    */
   function __processHalfWin(BetLib.Bet memory _bet) private {
+    IVault _vault = IVault(registry.getAddress("FanVault"));
+    address _consensusManager = registry.getAddress("ConsensusManager");
 
+    uint _backerStakeBeforeFee = _bet.backerStake;
+    uint _layerStakeBeforeFee = BetLib.backerReturn(_bet, ODDS_DECIMALS);
+
+    uint _backerOracleFee = _backerStakeBeforeFee.div(ORACLE_FEE);
+    uint _layerOracleFee = _layerStakeBeforeFee.div(ORACLE_FEE);
+
+    uint _layerReturnBeforeFee = _layerStakeBeforeFee.div(2);
+    uint _backerReturnBeforeFee = _backerStakeBeforeFee.add(_layerReturnBeforeFee);
+
+    uint _backerReturnAfterFee = _backerReturnBeforeFee.sub(_backerOracleFee);
+    uint _layerReturnAfterFee = _layerReturnBeforeFee.sub(_layerOracleFee);
+
+    uint _oracleFee = _backerOracleFee.add(_layerOracleFee);
+
+    require(
+      _vault.transfer(_bet.token, _bet.backer, _backerReturnAfterFee),
+      "Cannot transfer stake from pool"
+    );
+
+    require(
+      _vault.transfer(_bet.token, _bet.layer, _layerReturnAfterFee),
+      "Cannot transfer stake from pool"
+    );
+
+    require(
+      _vault.transfer(_bet.token, _consensusManager, _oracleFee),
+      "Cannot transfer stake from pool"
+    );
   }
 
   /**
