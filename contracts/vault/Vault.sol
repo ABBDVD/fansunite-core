@@ -82,6 +82,22 @@ contract Vault is Ownable, IVault, RegistryAccessible {
   }
 
   /**
+   * @notice Transfers token from sender to `_to`
+   * @param _token Address of token that is being transferred
+   * @param _to Address to which tokens are being transferred to
+   * @param _amount Number of tokens being transferred
+   * @return `true` if transfer successful, `false` otherwise
+   */
+  function transfer(address _token, address _to, uint _amount) external returns (bool) {
+    require(_amount > 0, "Amount must be greater than zero");
+
+    address _from = msg.sender;
+    balances[_token][_from] = balances[_token][_from].sub(_amount);
+    balances[_token][_to] = balances[_token][_to].add(_amount);
+    return true;
+  }
+
+  /**
    * @notice Transfers token from one address to another
    * @param _token Address of token that is being transferred
    * @param _from Address to which tokens are being transferred from

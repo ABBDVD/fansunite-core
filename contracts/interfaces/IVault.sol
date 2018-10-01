@@ -21,11 +21,21 @@ contract IVault {
   function withdraw(address _token, uint _amount) external;
 
   /**
+   * @notice Transfers token from sender to `_to`
+   * @param _token Address of token that is being transferred
+   * @param _to Address to which tokens are being transferred to
+   * @param _amount Number of tokens being transferred
+   * @return `true` if transfer successful, `false` otherwise
+   */
+  function transfer(address _token, address _to, uint _amount) external returns (bool);
+
+  /**
    * @notice Transfers token from one address to another
    * @param _token Address of token that is being transferred
    * @param _from Address to which tokens are being transferred from
    * @param _to Address to which tokens are being transferred to
    * @param _amount Number of tokens being transferred
+   * @return `true` if transfer successful, `false` otherwise
    */
   function transferFrom(address _token, address _from, address _to, uint _amount)
     external

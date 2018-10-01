@@ -305,6 +305,14 @@ contract League001 is Ownable, ILeague001, BaseLeague {
   }
 
   /**
+   * @notice Gets participants count
+   * @return participant count
+   */
+  function getParticipantCount() external view returns (uint) {
+    return participants.length;
+  }
+
+  /**
    * @notice Checks if resolver with address `_resolver` is registered with league
    * @param _resolver Address of the resolver
    * @return `true` if resolver is registered with league, `false` otherwise

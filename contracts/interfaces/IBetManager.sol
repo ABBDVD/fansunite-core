@@ -25,8 +25,8 @@ contract IBetManager {
 
   /**
    * @notice Claims a bet, transfers tokens and fees based on fixture resolution
-   * @param _subjects Subjects associated with bet [backer, layer, token, league, resolver]
-   * @param _params Parameters associated with bet [backerStake, fixture, odds, expiration]
+   * @param _subjects Subjects associated with bet
+   * @param _params Parameters associated with bet
    * @param _nonce Nonce, to ensure hash uniqueness
    * @param _payload Payload for resolver
    */

@@ -28,6 +28,9 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
   // Number of decimal places in BetLib.Odds
   uint public constant ODDS_DECIMALS = 4;
 
+  // Oracle fee dividing factor (1 / 400 = 0.0025)
+  uint public constant ORACLE_FEE = 400;
+
   // Resolves to `true` if hash is used, `false` otherwise
   mapping(bytes32 => bool) internal unclaimed;
   // Resolves to `true` if bet has been claimed, `false` otherwise
@@ -103,8 +106,8 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
 
   /**
    * @notice Claims a bet, transfers tokens and fees based on fixture resolution
-   * @param _subjects Subjects associated with bet [backer, layer, token, league, resolver]
-   * @param _params Parameters associated with bet [backerStake, fixture, odds, expiration]
+   * @param _subjects Subjects associated with bet
+   * @param _params Parameters associated with bet
    * @param _nonce Nonce, to ensure hash uniqueness
    * @param _payload Payload for resolver
    */
@@ -147,7 +150,7 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
 
   /**
    * @dev Throws if any of the following checks fail
-   *  + `msg.sender` is `_bet.layer` || `_bet.layer == 0x00`
+   *  + `msg.sender` is `_bet.layer`
    *  + `msg.sender` is not `_bet.backer`
    *  + `_bet.backer` has signed `_hash`
    *  + `_hash` is unique (preventing replay attacks)
@@ -160,7 +163,7 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
     view
   {
     require(
-      msg.sender == _bet.layer || _bet.layer == address(0),
+      msg.sender == _bet.layer,
       "Bet is not permitted for the msg.sender to take"
     );
     require(
@@ -192,7 +195,7 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
       "Backer has not approved BetManager to move funds in Vault"
     );
     require(
-      _vault.isApproved(msg.sender, address(this)),
+      _vault.isApproved(_bet.layer, address(this)),
       "Layer has not approved BetManager to move funds in Vault"
     );
     require(
@@ -467,12 +470,12 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
     uint _layerStake = BetLib.backerReturn(_bet, ODDS_DECIMALS);
 
     require(
-      _vault.transferFrom(_bet.token, address(this), _bet.backer, _backerStake),
+      _vault.transfer(_bet.token, _bet.backer, _backerStake),
       "Cannot transfer backer's stake from pool"
     );
 
     require(
-      _vault.transferFrom(_bet.token, address(this), _bet.layer, _layerStake),
+      _vault.transfer(_bet.token, _bet.layer, _layerStake),
       "Cannot transfer layer's stake from pool"
     );
   }
@@ -482,7 +485,24 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
    * @param _bet Bet struct
    */
   function __processLose(BetLib.Bet memory _bet) private {
+    IVault _vault = IVault(registry.getAddress("FanVault"));
+    address _consensusManager = registry.getAddress("ConsensusManager");
 
+    uint _backerStake = _bet.backerStake;
+    uint _layerStake = BetLib.backerReturn(_bet, ODDS_DECIMALS);
+    uint _totalStakeBeforeFee = _backerStake.add(_layerStake);
+    uint _oracleFee = _totalStakeBeforeFee.div(ORACLE_FEE);
+    uint _totalStakeAfterFee = _totalStakeBeforeFee.sub(_oracleFee);
+
+    require(
+      _vault.transfer(_bet.token, _bet.layer, _totalStakeAfterFee),
+      "Cannot transfer stake from pool"
+    );
+
+    require(
+      _vault.transfer(_bet.token, _consensusManager, _oracleFee),
+      "Cannot transfer stake from pool"
+    );
   }
 
   /**
@@ -490,7 +510,24 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
    * @param _bet Bet struct
    */
   function __processWin(BetLib.Bet memory _bet) private {
+    IVault _vault = IVault(registry.getAddress("FanVault"));
+    address _consensusManager = registry.getAddress("ConsensusManager");
 
+    uint _backerStake = _bet.backerStake;
+    uint _layerStake = BetLib.backerReturn(_bet, ODDS_DECIMALS);
+    uint _totalStakeBeforeFee = _backerStake.add(_layerStake);
+    uint _oracleFee = _totalStakeBeforeFee.div(ORACLE_FEE);
+    uint _totalStakeAfterFee = _totalStakeBeforeFee.sub(_oracleFee);
+
+    require(
+      _vault.transfer(_bet.token, _bet.backer, _totalStakeAfterFee),
+      "Cannot transfer stake from pool"
+    );
+
+    require(
+      _vault.transfer(_bet.token, _consensusManager, _oracleFee),
+      "Cannot transfer stake from pool"
+    );
   }
 
   /**
