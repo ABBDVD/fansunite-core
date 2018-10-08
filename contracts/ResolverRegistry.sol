@@ -119,7 +119,7 @@ contract ResolverRegistry is Ownable, IResolverRegistry, RegistryAccessible {
     return registered[_class][_resolver];
   }
 
-  /*yarn
+  /*
    * @title Gets resolver registered for class `_class`
    * @param _class Class of league
    * @return Addresses of resolvers registered for `_class`
