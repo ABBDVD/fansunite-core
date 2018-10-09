@@ -42,11 +42,14 @@ library SignatureLib {
       s := mload(add(_signature, 66))
     }
 
+    bytes32 hash;
     if (mode == SignatureMode.GETH) {
-      _hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", _hash));
+      hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", _hash));
+    } else {
+      hash = _hash;
     }
 
-    return ecrecover(_hash, v, r, s);
+    return ecrecover(hash, v, r, s);
   }
 
 }
