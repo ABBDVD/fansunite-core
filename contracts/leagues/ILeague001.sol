@@ -16,16 +16,17 @@ contract ILeague001 is ILeague {
   function addSeason(uint16 _year) external;
 
   /**
-   * @notice Creates a new fixture for the on-going season
+   * @notice Creates a new fixture for season `_season`
    * @param _season Season of fixture
    * @param _participants ids of participants in event
-   * @param _start Start time (unix timestamp)
+   * @param _start Start time (unix timestamp, seconds)
+   * @dev _start is rounded off to the nearest minute
    */
   function scheduleFixture(uint16 _season, uint[] _participants, uint _start) external;
 
   /**
    * @notice Adds a new participant to the league
-   * @param _name Name of the participant - should match pattern /[a-zA-Z ]+/
+   * @param _name Name of the participant - should match pattern /^[a-zA-Z0-9.() ]+$/
    * @param _details Off-chain hash of participant details
    */
   function addParticipant(string _name, bytes _details) external;
@@ -67,11 +68,5 @@ contract ILeague001 is ILeague {
    * @return participant count
    */
   function getParticipantCount() external view returns (uint);
-
-  /**
-   * @notice Gets all resolvers in league
-   * @return Addresses of all resolvers registered in league
-   */
-  function getResolvers() external view returns (address[]);
 
 }

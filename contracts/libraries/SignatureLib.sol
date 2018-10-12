@@ -31,7 +31,7 @@ library SignatureLib {
    * @return Returns Address of the signer.
    */
   function recover(bytes32 _hash, bytes _signature) internal pure returns (address) {
-    require(_signature.length == 66);
+    require(_signature.length == 66, "Signature must have length exactly 66");
     SignatureMode mode = SignatureMode(uint8(_signature[0]));
 
     uint8 v = uint8(_signature[1]);

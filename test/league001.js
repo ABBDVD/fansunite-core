@@ -6,7 +6,7 @@ let League = artifacts.require('./leagues/League001')
   , MockResolver = artifacts.require('./mocks/MockResolver')
   , { ensureException } = require('./helpers/utils');
 
-contract('League', async accounts => {
+contract('League001', async accounts => {
 
   let owner = accounts[0];
   let instance;
@@ -227,73 +227,6 @@ contract('League', async accounts => {
 
   });
 
-  describe('Test cases for setting up resolvers', async () => {
-
-    let resolver;
-
-    beforeEach('register resolver in resolver registry', async () => {
-      resolver = await MockResolver.new('0.0.1');
-      const resolverReg = await ResolverRegistry.deployed();
-      await resolverReg.addResolver(className, resolver.address);
-      await resolverReg.registerResolver(className, resolver.address, {from: owner});
-    });
-
-    describe('Test cases for valid resolver registration', async () => {
-
-      it('should successfully register a resolver', async () => {
-        await instance.registerResolver(resolver.address, { from: owner });
-        const isResolverRegistered = await instance.isResolverRegistered(resolver.address);
-
-        assert.isTrue(isResolverRegistered, 'resolver was not registered');
-      });
-
-    });
-
-    describe('Test cases for invalid resolver registration', async () => {
-
-      it('should revert if resolver is already resolved', async () => {
-        await instance.registerResolver(resolver.address, { from: owner });
-        try {
-          await instance.registerResolver(resolver.address, { from: owner });
-        } catch (err) {
-          ensureException(err);
-          return;
-        }
-
-        assert.fail('Expected throw not received');
-      });
-
-      it('should revert if resolver cannot be used', async () => {
-        try {
-          await instance.registerResolver(accounts[1], { from: owner }); // invalid resolver address
-        } catch (err) {
-          ensureException(err);
-          return;
-        }
-
-        assert.fail('Expected throw not received');
-      });
-
-      it('should revert if resolver does not support current league version', async () => {
-        resolver = await MockResolver.new('0.0.2');
-        const resolverReg = await ResolverRegistry.deployed();
-        await resolverReg.addResolver(className, resolver.address);
-        await resolverReg.registerResolver(className, resolver.address, {from: owner});
-
-        try {
-          await instance.registerResolver(resolver.address, { from: owner });
-        } catch (err) {
-          ensureException(err);
-          return;
-        }
-
-        assert.fail('Expected throw not received');
-      });
-
-    });
-
-  });
-
   describe('Test cases for resolution', async () => {
 
     let resolver;
@@ -311,7 +244,7 @@ contract('League', async accounts => {
       resolverReg = await ResolverRegistry.deployed();
       await resolverReg.addResolver(className, resolver.address);
       await resolverReg.registerResolver(className, resolver.address, {from: owner});
-      await instance.registerResolver(resolver.address, {from: owner});
+      await resolverReg.useResolver(instance.address, resolver.address, {from: owner});
     });
 
     describe('Test cases for valid resolution pushed', async () => {
@@ -324,37 +257,11 @@ contract('League', async accounts => {
 
         result = await instance.isFixtureResolved.call(fixtureId, resolver.address);
         assert.equal(result.toNumber(), 1, 'fixture was not resolved');
-
-        const resolvers = await resolverReg.getResolvers.call(className);
-        result = await instance.isFixtureResolved.call(fixtureId, resolvers[0]);
-        assert.equal(result.toNumber(), 2, 'fixture was not resolved');
       });
 
     });
 
     describe('Test cases for invalid resolution pushed', async () => {
-
-      it('should revert if fixture was not scheduled for the league', async () => {
-        try {
-          await instance.pushResolution(9999, resolver.address, betPayload, {from: owner}); // owner is also consensus manager
-        } catch (err) {
-          ensureException(err);
-          return;
-        }
-
-        assert.fail('Expected throw not received');
-      });
-
-      it('should revert if league does not support the given resolver', async () => {
-        try {
-          await instance.pushResolution(fixtureId, accounts[1], betPayload, {from: owner}); // accounts[1] is an invalid resolver
-        } catch (err) {
-          ensureException(err);
-          return;
-        }
-
-        assert.fail('Expected throw not received');
-      });
 
       it('should revert if not called from non-consensus manager', async () => {
         try {

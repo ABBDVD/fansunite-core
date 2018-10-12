@@ -30,7 +30,7 @@ contract Registry is Ownable, IRegistry {
    * @return Address of contract with namekey `_namekey`
    */
   function getAddress(string _nameKey) public view returns (address) {
-    require(validAddressKeys[keccak256(bytes(_nameKey))]);
+    require(validAddressKeys[keccak256(bytes(_nameKey))], "Namekey must be valid");
     return storedAddresses[keccak256(bytes(_nameKey))];
   }
 

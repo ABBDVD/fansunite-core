@@ -9,8 +9,6 @@ import "../utils/RegistryAccessible.sol";
  */
 contract BaseLeague is Ownable, RegistryAccessible {
 
-  // Version of the league
-  string internal version;
   // Name of the league
   string internal name;
   // Class to which the league belongs
@@ -22,16 +20,14 @@ contract BaseLeague is Ownable, RegistryAccessible {
    * @notice Constructor
    * @param _class Class of league
    * @param _name Name of league
-   * @param _version Version of league
    * @param _registry Address of the FansUnite Registry Contact
    */
-  constructor(string _class, string _name, string _version, address _registry)
+  constructor(string _class, string _name, address _registry)
     public
     RegistryAccessible(_registry)
   {
     class = _class;
     name = _name;
-    version = _version;
   }
 
   /**
@@ -64,14 +60,6 @@ contract BaseLeague is Ownable, RegistryAccessible {
    */
   function getDetails() external view returns (bytes) {
     return details;
-  }
-
-  /**
-   * @notice Gets the league version (matches LeagueFactory version)
-   * @return Version of the league protocol
-   */
-  function getVersion() external view returns (string) {
-    return version;
   }
 
 }
