@@ -14,19 +14,30 @@ contract('RMoneyLine2', async accounts => {
   const version = '0.0.1';
   const owner = accounts[0];
 
-  before(async () => {
+  let leagueAddress;
+  let league;
+
+  before('populate', async () => {
     instance = await RMoneyLine2.new(version);
+
+    const leagueRegistry = await LeagueRegistry.deployed();
+    const className = 'soccer';
+    await leagueRegistry.createClass(className, 2, {from: owner});
+    await leagueRegistry.createLeague(className, 'EPL', {from: owner});
+    const classLeagues = await leagueRegistry.getClass.call(className);
+    leagueAddress = classLeagues[1][0];
+
+    league = League.at(leagueAddress);
+    await league.addSeason(2018, {from: owner});
+    await league.addParticipant('Leicester City', '0x00', {from: owner});
+    await league.addParticipant('Manchester United', '0x00', {from: owner});
+    await league.scheduleFixture(2018, [1,2],  Math.floor(Date.now() / 1000) + 3600, {from: owner});
   });
 
   describe('Test cases for constructor', async () => {
 
     it('should successfully set version in constructor', async () => {
-      assert.isTrue(await instance.doesSupportVersion.call(version), 'version was not set in constructor');
-    });
-
-    it('should successfully support a new version', async () => {
-      await instance.supportVersion('0.0.2', {from: accounts[0]});
-      assert.isTrue(await instance.doesSupportVersion.call('0.0.2'), 'new version was added');
+      assert.isTrue(await instance.doesSupportLeague.call(leagueAddress), 'version was not set in constructor');
     });
 
     it('should revert if version is already supported', async () => {
@@ -60,7 +71,7 @@ contract('RMoneyLine2', async accounts => {
     });
 
     it('should return the correct description', async () => {
-      assert.equal(await instance.getDescription.call(), 'Common MoneyLine Resolver: Betting on who wins the fixture');
+      assert.equal(await instance.getDescription.call(), 'Common MoneyLine Resolver for two player leagues: Betting on who wins the fixture');
     });
 
     it('should return the correct type', async () => {
@@ -74,23 +85,6 @@ contract('RMoneyLine2', async accounts => {
   });
 
   describe('Test cases for validation and resolution', async () => {
-
-    let leagueAddress;
-
-    before('populate', async () => {
-      const leagueRegistry = await LeagueRegistry.deployed();
-      const className = 'soccer';
-      await leagueRegistry.createClass(className, 2, {from: owner});
-      await leagueRegistry.createLeague(className, 'EPL', {from: owner});
-      const classLeagues = await leagueRegistry.getClass.call(className);
-      leagueAddress = classLeagues[1][0];
-
-      const league = League.at(leagueAddress);
-      await league.addSeason(2018, {from: owner});
-      await league.addParticipant('Leicester City', '0x00', {from: owner});
-      await league.addParticipant('Manchester United', '0x00', {from: owner});
-      await league.scheduleFixture(2018, [1,2],  Math.floor(Date.now() / 1000) + 3600, {from: owner});
-    });
 
     describe('Test cases for validation', async () => {
 

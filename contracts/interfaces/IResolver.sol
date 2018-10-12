@@ -35,17 +35,11 @@ pragma solidity ^0.4.24;
 contract IResolver {
 
   /**
-   * @notice Support league version `_version`
-   * @param _version League version
+   * @notice Checks whether resolver supports a specific league
+   * @param _league Address of league contract
+   * @return `true` if resolver supports league `_league`, `false` otherwise
    */
-  function supportVersion(string _version) external;
-
-  /**
-   * @notice Checks whether resolver works with a specific league version
-   * @param _version League version
-   * @return `true` if resolver supports league version `_version`, `false` otherwise
-   */
-  function doesSupportVersion(string _version) external view returns (bool);
+  function doesSupportLeague(address _league) external view returns (bool);
 
   /**
    * @notice Gets the signature of the init function
