@@ -303,7 +303,7 @@ contract('League', async accounts => {
 
     before('schedule fixture', async () => {
       await instance.addSeason(2020, {from: owner});
-      await instance.scheduleFixture(2020, [1,2], parseInt((Date.now() / 1000) + 3600), {from: owner});
+      await instance.scheduleFixture(2020, [1,2], parseInt((Date.now() / 1000) + 7200), {from: owner});
     });
 
     beforeEach('register resolver in resolver registry', async () => {
@@ -437,7 +437,7 @@ contract('League', async accounts => {
     let fixtureId;
 
     before('create fixture', async () => {
-      const result = await instance.scheduleFixture(2019, participants, parseInt((Date.now() / 1000) + 3600), { from: owner});
+      const result = await instance.scheduleFixture(2019, participants, parseInt((Date.now() / 1000) + 10800), { from: owner});
       fixtureId = result.logs[0].args._id;
     });
 
