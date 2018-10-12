@@ -14,41 +14,11 @@ contract('LeagueRegistry', async accounts => {
     instance = await LeagueRegistry.deployed();
   });
 
-  describe('Test cases for setting registry', async () => {
-    let registryContract;
-
-    before(async () => {
-      registryContract = await instance.getRegistryContract.call();
-    });
-
-    afterEach(async () => {
-      await instance.setRegistryContract(registryContract);
-    });
-
-    it('should successfully set registry contract', async () => {
-      await instance.setRegistryContract(dummyAddressA, { from: owner });
-      let result = await instance.getRegistryContract.call();
-      assert.equal(result, dummyAddressA, "registry contract cannot be updated");
-    });
-
-    it('should throw exception when non-owner tries to set registry contact', async () => {
-      try {
-        await instance.setRegistryContract(dummyAddressA, { from: accounts[1] });
-      } catch (err) {
-        ensureException(err);
-        return;
-      }
-
-      assert.fail('Expected throw not received');
-    });
-
-  });
-
   describe('Test cases for class creation', async () => {
 
     before('create two new classes', async () => {
-      await instance.createClass("soccer", { from: owner });
-      await instance.createClass("baseball", { from: owner });
+      await instance.createClass("soccer", 2, { from: owner });
+      await instance.createClass("baseball", 2, { from: owner });
     });
 
     describe('Test cases for validating class creation', async () => {
@@ -79,7 +49,7 @@ contract('LeagueRegistry', async accounts => {
 
       it('should throw exception when non-owner tries to creates new class', async () => {
         try {
-          await instance.createClass("foo", { from: accounts[1] }); // non-owner
+          await instance.createClass("foo", 2, { from: accounts[1] }); // non-owner
         } catch (err) {
           ensureException(err);
           return;
@@ -90,7 +60,7 @@ contract('LeagueRegistry', async accounts => {
 
       it('should throw exception on duplicate classes', async () => {
         try {
-          await instance.createClass("soccer", { from: owner });
+          await instance.createClass("soccer", 2, { from: owner });
         } catch (err) {
           ensureException(err);
           return;
@@ -121,6 +91,17 @@ contract('LeagueRegistry', async accounts => {
       assert.equal(result, "0.0.1", "default league factory not set");
       result = await instance.getFactory.call("0.0.1");
       assert.notEqual(result, NULL_ADDRESS, "default factory has null address");
+    });
+
+    it('should revert when invalid factory version is attempted to be retrieved', async () => {
+      try {
+        await instance.getFactory.call('0.0.9'); // no factory added for version
+      } catch (err) {
+        ensureException(err);
+        return;
+      }
+
+      assert.fail('Expected throw not received');
     });
 
     describe('Test cases for valid factory additions', async () => {
@@ -186,7 +167,7 @@ contract('LeagueRegistry', async accounts => {
       let result = await instance.getClass.call("soccer");
       assert.lengthOf(result[1], 0, "new class has unexpected leagues");
 
-      await instance.createLeague("soccer", "english-premier-league", "0x00", { from: owner });
+      await instance.createLeague("soccer", "english-premier-league", { from: owner });
       result = await instance.getClass.call("soccer");
       assert.lengthOf(result[1], 1, "league not added to existing class");
 
@@ -197,12 +178,11 @@ contract('LeagueRegistry', async accounts => {
       assert.lengthOf(result, 3, "cannot retrieve existing league, invalid return type");
       assert.equal(result[0], league, "address returned by getClass does not match getLeague");
       assert.equal(result[1], "english-premier-league", "league name not set properly");
-      assert.equal(result[2], "0x00", "league details not set properly");
     });
 
     it('should throw exception when non-owner tries to create new league', async () => {
       try {
-        await instance.createLeague("soccer", "FIFA", "0x00", { from: accounts[1] }); // non-owner
+        await instance.createLeague("soccer", "FIFA", { from: accounts[1] }); // non-owner
       } catch (err) {
         ensureException(err);
         return;
@@ -213,7 +193,18 @@ contract('LeagueRegistry', async accounts => {
 
     it('should throw exception when try to create new league for invalid class', async () => {
       try {
-        await instance.createLeague("DoesNotExist", "FIFA", "0x00", { from: owner });
+        await instance.createLeague("DoesNotExist", "FIFA", { from: owner });
+      } catch (err) {
+        ensureException(err);
+        return;
+      }
+
+      assert.fail('Expected throw not received');
+    });
+
+    it('should revert when attempting to retrieve a class that does not exist', async () => {
+      try {
+        await instance.getClass.call("DoesNotExist");
       } catch (err) {
         ensureException(err);
         return;

@@ -9,13 +9,6 @@ pragma solidity ^0.4.24;
 contract ILeague {
 
   /**
-   * @notice Sets consensus contract of the league to `_consensus`
-   * @dev Only consensus contract will be able to call pushResolution
-   * @param _consensus address of the consensus contract
-   */
-  function updateConsensusContract(address _consensus) external;
-
-  /**
    * @notice Adds resolver with address `_resolver` to league
    * @dev fails if `_resolver` is not registered with FansUnite's Resolver Registry
    * @param _resolver Address of the resolver contract
@@ -46,6 +39,13 @@ contract ILeague {
   function getResolution(uint _fixtureId, address _resolver) external view returns (bytes);
 
   /**
+   * @notice Gets start time for fixture `_fixture`
+   * @param _fixture Id of fixture
+   * @return start time of fixture `_fixture`
+   */
+  function getFixtureStart(uint _fixture) external view returns (uint);
+
+  /**
    * @notice Checks if resolver with address `_resolver` is registered with league
    * @param _resolver Address of the resolver
    * @return `true` if resolver is registered with league, `false` otherwise
@@ -65,8 +65,8 @@ contract ILeague {
    * @dev It is possible that some resolvers do not get resolution payloads from oracles
    * @param _id Id of the fixture
    * @param _resolver Address of the resolver
-   * @return `0` if fixture is not resolved, `1` if fixture is resolved and resolver `_resolver`
-   *   is resolved, `2` if fixture is resolved but resolver `_resolver` is not
+   * @return `0` if fixture is not resolved, `1` if fixture is resolved and for resolver `_resolver`,
+   *  `2` if fixture is resolved but resolver `_resolver
    */
   function isFixtureResolved(uint _id, address _resolver) external view returns (uint8);
 
@@ -76,6 +76,17 @@ contract ILeague {
    * @return `true` if participant id `_id` is valid, `false` otherwise
    */
   function isParticipant(uint _id) external view returns (bool);
+
+  /**
+   * @notice Checks if participant `_participantId` is playing in fixture `_fixtureId`
+   * @param _participantId Id of the participant
+   * @param _fixtureId Id of the fixture
+   * @return `true` if participant `_participantId` is scheduled in for fixture `_fixtureId`
+   */
+  function isParticipantScheduled(uint _participantId, uint _fixtureId)
+    external
+    view
+    returns (bool);
 
   /**
    * @notice Gets the name of the league

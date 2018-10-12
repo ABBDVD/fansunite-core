@@ -13,18 +13,12 @@ contract RegistryAccessible is Ownable {
   // Address of the registry contract
   IRegistry internal registry;
 
-  // Emit when Registry contract updated
-  event LogRegistryUpdated(address indexed _old, address indexed _new);
-
-  /**
-   * @notice Updates registry contract address to `_reg`
-   * @param _reg Address of the FansUnite Registry contract
+  /*
+   * @notice Constructor
+   * @param _registry Address of the registry contract
    */
-  function setRegistryContract(address _reg) public onlyOwner {
-    require(_reg != address(0), "Registry address cannot be 0x");
-    address _old = registry;
-    registry = IRegistry(_reg);
-    emit LogRegistryUpdated(_old, _reg);
+  constructor(address _registry) public {
+    registry = IRegistry(_registry);
   }
 
   /**

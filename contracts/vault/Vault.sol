@@ -31,11 +31,11 @@ contract Vault is Ownable, IVault, RegistryAccessible {
   event LogSpenderAdded(address indexed _spender);
 
   /**
-   * @dev Throw is called by any account other than from spenders
+   * @notice Constructor
+   * @param _registry Address of the Registry contract
    */
-  modifier onlySpender {
-    require(spenders[msg.sender], "Given spender is not registered with Vault");
-    _;
+  constructor(address _registry) public RegistryAccessible(_registry) {
+
   }
 
   /**
@@ -79,6 +79,22 @@ contract Vault is Ownable, IVault, RegistryAccessible {
       msg.sender.transfer(_amount);
     else
       require(ERC20(_token).transfer(msg.sender, _amount), "Vault cannot transfer balance");
+  }
+
+  /**
+   * @notice Transfers token from sender to `_to`
+   * @param _token Address of token that is being transferred
+   * @param _to Address to which tokens are being transferred to
+   * @param _amount Number of tokens being transferred
+   * @return `true` if transfer successful, `false` otherwise
+   */
+  function transfer(address _token, address _to, uint _amount) external returns (bool) {
+    require(_amount > 0, "Amount must be greater than zero");
+
+    address _from = msg.sender;
+    balances[_token][_from] = balances[_token][_from].sub(_amount);
+    balances[_token][_to] = balances[_token][_to].add(_amount);
+    return true;
   }
 
   /**

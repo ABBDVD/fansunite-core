@@ -14,22 +14,22 @@ contract LeagueFactory001 is ILeagueFactory {
    * @dev Future versions of the factory can attach different resolvers or pass some other parameters.
    * @param _class Class of the league
    * @param _name Name of the league (approved by LeagueRegistry)
-   * @param _details Off-chain hash of league details
-   * @param _consensus Address of the consensus contract
+   * @param _registry Address of the registry contract
+   * @param _participantsPerFixture Number of participants allowed per fixture
    * @param _owner Owner of the league (FansUnite)
    * @return Address of the created league contract
    */
   function deployLeague(
     string _class,
     string _name,
-    bytes _details,
-    address _consensus,
+    address _registry,
+    uint _participantsPerFixture,
     address _owner
   )
     external
     returns (address)
   {
-    League _league = new League(_class, _name, _details, _consensus);
+    League _league = new League(_class, _name, "0.0.1", _registry, _participantsPerFixture);
     _league.transferOwnership(_owner);
     return _league;
   }

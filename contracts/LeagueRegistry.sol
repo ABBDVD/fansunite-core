@@ -20,7 +20,7 @@ import "./utils/RegistryAccessible.sol";
 contract LeagueRegistry is Ownable, ILeagueRegistry, RegistryAccessible {
 
   // Factory version
-  string internal factoryVersion; // TODO:pre:think Manan => Edge case of version not set
+  string internal factoryVersion;
   // Map of factory version to factory address
   mapping(string => address) internal factories;
   // Corresponds to `true` if class supported, false otherwise
@@ -31,6 +31,8 @@ contract LeagueRegistry is Ownable, ILeagueRegistry, RegistryAccessible {
   mapping(string => address[]) internal leagues;
   // Evaluates to `true` if league supported, `false` otherwise
   mapping(address => bool) internal supportedLeagues;
+  // Mapping of class to number of participants per fixture in leagues of class
+  mapping(string => uint) internal participantsPerFixture;
 
   // Emit when new class added
   event LogClassCreated(string _class);
@@ -42,12 +44,22 @@ contract LeagueRegistry is Ownable, ILeagueRegistry, RegistryAccessible {
   event LogFactoryVersionUpdated(string _version);
 
   /**
+   * @notice Constructor
+   * @param _registry Address of the Registry contract
+   */
+  constructor(address _registry) public RegistryAccessible(_registry) {
+
+  }
+
+  /**
    * @notice Creates a new league class
    * @param _class Class of the league (eg. tennis)
+   * @param _participantsPerFixture Number of participants per fixture in leagues of class `_class`
    */
-  function createClass(string _class) external onlyOwner {
+  function createClass(string _class, uint _participantsPerFixture) external onlyOwner {
     require(supportedClasses[_class] == false, "Registry already supports class");
     supportedClasses[_class] = true;
+    participantsPerFixture[_class] = _participantsPerFixture;
     classes.push(_class);
 
     emit LogClassCreated(_class);
@@ -57,13 +69,20 @@ contract LeagueRegistry is Ownable, ILeagueRegistry, RegistryAccessible {
    * @notice Creates a new League Contract and saves it to the registry
    * @param _class Class of the league (eg. tennis)
    * @param _name Name of the League (eg. Shanghai Masters)
-   * @param _leagueDetails Off-chain details of the league (eg. IPFS hash)
    */
-  function createLeague(string _class, string _name, bytes _leagueDetails) external onlyOwner {
+  function createLeague(string _class, string _name) external onlyOwner {
     require(supportedClasses[_class] == true, "Class not supported by Registry");
+    require(factories[factoryVersion] != address(0), "Factory version not set");
+
     ILeagueFactory _factory = ILeagueFactory(factories[factoryVersion]);
-    address _consensus = registry.getAddress("ConsensusManager");
-    address _league = _factory.deployLeague(_class, _name, _leagueDetails, _consensus, msg.sender);
+    address _league = _factory.deployLeague(
+      _class,
+      _name,
+      registry,
+      participantsPerFixture[_class],
+      msg.sender
+    );
+
     leagues[_class].push(_league);
     supportedLeagues[_league] = true;
 

@@ -4,7 +4,7 @@ module.exports = {
     dev: {
       host: 'localhost',
       port: 8545,
-      network_id: '15', // Match any network id
+      network_id: '15',
       gas: 7900000
     },
     mainnet: {
@@ -31,9 +31,9 @@ module.exports = {
       gasPrice: 10000000000
     },
     coverage: {
-      host: "localhost",
+      host: 'localhost',
       port: 8545,
-      network_id: "*",
+      network_id: '15',
       gas: 0xffffffff
     }
   },

@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/fansunite/fansunite-core.svg?branch=master)](https://travis-ci.org/fansunite/fansunite-core)
-[![Coverage Status](https://coveralls.io/repos/github/fansunite/fansunite-core/badge.svg?branch=master)](https://coveralls.io/github/fansunite/fansunite-core?branch=master)
+[![Build Status](https://travis-ci.org/fansunite/fansunite-core.svg?branch=bet-manager/master)](https://travis-ci.org/fansunite/fansunite-core)
+[![Coverage Status](https://coveralls.io/repos/github/fansunite/fansunite-core/badge.svg?branch=bet-manager/master)](https://coveralls.io/github/fansunite/fansunite-core?branch=master)
 
 ![Fansunite logo](fansunite.png)
 
