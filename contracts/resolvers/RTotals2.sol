@@ -16,6 +16,8 @@ contract RTotals2 is IResolver, BaseResolver {
 
   uint public TOTAL_DECIMALS = 2;
 
+  // NOTE This is a HIGHLY experimental resolver, do NOT use in production
+
   /**
    * @notice Constructor
    * @param _version Base version Resolver supports
@@ -26,11 +28,11 @@ contract RTotals2 is IResolver, BaseResolver {
    * @notice Returns the Result of a Totals bet
    * @param _league Address of league
    * @param _fixture Id of fixture
-   * @param _bParticipant bet payload encoded, participant id (backer's pick) or 0 (for draw)
+   * @param _bParticipant bet payload encoded, participant id or 0 (for team total)
    * @param _bTotal bet payload encoded, total score
    * @param _bOver bey payload encoded, `true` if score should be over `_bTotal`, `false` otherwise
    * @param _rScores Array of scores, matching index as fixture.participants (resolution data)
-   * @return Bet outcome compliant with IResolver Specs [1,2]
+   * @return Bet outcome compliant with IResolver Specs [1,2,3,4,5]
    */
   function resolve(
     address _league,
@@ -44,7 +46,6 @@ contract RTotals2 is IResolver, BaseResolver {
     view
     returns (uint)
   {
-    // TODO HIGHLY experimental, do NOT use in production
     uint _score;
 
     var (, _participants,) = ILeague001(_league).getFixture(_fixture);
