@@ -16,6 +16,7 @@ import "./libraries/SignatureLib.sol";
 
 import "./utils/RegistryAccessible.sol";
 import "./utils/ChainSpecifiable.sol";
+import "./interfaces/IResolverRegistry.sol";
 
 /**
  * @title Bet Manger Contract
@@ -221,16 +222,17 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
    * @param _bet Bet struct
    */
   function _validateBet(BetLib.Bet memory _bet) internal view {
-    ILeagueRegistry _leagueRegistry = ILeagueRegistry(registry.getAddress("LeagueRegistry"));
+    address _leagueRegistry = registry.getAddress("LeagueRegistry");
+    address _resolverRegistry = registry.getAddress("ResolverRegistry");
     ILeague _league = ILeague(_bet.league);
 
     require(
-      _leagueRegistry.isLeagueRegistered(_bet.league),
+      ILeagueRegistry(_leagueRegistry).isLeagueRegistered(_bet.league),
       "League is not registered with FansUnite"
     );
     require(
-      _league.isResolverRegistered(_bet.resolver),
-      "Resolver is not registered with FansUnite"
+      IResolverRegistry(_resolverRegistry).isResolverUsed(_bet.league, _bet.resolver),
+      "Resolver is not usable with league"
     );
     require(
       _league.isFixtureScheduled(_bet.fixture),

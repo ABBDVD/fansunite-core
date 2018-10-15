@@ -76,7 +76,7 @@ contract('BetManager', async accounts => {
 
     // populate league
     league = League.at(leagueAddress);
-    await league.registerResolver(resolver.address, {from: owner});
+    await resolverRegistry.useResolver(leagueAddress, resolver.address, {from: owner});
     await league.addSeason(2018, {from: owner});
     await league.addParticipant('Leicester City', '0x00', {from: owner});
     await league.addParticipant('Manchester United', '0x00', {from: owner});
@@ -335,7 +335,7 @@ contract('BetManager', async accounts => {
           const resolver = await Resolver.new('0.0.1');
           await resolverRegistry.addResolver(className, resolver.address, {from: owner});
           await resolverRegistry.registerResolver(className, resolver.address, {from: owner});
-          await league.registerResolver(resolver.address, {from: owner});
+          await resolverRegistry.useResolver(league.address, resolver.address, {from: owner});
           await league.pushResolution(1, resolver.address, web3.eth.abi.encodeParameters(['uint8'], ['1']));
 
           const bet = await betFactory.generate({resolver: resolver.address});

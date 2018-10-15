@@ -29,7 +29,7 @@ contract LeagueFactory001 is ILeagueFactory {
     external
     returns (address)
   {
-    League _league = new League(_class, _name, "0.0.1", _registry, _participantsPerFixture);
+    League _league = new League(_class, _name, _registry, _participantsPerFixture);
     _league.transferOwnership(_owner);
     return _league;
   }

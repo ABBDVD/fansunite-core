@@ -1,10 +1,9 @@
 pragma solidity ^0.4.24;
 
 import "../interfaces/IResolver.sol";
-import { ILeague001 as ILeague } from "../leagues/ILeague001.sol";
+import "../leagues/ILeague001.sol";
 
 import "./BaseResolver.sol";
-
 
 /**
  * @title MoneyLine Resolver
@@ -31,7 +30,7 @@ contract RMoneyLine2 is IResolver, BaseResolver {
     view
     returns (uint)
   {
-    var (, _participants,) = ILeague(_league).getFixture(_fixture);
+    var (, _participants,) = ILeague001(_league).getFixture(_fixture);
 
     if (_bWinner == 0)
       return _scores[0] == _scores[1] ? 2 : 1;
@@ -48,7 +47,7 @@ contract RMoneyLine2 is IResolver, BaseResolver {
    * @return `true` if bet payload valid, `false` otherwise
    */
   function validate(address _league, uint _fixture, uint _winner) external view returns (bool) {
-    return _winner == 0 || ILeague(_league).isParticipantScheduled(_winner, _fixture);
+    return _winner == 0 || ILeague001(_league).isParticipantScheduled(_winner, _fixture);
   }
 
   /**
@@ -90,7 +89,7 @@ contract RMoneyLine2 is IResolver, BaseResolver {
    * @return Description of the resolver
    */
   function getDescription() external view returns (string) {
-    return "Common MoneyLine Resolver: Betting on who wins the fixture";
+    return "Common MoneyLine Resolver for two player leagues: Betting on who wins the fixture";
   }
 
   /**

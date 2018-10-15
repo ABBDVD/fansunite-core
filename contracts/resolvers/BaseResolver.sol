@@ -1,14 +1,15 @@
 pragma solidity ^0.4.24;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "../interfaces/IResolver.sol";
+
+import "../interfaces/ILeague.sol";
 
 
 /**
  * @title BaseResolver
  * @dev (Abstract) BaseResolver implements functionality that all resolvers will need
  */
-contract BaseResolver is Ownable, IResolver {
+contract BaseResolver is Ownable {
 
   // League versions supported by RMoneyLine
   mapping(string => bool) internal versions;
@@ -30,15 +31,19 @@ contract BaseResolver is Ownable, IResolver {
   function supportVersion(string _version) external onlyOwner {
     require(versions[_version] == false, "Resolver supports version already");
     versions[_version] = true;
+
     emit LogSupportVersion(_version);
   }
 
   /**
-   * @notice Checks whether resolver works with a specific league version
-   * @param _version League version
-   * @return `true` if resolver supports league version `_version`, `false` otherwise
+   * @notice Checks whether resolver supports a specific league
+   * @param _league Address of league contract
+   * @return `true` if resolver supports league `_league`, `false` otherwise
    */
-  function doesSupportVersion(string _version) external view returns (bool) {
+  function doesSupportLeague(address _league) external view returns (bool) {
+    string memory _version = ILeague(_league).getVersion();
+    // TODO other sanity checks
+
     return versions[_version];
   }
 

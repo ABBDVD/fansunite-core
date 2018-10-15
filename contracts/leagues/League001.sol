@@ -15,13 +15,11 @@ import { LeagueLib001 as L } from "./LeagueLib001.sol";
  */
 contract League001 is Ownable, ILeague001, BaseLeague {
 
+  // League version
+  string internal VERSION = "0.0.1";
+
   // Number of Participants in each fixture
   uint internal PARTICIPANTS_PER_FIXTURE;
-
-  // Resolver addresses correspond to `true` if registered with league, `false` otherwise
-  mapping(address => bool) internal registeredResolvers;
-  // List of resolver addresses registered with league
-  address[] internal resolvers;
 
   // Season corresponds to `true` if exists, `false` otherwise
   mapping(uint16 => bool) internal supportedSeasons;
@@ -46,8 +44,6 @@ contract League001 is Ownable, ILeague001, BaseLeague {
   // fixture => resolver => boolean (whether pushed or not)
   mapping(uint => mapping(address => bool)) internal pushed;
 
-  // Emit when new Resolver added
-  event LogResolverRegistered(address _resolver);
   // Emit when new season added
   event LogSeasonAdded(uint16 indexed _year);
   // Emit when new fixture added
@@ -61,19 +57,17 @@ contract League001 is Ownable, ILeague001, BaseLeague {
    * @notice Constructor
    * @param _class Class of league
    * @param _name Name of league
-   * @param _version Version of league
    * @param _registry Address of the FansUnite Registry Contact
    * @param _participantsPerFixture Number of participants allowed per fixture
    */
   constructor(
     string _class,
     string _name,
-    string _version,
     address _registry,
     uint _participantsPerFixture
   )
     public
-    BaseLeague(_class, _name, _version, _registry)
+    BaseLeague(_class, _name, _registry)
   {
     PARTICIPANTS_PER_FIXTURE = _participantsPerFixture;
   }
@@ -82,7 +76,10 @@ contract League001 is Ownable, ILeague001, BaseLeague {
    * @dev Throw is called by any account other than consensus
    */
   modifier onlyConsensus() {
-    require(msg.sender == registry.getAddress("ConsensusManager"));
+    require(
+      msg.sender == registry.getAddress("ConsensusManager"),
+      "Sender is not ConsensusManager"
+    );
     _;
   }
 
@@ -91,51 +88,26 @@ contract League001 is Ownable, ILeague001, BaseLeague {
   ///////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @notice Adds resolver with address `_resolver` to league
-   * @dev fails if `_resolver` is not registered with FansUnite's Resolver Registry
-   * @param _resolver Address of the resolver contract
-   */
-  function registerResolver(address _resolver) external {
-    require(
-      !_isResolverRegistered(_resolver),
-      "Resolver already registered"
-    );
-    require(
-      IResolverRegistry(registry.getAddress("ResolverRegistry")).useResolver(class, _resolver),
-      "Cannot use resolver"
-    );
-    require(
-      IResolver(_resolver).doesSupportVersion(version),
-      "Resolver does not support current league version"
-    );
-
-    registeredResolvers[_resolver] = true;
-    resolvers.push(_resolver);
-
-    emit LogResolverRegistered(_resolver);
-  }
-
-  /**
-   * @notice Adds a resolution payload for fixture with id `_fixtureId` and resolver `_resolver`
-   * @param _fixtureId Id of the fixture being resolved
+   * @notice Adds a resolution payload for fixture with id `_fixture` and resolver `_resolver`
+   * @param _fixture Id of the fixture being resolved
    * @param _resolver Address of the resolver that can resolve _payload
    * @param _payload Encoded resolution payload
+   * @dev _payload can be 0x, should result in bet cancellation
+   * @dev _payload can be 0x00..00, would be passed as valid resolution payload to resolvers
    */
-  function pushResolution(uint _fixtureId, address _resolver, bytes _payload)
+  function pushResolution(uint _fixture, address _resolver, bytes _payload)
     external
     onlyConsensus
   {
     // TODO Reduce duplication when multiple resolvers use the same payload
-    // _payload can be 0x, should result in bet cancellation
-    // _payload can be 0x00..00, would be passed as valid resolution payload to resolvers
-    require(_isFixtureScheduled(_fixtureId), "Given Fixture is not scheduled in league");
-    require(_isResolverRegistered(_resolver), "League does not support given resolver");
+    // NOTE pushResolution can be called to write and overwrite payload, by design
+    // NOTE not validating _resolver and _fixture, economical guarantee from oracles
 
-    if (!resolved[_fixtureId]) resolved[_fixtureId] = true;
-    pushed[_fixtureId][_resolver] = true;
-    resolutions[_fixtureId][_resolver] = _payload;
+    if (!resolved[_fixture]) resolved[_fixture] = true;
+    pushed[_fixture][_resolver] = true;
+    resolutions[_fixture][_resolver] = _payload;
 
-    emit LogFixtureResolved(_fixtureId, _resolver, _payload);
+    emit LogFixtureResolved(_fixture, _resolver, _payload);
   }
 
   /**
@@ -152,10 +124,11 @@ contract League001 is Ownable, ILeague001, BaseLeague {
   }
 
   /**
-   * @notice Creates a new fixture for the on-going season
+   * @notice Creates a new fixture for season `_season`
    * @param _season Season of fixture
    * @param _participants ids of participants in event
-   * @param _start Start time (unix timestamp)
+   * @param _start Start time (unix timestamp, seconds)
+   * @dev _start is rounded off to the nearest minute
    */
   function scheduleFixture(uint16 _season, uint[] _participants, uint _start) external {
     bytes32 _hash = L.hashRawFixture(_participants, _start);
@@ -194,7 +167,7 @@ contract League001 is Ownable, ILeague001, BaseLeague {
 
   /**
    * @notice Adds a new participant to the league
-   * @param _name Name of the participant - should match pattern /[a-zA-Z ]+/
+   * @param _name Name of the participant - should match pattern /^[a-zA-Z0-9.() ]+$/
    * @param _details Off-chain hash of participant details
    */
   function addParticipant(string _name, bytes _details) external onlyOwner {
@@ -222,27 +195,19 @@ contract League001 is Ownable, ILeague001, BaseLeague {
 
 
   /**
-   * @notice Gets resolution payload for fixture `_fixtureId` and resolver `_resolver`
-   * @dev Requires the fixture `_fixtureId` to be resolved for resolver `_resolver`
-   * @param _fixtureId Id of the payload's corresponding fixture
+   * @notice Gets resolution payload for fixture `_fixture` and resolver `_resolver`
+   * @dev throws if fixture `_fixture` is not resolved for resolver `_resolver`
+   * @param _fixture Id of the payload's corresponding fixture
    * @param _resolver Address of the payload's corresponding resolver
-   * @return Resolution payload for fixture `_fixtureId` and resolver `_resolver`
+   * @return Resolution payload for fixture `_fixture` and resolver `_resolver`
    */
-  function getResolution(uint _fixtureId, address _resolver) external view returns (bytes) {
+  function getResolution(uint _fixture, address _resolver) external view returns (bytes) {
     require(
-      _isFixtureResolved(_fixtureId, _resolver) == 1,
+      _isFixtureResolved(_fixture, _resolver) == 1,
       "Given resolver, for given fixture, has not been resolved"
     );
 
-    return resolutions[_fixtureId][_resolver];
-  }
-
-  /**
-   * @notice Gets all resolvers in league
-   * @return Addresses of all resolvers registered in league
-   */
-  function getResolvers() external view returns (address[]) {
-    return resolvers;
+    return resolutions[_fixture][_resolver];
   }
 
   /**
@@ -313,62 +278,53 @@ contract League001 is Ownable, ILeague001, BaseLeague {
   }
 
   /**
-   * @notice Checks if resolver with address `_resolver` is registered with league
-   * @param _resolver Address of the resolver
-   * @return `true` if resolver is registered with league, `false` otherwise
+   * @notice Checks if fixture with id `_fixture` has been scheduled in league
+   * @param _fixture Id of the fixture
+   * @return `true` if fixture with id `_fixture` is scheduled, `false` otherwise
    */
-  function isResolverRegistered(address _resolver) external view returns (bool) {
-    return _isResolverRegistered(_resolver);
+  function isFixtureScheduled(uint _fixture) external view returns (bool) {
+    return _isFixtureScheduled(_fixture);
   }
 
   /**
-   * @notice Checks if fixture with id `_id` has been scheduled in league
-   * @param _id Id of the fixture
-   * @return `true` if fixture with id `_id` is scheduled, `false` otherwise
-   */
-  function isFixtureScheduled(uint _id) external view returns (bool) {
-    return _isFixtureScheduled(_id);
-  }
-
-  /**
-   * @notice Checks if fixture with id `_id` has been resolved for resolver `_resolver`
+   * @notice Checks if fixture with id `_fixture` has been resolved for resolver `_resolver`
    * @dev A fixture is resolved if at least one resolver receives resolution payload
    * @dev It is possible that some resolvers do not get resolution payloads from oracles
-   * @param _id Id of the fixture
+   * @param _fixture Id of the fixture
    * @param _resolver Address of the resolver
-   * @return `0` if fixture is not resolved, `1` if fixture is resolved and for resolver `_resolver`,
-   *  `2` if fixture is resolved but resolver `_resolver
+   * @return `0` if fixture is not resolved, `1` if fixture is resolved for resolver `_resolver`,
+   *  `2` if fixture is resolved but not for resolver `_resolver
    */
-  function isFixtureResolved(uint _id, address _resolver) external view returns (uint8) {
-    return _isFixtureResolved(_id, _resolver);
+  function isFixtureResolved(uint _fixture, address _resolver) external view returns (uint8) {
+    return _isFixtureResolved(_fixture, _resolver);
   }
 
   /**
-   * @notice Checks if participant id `_id` is valid
-   * @param _id Id of the participant
-   * @return `true` if participant id `_id` is valid, `false` otherwise
+   * @notice Checks if participant id `_participant` is valid
+   * @param _participant Id of the participant
+   * @return `true` if participant id `_participant` is valid, `false` otherwise
    */
-  function isParticipant(uint _id) external view returns (bool) {
-    return _isParticipant(_id);
+  function isParticipant(uint _participant) external view returns (bool) {
+    return _isParticipant(_participant);
   }
 
   /**
-   * @notice Checks if participant `_participantId` is playing in fixture `_fixtureId`
-   * @param _participantId Id of the participant
-   * @param _fixtureId Id of the fixture
-   * @return `true` if participant `_participantId` is scheduled in for fixture `_fixtureId`
+   * @notice Checks if participant `_participant` is playing in fixture `_fixture`
+   * @param _participant Id of the participant
+   * @param _fixture Id of the fixture
+   * @return `true` if participant `_participant` is scheduled in for fixture `_fixture`
    */
-  function isParticipantScheduled(uint _participantId, uint _fixtureId)
+  function isParticipantScheduled(uint _participant, uint _fixture)
     external
     view
     returns (bool)
   {
-    require(_isParticipant(_participantId), "Given participant is not in league");
-    require(_isFixtureScheduled(_fixtureId), "Given fixture is not scheduled");
+    require(_isParticipant(_participant), "Given participant is not in league");
+    require(_isFixtureScheduled(_fixture), "Given fixture is not scheduled");
 
-    L.Fixture storage _fixture = fixtures[_fixtureId - 1];
-    for (uint i = 0; i < _fixture.participants.length; i++)
-      if (_fixture.participants[i] == _participantId) return true;
+    L.Fixture storage __fixture = fixtures[_fixture - 1];
+    for (uint i = 0; i < __fixture.participants.length; i++)
+      if (__fixture.participants[i] == _participant) return true;
     return false;
   }
 
@@ -377,41 +333,42 @@ contract League001 is Ownable, ILeague001, BaseLeague {
   ///////////////////////////// internal view functions /////////////////////////
   ///////////////////////////////////////////////////////////////////////////////
 
-
-  // internal isParticipant
-  function _isResolverRegistered(address _resolver) internal view returns (bool) {
-    return registeredResolvers[_resolver];
-  }
-
   // internal isFixtureScheduled
-  function _isFixtureScheduled(uint _id) internal view returns (bool) {
-    return _id > 0 && _id < fixtures.length + 1;
+  function _isFixtureScheduled(uint _fixture) internal view returns (bool) {
+    return _fixture > 0 && _fixture < fixtures.length + 1;
   }
 
   // internal isFixtureResolved
-  function _isFixtureResolved(uint _id, address _resolver) internal view returns (uint8) {
-    if (!resolved[_id])
+  function _isFixtureResolved(uint _fixture, address _resolver) internal view returns (uint8) {
+    if (!resolved[_fixture])
       return 0;
-    return pushed[_id][_resolver] ? 1 : 2;
+    return pushed[_fixture][_resolver] ? 1 : 2;
   }
 
   // internal isParticipant
-  function _isParticipant(uint _id) internal view returns (bool) {
-    return _id > 0 && _id < participants.length + 1;
+  function _isParticipant(uint _participant) internal view returns (bool) {
+    return _participant > 0 && _participant < participants.length + 1;
   }
 
   // validate all participants
   function _areParticipants(uint[] _participants) internal view returns (bool) {
-    bool _valid = true;
     for (uint i = 0; i < _participants.length; i++) {
-      _valid = _valid && _isParticipant(_participants[i]);
+      if (!_isParticipant(_participants[i])) return false;
     }
-    return _valid;
+    return true;
   }
 
   // internal isSeasonSupported
   function _isSeasonSupported(uint16 _year) internal view returns (bool) {
     return supportedSeasons[_year];
+  }
+
+  /**
+   * @notice Gets the league version (matches LeagueFactory version)
+   * @return Version of the league protocol
+   */
+  function getVersion() external view returns (string) {
+    return VERSION;
   }
 
 }
