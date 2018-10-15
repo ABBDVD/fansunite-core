@@ -75,7 +75,7 @@ contract('RMoneyLine2', async accounts => {
     });
 
     it('should return the correct type', async () => {
-      assert.equal(await instance.getType.call(), 'Moneyline');
+      assert.equal(await instance.getType.call(), 'Moneyline2');
     });
 
     it('should return the correct details', async () => {
