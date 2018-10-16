@@ -38,6 +38,9 @@ module.exports = function(deployer, network, accounts) {
             });
         })
         .then(() => {
+          return deployer.deploy(FanToken);
+        })
+        .then(() => {
           return deployer.deploy(ResolverRegistry, Registry.address);
         })
         .then(() => {
@@ -73,6 +76,7 @@ module.exports = function(deployer, network, accounts) {
           console.log('\n');
           console.log('----- FansUnite Core Contracts -----');
           console.log('*** FansUnite Organization: ', accounts[0], '***');
+          console.log('*** FansUnite Token: ', FanToken.address, '***');
           console.log('*** FansUnite Registry Address: ', Registry.address, '***');
           console.log('*** LeagueRegistry Address: ', LeagueRegistry.address, '***');
           console.log('*** ResolverRegistry Address: ', ResolverRegistry.address, '***');
