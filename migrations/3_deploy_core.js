@@ -1,4 +1,5 @@
 let Registry = artifacts.require('./Registry.sol');
+let FanToken = artifacts.require('./tokens/FanToken.sol');
 let LeagueRegistry = artifacts.require('./LeagueRegistry.sol');
 let ResolverRegistry = artifacts.require('./ResolverRegistry.sol');
 let LeagueLib = artifacts.require('./leagues/LeagueLib001.sol');
@@ -63,6 +64,9 @@ module.exports = function(deployer, network, accounts) {
         })
         .then(() => {
           return registry.changeAddress("BetManager", BetManager.address);
+        })
+        .then(() => {
+          return registry.changeAddress("FanToken", FanToken.address);
         })
         .then(() => {
           /* eslint no-console: "off" */
