@@ -1,4 +1,5 @@
 let Registry = artifacts.require('./Registry.sol');
+let FanToken = artifacts.require('./tokens/FanToken.sol');
 let LeagueRegistry = artifacts.require('./LeagueRegistry.sol');
 let ResolverRegistry = artifacts.require('./ResolverRegistry.sol');
 let LeagueLib = artifacts.require('./leagues/LeagueLib001.sol');
@@ -37,6 +38,9 @@ module.exports = function(deployer, network, accounts) {
             });
         })
         .then(() => {
+          return deployer.deploy(FanToken);
+        })
+        .then(() => {
           return deployer.deploy(ResolverRegistry, Registry.address);
         })
         .then(() => {
@@ -65,10 +69,14 @@ module.exports = function(deployer, network, accounts) {
           return registry.changeAddress("BetManager", BetManager.address);
         })
         .then(() => {
+          return registry.changeAddress("FanToken", FanToken.address);
+        })
+        .then(() => {
           /* eslint no-console: "off" */
           console.log('\n');
           console.log('----- FansUnite Core Contracts -----');
           console.log('*** FansUnite Organization: ', accounts[0], '***');
+          console.log('*** FansUnite Token: ', FanToken.address, '***');
           console.log('*** FansUnite Registry Address: ', Registry.address, '***');
           console.log('*** LeagueRegistry Address: ', LeagueRegistry.address, '***');
           console.log('*** ResolverRegistry Address: ', ResolverRegistry.address, '***');
