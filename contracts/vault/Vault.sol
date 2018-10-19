@@ -19,7 +19,7 @@ contract Vault is Ownable, IVault, RegistryAccessible {
 
   address constant public ETH = 0x0;
 
-  // TODO:v1:security Manan => Safer to set allowance limits, in case of exploits
+  // TODO Manan => Safer to set allowance limits
   // Mapping of approved spenders by user
   mapping (address => mapping (address => bool)) private approved; // user => sender => bool
   // Mapping of tokens balances by token address, by user
@@ -130,10 +130,6 @@ contract Vault is Ownable, IVault, RegistryAccessible {
    * @param _spender Address of spender being added
    */
   function addSpender(address _spender) external onlyOwner {
-    require(
-      registry.getAddress("BetManager") == _spender,
-      "Spender must be an active Bet Manager"
-    );
     spenders[_spender] = true;
     emit LogSpenderAdded(_spender);
   }
