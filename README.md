@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/fansunite/fansunite-core.svg?branch=master)](https://travis-ci.org/fansunite/fansunite-core)
-[![Coverage Status](https://coveralls.io/repos/github/fansunite/fansunite-core/badge.svg?branch=master)](https://coveralls.io/github/fansunite/fansunite-core?branch=master)
+[![Build Status](https://travis-ci.org/fansunite/fansunite-core.svg?branch=development)](https://travis-ci.org/fansunite/fansunite-core)
+[![Coverage Status](https://coveralls.io/repos/github/fansunite/fansunite-core/badge.svg?branch=development)](https://coveralls.io/github/fansunite/fansunite-core?branch=development)
 
 ![Fansunite logo](fansunite.png)
 
@@ -14,7 +14,7 @@ Fansunite Core defines a protocol to facilitate trustless wagering of any ERC20 
 ### BetManager
 [TODO: Team]
 
-### Vault
+### FanVault
 [TODO: Team]
 
 ### League
@@ -32,3 +32,5 @@ Fansunite Core defines a protocol to facilitate trustless wagering of any ERC20 
 ### ResolverRegistry
 [TODO: Team]
 
+### Registry
+[TODO: Team]

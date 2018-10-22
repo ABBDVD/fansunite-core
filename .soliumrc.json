@@ -18,6 +18,15 @@
     ],
     "no-empty-blocks": [
       "off"
+    ],
+    "security/no-inline-assembly": [
+      "off"
+    ],
+    "no-unused-vars": [
+      "warning"
+    ],
+    "no-experimental": [
+      "off"
     ]
   }
 }

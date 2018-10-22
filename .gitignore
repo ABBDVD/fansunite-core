@@ -17,7 +17,7 @@ lib-cov
 # Coverage directory used by tools like istanbul
 coverage
 coverage.json
-.coveralls.yml
+.coverall.yml
 
 # nyc test coverage
 .nyc_output
@@ -35,4 +35,5 @@ node_modules/
 build/
 TODO.md
 ISSUES.md
+QUESTIONS.md
 .swp

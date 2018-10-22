@@ -12,9 +12,11 @@ contract Registry is Ownable, IRegistry {
   Valid Address Keys
   leagueRegistry = getAddress("LeagueRegistry")
   resolverRegistry = getAddress("ResolverRegistry")
-  fanToken = getAddress("FanToken")
   betManager = getAddress("BetManager")
+  consensusManager = getAddress("ConsensusManager")
+  fanToken = getAddress("FanToken")
   fanVault = getAddress("FanVault")
+  fanOrg = getAddress("FanOrg")
   */
 
   mapping (bytes32 => address) public storedAddresses;
@@ -28,7 +30,7 @@ contract Registry is Ownable, IRegistry {
    * @return Address of contract with namekey `_namekey`
    */
   function getAddress(string _nameKey) public view returns (address) {
-    require(validAddressKeys[keccak256(bytes(_nameKey))]);
+    require(validAddressKeys[keccak256(bytes(_nameKey))], "Namekey must be valid");
     return storedAddresses[keccak256(bytes(_nameKey))];
   }
 

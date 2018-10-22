@@ -1,7 +1,5 @@
 pragma solidity ^0.4.24;
 
-import "./ILeague.sol";
-
 
 /**
  * @title Interface for the fansunite league registry contract
@@ -14,42 +12,46 @@ contract ILeagueRegistry {
   /**
    * @notice Creates a new league class
    * @param _class Class of the league (eg. tennis)
+   * @param _participantsPerFixture Number of participants per fixture in leagues of class `_class`
    */
-  function createClass(string _class) external;
+  function createClass(string _class, uint _participantsPerFixture) external;
 
   /**
    * @notice Creates a new League Contract and saves it to the registry
    * @param _class Class of the league (eg. tennis)
    * @param _name Name of the League (eg. Shanghai Masters)
-   * @param _leagueDetails Off-chain details of the league (eg. IPFS hash)
    */
-  function createLeague(string _class, string _name, bytes _leagueDetails) external;
+  function createLeague(string _class, string _name) external;
 
   /**
-   * @notice Updates leagueFactoryVersion to `_version` and factoryAddress to `_leagueFactory`
+   * @notice Upsert version `_version` to correspond factoryAddress `_leagueFactory`
    * @param _leagueFactory Address of the LeagueFactory for `_version`
    * @param _version Version string for leagueFactory
    */
-  function setLeagueFactoryVersion(address _leagueFactory, string _version) external;
+  function addFactory(address _leagueFactory, string _version) external;
 
   /**
-   * @notice Gets Class with id `_id`
-   * @param _id id of the class
-   * @return Class id
-   * @return Class name
-   * @return Ids of league in class
+   * @notice Updates leagueFactoryVersion to `_version` if supported
+   * @param _version Version string for leagueFactory
    */
-  function getClass(uint _id) external view returns (uint, string, uint[]);
+  function setFactoryVersion(string _version) external;
+
+  /**
+   * @notice Gets Class with name `_class`
+   * @param _class Class name
+   * @return Class name
+   * @return Address of all leagues in class
+   */
+  function getClass(string _class) external view returns (string, address[]);
 
   /**
    * @notice Gets league with id `_id`
-   * @param _id id of the league
-   * @return League id
+   * @param _league Address of the league
    * @return League address
    * @return League name
    * @return League details (hash)
    */
-  function getLeague(uint _id) external view returns (uint, address, string, bytes);
+  function getLeague(address _league) external view returns (address, string, bytes);
 
   /**
    * @notice Gets the current version used to deploy new leagues contracts

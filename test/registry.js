@@ -1,44 +1,59 @@
-/* global assert, contract, it */
+/* global assert, contract, it, artifacts */
 
 const Registry = artifacts.require('./Registry.sol');
 const { ensureException } = require('./helpers/utils');
 
 contract('Registry', async accounts => {
 
-  it('should successfully add address for namekey that does not exist in registry', async () => {
-    let instance = await Registry.deployed();
+  let owner = accounts[0]
+    , dummyAddressA = "0x1111111111111111111111111111111111111111"
+    , dummyAddressB = "0x2222222222222222222222222222222222222222"
+    , instance;
 
+  before('setup contract instance', async () => {
+    instance = await Registry.deployed();
+  });
+
+  it('should successfully add address for new namekey', async () => {
     let namekey = "BetManager";
-    let address = accounts[1];
+    let address = dummyAddressA;
 
-    await instance.changeAddress(namekey, address, { from: accounts[0] });
+    await instance.changeAddress(namekey, address, { from: owner });
     let result = await instance.getAddress.call(namekey);
     assert.equal(result, address, 'registry does not add address for new namekey');
   });
 
 
   it('should successfully change address for existing namekey', async () => {
-    let instance = await Registry.deployed();
-
     let namekey = "LeagueRegistry";
-    let address = accounts[1];
-    let new_address = accounts[2];
+    let address = dummyAddressA;
+    let newAddress = dummyAddressB;
 
-    await instance.changeAddress(namekey, address, { from: accounts[0] });
+    await instance.changeAddress(namekey, address, { from: owner });
     let result = await instance.getAddress.call(namekey);
     assert.equal(result, address, 'registry does not add address for new namekey');
 
-    await instance.changeAddress(namekey, new_address, { from: accounts[0] });
+    await instance.changeAddress(namekey, newAddress, { from: owner });
     result = await instance.getAddress.call(namekey);
-    assert.equal(result, new_address, 'registry does not change address for existing namekey');
+    assert.equal(result, newAddress, 'registry does not change address for existing namekey');
   });
 
-  it('should throw exception when retrieving address for namekey that does not exist', async () => {
-    let instance = await Registry.deployed();
-
+  it('should throw exception when retrieving address for namekey that dne', async () => {
     let namekey = "DoesNotExist";
     try {
       await instance.getAddress.call(namekey);
+    } catch (err) {
+      ensureException(err);
+      return;
+    }
+
+    assert.fail('Expected throw not received');
+  });
+
+  it('should fail when non-owner tries to update address', async () => {
+    let namekey = "DoesNotExist";
+    try {
+      await instance.changeAddress(namekey, dummyAddressA, { from: accounts[1] }); // Non-owner
     } catch (err) {
       ensureException(err);
       return;
