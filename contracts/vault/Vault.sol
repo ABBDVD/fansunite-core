@@ -130,6 +130,7 @@ contract Vault is Ownable, IVault, RegistryAccessible {
    * @param _spender Address of spender being added
    */
   function addSpender(address _spender) external onlyOwner {
+    require(_spender != address(0), "Spender must be non-zero address");
     spenders[_spender] = true;
     emit LogSpenderAdded(_spender);
   }

@@ -274,7 +274,7 @@ contract('Vault', async accounts => {
         assert.fail('Expected throw not received');
       });
 
-      it('should revert if attempting to add a spender that is not the current BetManager', async () => {
+      it('should revert if attempting to add null address', async () => {
         try {
           await instance.addSpender(NULL_ADDRESS, {from: owner});
         } catch (err) {
