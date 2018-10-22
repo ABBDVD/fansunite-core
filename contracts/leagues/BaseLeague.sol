@@ -40,7 +40,7 @@ contract BaseLeague is Ownable, RegistryAccessible {
 
   /**
    * @notice Gets the name of the league
-   * @return UTF-8 encoded name of league
+   * @return Name of league
    */
   function getName() external view returns (string) {
     return name;
@@ -48,15 +48,15 @@ contract BaseLeague is Ownable, RegistryAccessible {
 
   /**
    * @notice Gets the class of the league
-   * @return UTF-8 encoded class of league
+   * @return Class to which league belongs
    */
   function getClass() external view returns (string) {
     return class;
   }
 
   /**
-   * @notice Gets the league details
-   * @return IPFS hash with league details
+   * @notice Gets the off-chain hash of league details
+   * @return Off-chain hash of league details
    */
   function getDetails() external view returns (bytes) {
     return details;

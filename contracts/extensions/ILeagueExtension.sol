@@ -20,7 +20,7 @@ contract ILeagueExtension {
    * @return Participants Ids by fixture Ids
    * @return Start times
    */
-  function getFixtures(address _league, uint16 _season)
+  function getFixtures(address _league, uint _season)
     external
     view
     returns (uint[], uint[][], uint[]);

@@ -22,11 +22,11 @@ contract League001 is Ownable, ILeague001, BaseLeague {
   uint internal PARTICIPANTS_PER_FIXTURE;
 
   // Season corresponds to `true` if exists, `false` otherwise
-  mapping(uint16 => bool) internal supportedSeasons;
+  mapping(uint => bool) internal supportedSeasons;
   // Season corresponds to list of fixture ids
-  mapping(uint16 => uint[]) internal seasons;
+  mapping(uint => uint[]) internal seasons;
   // List of seasons
-  uint16[] internal seasonList;
+  uint[] internal seasonList;
   // List of all fixtures ever in league
   L.Fixture[] internal fixtures;
   // List of participants ever played in league
@@ -45,7 +45,7 @@ contract League001 is Ownable, ILeague001, BaseLeague {
   mapping(uint => mapping(address => bool)) internal pushed;
 
   // Emit when new season added
-  event LogSeasonAdded(uint16 indexed _year);
+  event LogSeasonAdded(uint indexed _year);
   // Emit when new fixture added
   event LogFixtureAdded(uint _id);
   // Emit when new participant added
@@ -114,7 +114,7 @@ contract League001 is Ownable, ILeague001, BaseLeague {
    * @notice Starts a new season with year `_year`
    * @param _year Year of the first fixture in new season
    */
-  function addSeason(uint16 _year) external {
+  function addSeason(uint _year) external {
     require(!_isSeasonSupported(_year), "Season already supported");
 
     supportedSeasons[_year] = true;
@@ -130,7 +130,7 @@ contract League001 is Ownable, ILeague001, BaseLeague {
    * @param _start Start time (unix timestamp, seconds)
    * @dev _start is rounded off to the nearest minute
    */
-  function scheduleFixture(uint16 _season, uint[] _participants, uint _start) external {
+  function scheduleFixture(uint _season, uint[] _participants, uint _start) external {
     bytes32 _hash = L.hashRawFixture(_participants, _start);
 
     require(
@@ -214,7 +214,7 @@ contract League001 is Ownable, ILeague001, BaseLeague {
    * @notice Gets a list of all seasons in league
    * @return Years of all seasons in league
    */
-  function getSeasons() external view returns (uint16[]) {
+  function getSeasons() external view returns (uint[]) {
     return seasonList;
   }
 
@@ -224,7 +224,7 @@ contract League001 is Ownable, ILeague001, BaseLeague {
    * @return Year of the season
    * @return Ids fixtures scheduled in season `_year`
    */
-  function getSeason(uint16 _year) external view returns (uint16, uint[]) {
+  function getSeason(uint _year) external view returns (uint, uint[]) {
     require(_isSeasonSupported(_year), "League does not support given season");
 
     return (_year, seasons[_year]);
@@ -359,7 +359,7 @@ contract League001 is Ownable, ILeague001, BaseLeague {
   }
 
   // internal isSeasonSupported
-  function _isSeasonSupported(uint16 _year) internal view returns (bool) {
+  function _isSeasonSupported(uint _year) internal view returns (bool) {
     return supportedSeasons[_year];
   }
 
