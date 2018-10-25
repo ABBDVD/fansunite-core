@@ -13,11 +13,10 @@ import { LeagueLib001 as L } from "./LeagueLib001.sol";
 /**
  * @title League Contract
  */
-contract League001 is Ownable, ILeague001, BaseLeague {
+contract League001 is ILeague001, BaseLeague {
 
   // League version
   string internal VERSION = "0.0.1";
-
   // Number of Participants in each fixture
   uint internal PARTICIPANTS_PER_FIXTURE;
 
@@ -28,16 +27,17 @@ contract League001 is Ownable, ILeague001, BaseLeague {
   // List of seasons
   uint[] internal seasonList;
   // List of all fixtures ever in league
+  // Fixture id is (i + 1), where i is the index of fixture
   L.Fixture[] internal fixtures;
   // List of participants ever played in league
+  // Participant id is (i + 1), where i is the index of participant
   L.Participant[] internal participants;
 
   // Mapping of fixture hashes to whether they exist, to avoid duplicates
-  // NOTE Think about converting uint fixture ids to bytes32 hashes?
   mapping(bytes32 => bool) duplicateManager;
 
   // Fixture ids correspond to `true` if resolved, `false` if not resolved
-  // Being resolved means at least one resolution has been pushed
+  // Being resolved means at least one resolution has been pushed by ConsensusManager
   mapping(uint => bool) internal resolved;
   // fixture => resolver => payload
   mapping(uint => mapping(address => bytes)) internal resolutions;
