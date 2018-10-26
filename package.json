@@ -21,7 +21,9 @@
     "migrate:ropsten": "truffle migrate --network=ropsten --reset --all",
     "migrate:kovan": "truffle migrate --network=kovan --reset --all",
     "migrate:mainnet": "truffle migrate --network=mainnet",
-    "console:dev": "truffle console --network=dev"
+    "console:dev": "truffle console --network=dev",
+    "surya:report": "surya mdreport suryareport.md contracts/**/*.sol && open suryareport.md",
+    "surya:describe": "surya describe contracts/**/*.sol"
   },
   "repository": {
     "type": "git",
@@ -39,6 +41,7 @@
     "ganache-cli": "^6.1.4",
     "solidity-coverage": "^0.5.5",
     "solium": "^1.1.7",
+    "surya": "^0.2.7",
     "truffle": "^4.1.14",
     "truffle-flattener": "^1.2.9"
   },
