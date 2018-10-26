@@ -10,13 +10,13 @@ contract IRegistry {
    * @notice get the contract address for `_namekey`
    * @param _nameKey is the key for the contract address mapping
    */
-  function getAddress(string _nameKey) public view returns(address);
+  function getAddress(string _nameKey) external view returns(address);
 
   /**
    * @notice change the contract address for `_namekey` to `_newAddress`
    * @param _nameKey is the key for the contract address mapping
    * @param _newAddress is the new contract address
    */
-  function changeAddress(string _nameKey, address _newAddress) public;
+  function changeAddress(string _nameKey, address _newAddress) external;
 
 }

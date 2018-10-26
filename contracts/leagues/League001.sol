@@ -328,6 +328,14 @@ contract League001 is ILeague001, BaseLeague {
     return false;
   }
 
+  /**
+   * @notice Gets the league version (matches LeagueFactory version)
+   * @return Version of the league protocol
+   */
+  function getVersion() external view returns (string) {
+    return VERSION;
+  }
+
 
   ///////////////////////////////////////////////////////////////////////////////
   ///////////////////////////// internal view functions /////////////////////////
@@ -361,14 +369,6 @@ contract League001 is ILeague001, BaseLeague {
   // internal isSeasonSupported
   function _isSeasonSupported(uint _year) internal view returns (bool) {
     return supportedSeasons[_year];
-  }
-
-  /**
-   * @notice Gets the league version (matches LeagueFactory version)
-   * @return Version of the league protocol
-   */
-  function getVersion() external view returns (string) {
-    return VERSION;
   }
 
 }

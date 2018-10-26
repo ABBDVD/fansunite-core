@@ -87,7 +87,7 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
     external
   {
     BetLib.Bet memory _bet = BetLib.generate(_subjects, _params, _payload);
-    bytes32 _hash = BetLib.hash(_bet, chainId, _nonce);
+    bytes32 _hash = BetLib.hash(_bet, getChainId(), _nonce);
 
     _authenticateBet(_bet, _hash, _signature);
     _authorizeBet(_bet);
@@ -114,7 +114,7 @@ contract BetManager is Ownable, IBetManager, RegistryAccessible, ChainSpecifiabl
    */
   function claimBet(address[5] _subjects, uint[4] _params, uint _nonce, bytes _payload) external {
     BetLib.Bet memory _bet = BetLib.generate(_subjects, _params, _payload);
-    bytes32 _hash = BetLib.hash(_bet, chainId, _nonce);
+    bytes32 _hash = BetLib.hash(_bet, getChainId(), _nonce);
 
     require(unclaimed[_hash], "Bet with given parameters either claimed or never submitted");
 

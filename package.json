@@ -22,8 +22,8 @@
     "migrate:kovan": "truffle migrate --network=kovan --reset --all",
     "migrate:mainnet": "truffle migrate --network=mainnet",
     "console:dev": "truffle console --network=dev",
-    "surya:report": "surya mdreport suryareport.md contracts/**/*.sol && open suryareport.md",
-    "surya:describe": "surya describe contracts/**/*.sol"
+    "surya:report": "surya mdreport suryareport.md contracts/**/*.sol contracts/*.sol",
+    "surya:describe": "surya describe contracts/**/*.sol contracts/*.sol"
   },
   "repository": {
     "type": "git",

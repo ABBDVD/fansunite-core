@@ -23,5 +23,6 @@ contract ILeagueFactory {
     address _owner
   )
     external
+    view
     returns (address);
 }

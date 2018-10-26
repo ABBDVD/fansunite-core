@@ -27,6 +27,7 @@ contract LeagueFactory001 is ILeagueFactory {
     address _owner
   )
     external
+    view
     returns (address)
   {
     League _league = new League(_class, _name, _registry, _participantsPerFixture);
