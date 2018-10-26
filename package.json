@@ -39,7 +39,8 @@
     "ganache-cli": "^6.1.4",
     "solidity-coverage": "^0.5.5",
     "solium": "^1.1.7",
-    "truffle": "^4.1.14"
+    "truffle": "^4.1.14",
+    "truffle-flattener": "^1.2.9"
   },
   "dependencies": {
     "bignumber.js": "^7.2.1",
