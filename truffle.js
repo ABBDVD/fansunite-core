@@ -1,3 +1,6 @@
+require('dotenv').config();
+
+const HDWalletProvider = require("truffle-hdwallet-provider");
 
 module.exports = {
   networks: {
@@ -23,12 +26,12 @@ module.exports = {
       gasPrice: 150000000000
     },
     kovan: {
-      // provider: new HDWalletProvider(...),
+      provider: new HDWalletProvider(process.env.MNEMONIC, `https://kovan.infura.io/${process.env.INFURA_KEY}`),
       host: 'localhost',
       port: 8545,
       network_id: '42',
       gas: 7900000,
-      gasPrice: 10000000000
+      gasPrice: 150000000000
     },
     coverage: {
       host: 'localhost',
