@@ -10,7 +10,7 @@ Fansunite Core defines a protocol to facilitate trustless wagering of any ERC20 
 # The Fansunite Core Architecture
 The diagram below depicts a high-level view of the various modules, registries, and contracts implemented in FansUnite Core:
 
-![FansUnite Core architecture](https://github.com/fansunite/fansunite-core/blob/master/docs/images/protocol-architecture.png)
+![FansUnite Core architecture](./docs/images/protocol-architecture.png)
 
 ## Components
 
