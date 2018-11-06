@@ -31,7 +31,7 @@ The FanRegistry keeps track of the following deployed contracts on the FansUnite
 The league manages the addition of participants, fixtures and also manages resolution payloads passed in from ConsensusManager. League contracts are versioned, i.e., all leagues implement common base functionality (BaseLeague.sol) but besides that, each version of the league is free to manage fixtures,  participants and resolution data flexibly and even extend functionality.  
 
 #### League001
-League001 implements a common multi-player league. It organizes the fixtures by season, seasons and fixtures are open to be added by any account on the ethereum network; however, participants can only be added by FanOrg. Each fixture is an ordered list of Participant Ids (players participating in the fixture) and a start time. In League001, the number of participants in all fixtures must be the same and this number is set at deploy time and cannot be changed thereafter. 
+League001 implements a common multi-player league. It organizes the fixtures by seasons. Fixtures are open to be added by any account on the ethereum network; however, participants can only be added by FanOrg. Each fixture is an ordered list of Participant Ids (players participating in the fixture) and a start time. In League001, the number of participants in all fixtures must be the same and this number is set at deploy time and cannot be changed thereafter. 
 
 ### LeagueFactory
 LeagueFactory contracts implement the Factory design pattern. Each league version has one league factory contract that is used to create multiple instances of that league version. Each time a new league is created on the FansUnite protocol, LeagueFactory deploys the league contract and renounces the ownership to FanOrg. 
