@@ -55,10 +55,40 @@ The ResolverRegistry keeps track of the following on the FansUnite Protocol:
 + Resolvers that are permitted to be used by leagues
 
 ### BetManager
-[TODO: Team]
+The BetManager interface sums up the functionality of BetManager. BetManager is the core contract responsible for validating and accepting bets, managing exposures on the vault, transferring tokens on bet claims, handling fall backs in case of resolution errors etc.
 
-### ConsensusManager
-[TODO: Team]
+```solidity
+pragma solidity ^0.4.24;
+
+/**
+ * @title Interface for Bet Manger Contract
+ */
+contract IBetManager {
+
+  /**
+   * @notice Submits a bet
+   * @param _subjects Subjects associated with bet [backer, layer, token, league, resolver]
+   * @param _params Parameters associated with bet [backerStake, fixture, odds, expiration]
+   * @param _nonce Nonce, to ensure hash uniqueness
+   * @param _payload Payload for resolver
+   * @param _signature ECDSA signature along with the mode
+   */
+  function submitBet(address[5] _subjects, uint[4] _params, uint _nonce, bytes _payload, bytes _signature) external;
+
+  /**
+   * @notice Claims a bet, transfers tokens and fees based on fixture resolution
+   * @param _subjects Subjects associated with bet
+   * @param _params Parameters associated with bet
+   * @param _nonce Nonce, to ensure hash uniqueness
+   * @param _payload Payload for resolver
+   */
+  function claimBet(address[5] _subjects, uint[4] _params, uint _nonce, bytes _payload) external;
+
+  // .... more
+
+}
+
+```
 
 # Setting up FansUnite Core
 
