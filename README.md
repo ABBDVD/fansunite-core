@@ -43,10 +43,16 @@ The LeagueRegistry keeps track of the following on the FansUnite Protocol:
 + All leagues on the FansUnite protocol
 
 ### Resolver
-[TODO: Team]
+Resolvers are modular units of logic that can resolve specific bet types and are designed for extreme flexibility. A resolver contract must implement two major functions:
++ init: Each resolver must have a public init function. The init function is free to consume arbitrary parameters of any native solidity types with some [invariants](./contracts/interfaces/IResolver.sol). Init functions are responsible for resolving a specific bet type given the bet payload encoded parameters and the resolution payload encoded parameters. Each bet must result in one of [1 (lose), 2 (win), 3 (half-lose), 4 (half-win), 5 (push)].
++ validator: Each resolver must have a public validator function. The validator function is free to consume arbitrary parameters of any native solidity types with some [invariants](./contracts/interfaces/IResolver.sol). Validator functions are responsible for validating the bet payload encoded parameters for a specific bet type.      
 
 ### ResolverRegistry
-[TODO: Team]
+The ResolverRegistry keeps track of the following on the FansUnite Protocol:
++ Registered resolvers
++ Rejected resolvers
++ Resolvers that are pending registration
++ Resolvers that are permitted to be used by leagues
 
 ### BetManager
 [TODO: Team]
